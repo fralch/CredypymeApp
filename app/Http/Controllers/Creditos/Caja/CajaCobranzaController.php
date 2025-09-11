@@ -235,44 +235,46 @@ class CajaCobranzaController extends Controller
 
                     if ($value != null) {
 
-                        $conexion_1 = 'master_' .  $value->agencia_id;
-                        $main_db_1 = 'solucion_master';
+                        if (in_array($value->agencia_id, [2, 3])) {
+                            $conexion_1 = 'master_' .  $value->agencia_id;
+                            $main_db_1 = 'solucion_master';
 
-                        $credito_de = Credito::on($conexion_1)->from('credito_registros as cre_reg')
-                            ->select(
-                                'cre_reg.id',
-                                'cre_reg.capital_total',
+                            $credito_de = Credito::on($conexion_1)->from('credito_registros as cre_reg')
+                                ->select(
+                                    'cre_reg.id',
+                                    'cre_reg.capital_total',
 
-                                'cli_reg.apellido_paterno',
-                                'cli_reg.apellido_materno',
-                                'cli_reg.nombres',
-                                'cli_reg.codigo_expediente',
-                                'cli_reg.agencia_id',
+                                    'cli_reg.apellido_paterno',
+                                    'cli_reg.apellido_materno',
+                                    'cli_reg.nombres',
+                                    'cli_reg.codigo_expediente',
+                                    'cli_reg.agencia_id',
 
-                                'cre_apr.plazo',
-                                'cre_apr.periodo_pago',
+                                    'cre_apr.plazo',
+                                    'cre_apr.periodo_pago',
 
-                                'cre_tip.tipo',
+                                    'cre_tip.tipo',
 
-                                'caj_des.datos_creacion',
+                                    'caj_des.datos_creacion',
 
-                                'usu.usuario as usuario_asesor',
+                                    'usu.usuario as usuario_asesor',
 
-                                DB::raw("'$key' as vinculo")
-                            )
-                            ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
-                            ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
-                            ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
-                            ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                            ->join("$main_db_1.usuarios as usu",  'cli_reg.asesor_id', 'usu.dni')
-                            ->where([
-                                ['cre_reg.cliente_id', $value->cliente_id],
-                                ['cre_reg.estado_id', $estado_id]
-                            ])
-                            ->get();
+                                    DB::raw("'$key' as vinculo")
+                                )
+                                ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
+                                ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
+                                ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
+                                ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
+                                ->join("$main_db_1.usuarios as usu",  'cli_reg.asesor_id', 'usu.dni')
+                                ->where([
+                                    ['cre_reg.cliente_id', $value->cliente_id],
+                                    ['cre_reg.estado_id', $estado_id]
+                                ])
+                                ->get();
 
-                        foreach ($credito_de as $item) {
-                            $creditos_vinculados_de[] = $item;
+                            foreach ($credito_de as $item) {
+                                $creditos_vinculados_de[] = $item;
+                            }
                         }
                     }
 
@@ -292,46 +294,49 @@ class CajaCobranzaController extends Controller
                     $agencias = Agencia::all();
                     foreach ($agencias as $item_1) {
 
-                        $conexion_2 = 'master_' .  $item_1->id_agencia;
-                        $main_db_2 = 'solucion_master';
+                        if (in_array($item_1->id_agencia, [2, 3])) {
 
-                        $credito_a = Credito::on($conexion_2)->from('credito_registros as cre_reg')
-                            ->select(
-                                'cre_reg.id',
-                                'cre_reg.capital_total',
+                            $conexion_2 = 'master_' .  $item_1->id_agencia;
+                            $main_db_2 = 'solucion_master';
 
-                                'cli_reg.apellido_paterno',
-                                'cli_reg.apellido_materno',
-                                'cli_reg.nombres',
-                                'cli_reg.codigo_expediente',
-                                'cli_reg.agencia_id',
+                            $credito_a = Credito::on($conexion_2)->from('credito_registros as cre_reg')
+                                ->select(
+                                    'cre_reg.id',
+                                    'cre_reg.capital_total',
 
-                                'cre_apr.plazo',
-                                'cre_apr.periodo_pago',
+                                    'cli_reg.apellido_paterno',
+                                    'cli_reg.apellido_materno',
+                                    'cli_reg.nombres',
+                                    'cli_reg.codigo_expediente',
+                                    'cli_reg.agencia_id',
 
-                                'cre_tip.tipo',
+                                    'cre_apr.plazo',
+                                    'cre_apr.periodo_pago',
 
-                                'caj_des.datos_creacion',
+                                    'cre_tip.tipo',
 
-                                'usu.usuario as usuario_asesor',
+                                    'caj_des.datos_creacion',
 
-                                DB::raw("'$key' as vinculo")
-                            )
-                            ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
-                            ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
-                            ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
-                            ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                            ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
-                            ->join("$main_db_2.usuarios as usu", 'cli_reg.asesor_id', 'usu.dni')
-                            ->where([
-                                ["cre_pro.$columna_1", $agencia_id],
-                                ["cre_pro.$columna_2", $datos_credito->cliente_id],
-                                ['cre_reg.estado_id', $estado_id]
-                            ])
-                            ->get();
+                                    'usu.usuario as usuario_asesor',
 
-                        foreach ($credito_a as $item) {
-                            $creditos_vinculados_a[] = $item;
+                                    DB::raw("'$key' as vinculo")
+                                )
+                                ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
+                                ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
+                                ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
+                                ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
+                                ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
+                                ->join("$main_db_2.usuarios as usu", 'cli_reg.asesor_id', 'usu.dni')
+                                ->where([
+                                    ["cre_pro.$columna_1", $agencia_id],
+                                    ["cre_pro.$columna_2", $datos_credito->cliente_id],
+                                    ['cre_reg.estado_id', $estado_id]
+                                ])
+                                ->get();
+
+                            foreach ($credito_a as $item) {
+                                $creditos_vinculados_a[] = $item;
+                            }
                         }
                     }
                 }
