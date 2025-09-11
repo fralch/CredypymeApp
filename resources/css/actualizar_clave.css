@@ -1,0 +1,44 @@
+:root {
+    --colorCreditos1: #337ba3;
+    --colorCreditos2: #53c3ff;
+    --colorOperaciones1: #70639e;
+    --colorOperaciones2: #b6a2ff;
+    --colorGth1: #d6975f;
+    --colorGth2: #fab06f;
+    --colorLogistica1: #71bc9c;
+    --colorLogistica2: #95ffd1;
+    --colorContabilidad1: #d64355;
+    --colorContabilidad2: #ff576b;
+    --colorAlto: #89bd29;
+}
+
+html {
+    font-size: 62.5%;
+    /*Rest para REMS - 62.5% = 10px de 16px*/
+}
+
+body {
+    margin: 0;
+    background-image: url(/public/images/home/portada-sistema.svg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #244b9a;
+}
+
+.header {
+    text-align: center;
+    height: 6rem;
+}
+
+.logo-principal {
+    margin-top: 3rem;
+    width: 70%;
+}
+.swal2-html-container {
+    font-size: 1.5rem !important;
+}
+.swal2-title {
+    font-size: 2rem !important;
+}

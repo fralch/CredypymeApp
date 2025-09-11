@@ -1,0 +1,163 @@
+@charset "UTF-8";
+/* PRIME DATATABLE */
+:root {
+    --color-alto: var(--colorAlto);
+    --color-medio: var(--colorMedio);
+    --color-bajo: var(--colorBajo);
+    --letra-table: var(--tamañoLetraTable);
+    --main-1: var(--colorAlto);
+    --main-2: #404040;
+}
+
+.p-datatable {
+    font-family: inherit;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+    padding: 5px !important;
+    font-size: 10px !important;
+    font-weight: bolder;
+    cursor: pointer !important;
+    background-color: var(--color-alto);
+    color: white;
+    justify-content: center !important;
+}
+.p-datatable .p-datatable-thead > tr > th .p-link {
+    color: white;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+    padding: 4px !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+}
+
+.p-datatable .p-datatable-tbody > tr:focus {
+    outline: 0.15rem solid var(--color-medio);
+}
+
+.p-paginator {
+    background-color: transparent;
+    padding: 0 !important;
+}
+.p-paginator .p-paginator-current {
+    font-size: 14px;
+}
+.p-paginator .p-paginator-pages .p-paginator-page {
+    font-size: 12px;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    background: var(--color-alto) !important;
+    border-color: var(--color-medio) !important;
+    color: white !important;
+}
+
+.p-link:focus {
+    box-shadow: 0 0 0 0.2rem var(--color-medio);
+}
+
+.p-link:hover {
+    background-color: var(--color-medio) !important;
+}
+
+.p-column-filter-menu-button:hover {
+    background-color: var(--plomoOscuroEmpresarial) !important;
+}
+
+.p-column-filter-menu-button-open {
+    background-color: var(--color-alto) !important;
+}
+
+.align-right {
+    justify-content: flex-end !important;
+}
+
+.align-center {
+    justify-content: center !important;
+}
+
+.p-datatable th[class*="align-"] .p-column-header-content {
+    display: inline-flex;
+}
+
+.p-datatable-footer {
+    color: gray !important;
+    font-weight: normal !important;
+    background-color: transparent !important;
+    font-size: 14px;
+    padding: 4px !important;
+    border: none !important;
+}
+
+.p-datatable .p-datatable-tfoot tr > td {
+    background-color: var(--plomoOscuroEmpresarial) !important;
+    color: white !important;
+    font-size: var(--tamañoLetraTable) !important;
+    padding: 4px;
+}
+
+table thead tr th input[type="checkbox"] {
+    transform: scale(1.5);
+}
+
+table tbody tr td input[type="checkbox"] {
+    transform: scale(1.5);
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+    border-color: var(--plomoOscuroEmpresarial) !important;
+    background-color: var(--plomoOscuroEmpresarial) !important;
+}
+
+.p-datatable .p-datatable-tbody > tr.p-highlight {
+    background-color: var(--color-bajo);
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight {
+    border-color: var(--color-alto) !important;
+    background-color: var(--color-alto) !important;
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight:not(.p-disabled):hover {
+    border-color: var(--color-alto) !important;
+    background: var(--color-alto) !important;
+}
+
+.p-radiobutton
+    .p-radiobutton-box.p-highlight:not(.p-disabled):not(.p-higlight):hover {
+    border-color: var(--color-alto) !important;
+}
+
+.p-radiobutton .p-radiobutton-box:not(.p-disabled).p-focus {
+    box-shadow: 0 0 0 0.2rem var(--color-medio);
+}
+
+.p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
+    border-color: var(--color-alto) !important;
+}
+
+/* PRIME TABVIEW */
+.p-tabview .p-tabview-nav {
+    background-color: transparent !important;
+}
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    padding: 6px;
+    color: white;
+    font-size: var(--tamañoLetraTable);
+    background: var(--color-alto);
+    border: none !important;
+    box-shadow: none !important;
+}
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 6px;
+    font-size: var(--tamañoLetraTable);
+    background: transparent;
+}
+.p-tabview .p-tabview-nav .pi {
+    font-size: 12px;
+}
+.p-tabview .p-tabview-panels {
+    padding: 5px;
+    background-color: transparent !important;
+} /*# sourceMappingURL=app.css.map */

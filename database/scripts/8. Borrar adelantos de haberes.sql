@@ -1,0 +1,2 @@
+delete from transaccion_adelanto_haberes where usuario_id in (select dni from solucion_master.usuarios where agencia_id in (1, 4, 5, 6)
+	and usuario not in ('huber_aa', 'personal_emp', 'cartera_dscto_agencias', 'cartera_recup_admin','soporte_ti') );
