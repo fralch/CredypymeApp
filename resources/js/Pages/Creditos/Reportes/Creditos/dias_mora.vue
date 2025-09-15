@@ -906,13 +906,13 @@ export default {
 
 			let credito_id = e.data.id;
 
-			//   this.$inertia.post(
-			//     route("rep.cre.dias_mora.detalle", {
-			//       credito_id: credito_id,
-			//       agencia_id: self.agencia_seleccionada,
-			//     })
-			//   );
-			//   return false;
+			// this.$inertia.post(
+			// 	route("rep.cre.dias_mora.detalle", {
+			// 		credito_id: credito_id,
+			// 		agencia_id: self.agencia_seleccionada,
+			// 	})
+			// );
+			// return false;
 
 			await axios
 				.post(

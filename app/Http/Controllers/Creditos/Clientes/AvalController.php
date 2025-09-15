@@ -12,6 +12,10 @@ use App\Models\General\Agencia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Http;
+
+define('API_AVA_URL',  getenv('VITE_S_API_EXTERNA'));
+
 class AvalController extends Controller
 {
     public function listar_avales($cliente_id, $agencia_id)
@@ -29,45 +33,68 @@ class AvalController extends Controller
             ->get();
 
         foreach ($lista as $key => $item) {
-            $conexion = 'master_' .  $item->agencia_aval;
 
-            $datos_cliente = Cliente::on($conexion)->from('cliente_registros as cli_reg')
-                ->select(
-                    'cli_reg.dni',
-                    'cli_reg.apellido_paterno',
-                    'cli_reg.apellido_materno',
-                    'cli_reg.nombres',
-                    'cli_reg.fecha_nacimiento',
-                    'cli_reg.estado_civil',
-                    'cli_reg.sexo',
-                    'cli_reg.agencia_id',
-                    'cli_reg.codigo_expediente',
-                    'cli_reg.asesor_id',
-                    'cli_reg.promotor_id',
-                    'cli_reg.central_riesgo',
-                    'cli_reg.canal_referencia',
-                    'cli_reg.monto_maximo',
-                    'cli_reg.notas',
-                    'cli_reg.reportar_equifax',
-                    'cli_reg.direccion',
-                    'cli_reg.departamento_id',
-                    'cli_reg.provincia_id',
-                    'cli_reg.distrito_id',
-                    'cli_reg.referencia_direccion',
-                    'cli_reg.telefonos',
+            if (in_array($item->agencia_pariente, [2, 3, 5])) {
+                $conexion = 'master_' .  $item->agencia_aval;
 
-                    'ag.nombre as agencia',
+                $datos_cliente = Cliente::on($conexion)->from('cliente_registros as cli_reg')
+                    ->select(
+                        'cli_reg.dni',
+                        'cli_reg.apellido_paterno',
+                        'cli_reg.apellido_materno',
+                        'cli_reg.nombres',
+                        'cli_reg.fecha_nacimiento',
+                        'cli_reg.estado_civil',
+                        'cli_reg.sexo',
+                        'cli_reg.agencia_id',
+                        'cli_reg.codigo_expediente',
+                        'cli_reg.asesor_id',
+                        'cli_reg.promotor_id',
+                        'cli_reg.central_riesgo',
+                        'cli_reg.canal_referencia',
+                        'cli_reg.monto_maximo',
+                        'cli_reg.notas',
+                        'cli_reg.reportar_equifax',
+                        'cli_reg.direccion',
+                        'cli_reg.departamento_id',
+                        'cli_reg.provincia_id',
+                        'cli_reg.distrito_id',
+                        'cli_reg.referencia_direccion',
+                        'cli_reg.telefonos',
 
-                    'dep.departamento',
-                    'pro.provincia',
-                    'dis.distrito'
-                )
-                ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli_reg.agencia_id')
-                ->join('solucion_master.departamentos as dep', 'dep.id', 'cli_reg.departamento_id')
-                ->join('solucion_master.provincias as pro', 'pro.id', 'cli_reg.provincia_id')
-                ->join('solucion_master.distritos as dis', 'dis.id', 'cli_reg.distrito_id')
-                ->where('cli_reg.id', $item->pariente_aval_id)
-                ->get()->last();
+                        'ag.nombre as agencia',
+
+                        'dep.departamento',
+                        'pro.provincia',
+                        'dis.distrito'
+                    )
+                    ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli_reg.agencia_id')
+                    ->join('solucion_master.departamentos as dep', 'dep.id', 'cli_reg.departamento_id')
+                    ->join('solucion_master.provincias as pro', 'pro.id', 'cli_reg.provincia_id')
+                    ->join('solucion_master.distritos as dis', 'dis.id', 'cli_reg.distrito_id')
+                    ->where('cli_reg.id', $item->pariente_aval_id)
+                    ->get()->last();
+            } else {
+
+                $datos_aval =
+                    [
+                        'agencia_id' => $item->agencia_aval,
+                        'cliente_id' => $item->pariente_aval_id
+                    ];
+
+                $response = Http::get(API_AVA_URL . "/api/cli/listado_externa/datos_cliente", $datos_aval);
+
+
+                if ($response->successful()) {
+
+                    $response = $response->json();
+
+                    $datos_cliente = collect($response['datos_cliente']);
+                } else {
+                    $datos_cliente = null;
+                }
+            }
+
 
             if ($datos_cliente != null) {
 
@@ -134,6 +161,31 @@ class AvalController extends Controller
                 $lista[] = $item_1;
             }
         }
+
+
+        $datos_titular =
+            [
+                'tipo' => 'AVAL',
+                'agencia_id' => $agencia_id,
+                'cliente_id' => $cliente_id
+            ];
+
+        $response = Http::get(API_AVA_URL . "/api/cli/listado_externa/buscar_parientes_avales", $datos_titular);
+
+
+        if ($response->successful()) {
+
+            $response = $response->json();
+
+            $avales = collect($response['clientes']);
+        } else {
+            $avales = [];
+        }
+
+        foreach ($avales as $item_2) {
+            $lista[] = $item_2;
+        }
+
 
         return $lista;
     }

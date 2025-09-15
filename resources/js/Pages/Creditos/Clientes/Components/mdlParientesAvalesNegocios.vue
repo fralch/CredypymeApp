@@ -117,23 +117,29 @@ export default {
 		};
 	},
 	methods: {
-		ListarParientesAvalesNegocios() {
-			let self = this;
+		async ListarParientesAvalesNegocios() {
+			// this.$inertia.post(
+			// 	route("cli.listado_registro.parientes_avales_negocios", {
+			// 		cliente_id: this.frmParienteAval.cliente_id,
+			// 		agencia_id: this.agencia_seleccionada,
+			// 	})
+			// );
+			// return false;
 
-			axios
+			await axios
 				.post(
 					route("cli.listado_registro.parientes_avales_negocios", {
-						cliente_id: self.frmParienteAval.cliente_id,
-						agencia_id: self.agencia_seleccionada,
+						cliente_id: this.frmParienteAval.cliente_id,
+						agencia_id: this.agencia_seleccionada,
 					})
 				)
-				.then(function (response) {
-					self.lista_parientes = response.data.parientes;
-					self.lista_avales = response.data.avales;
-					self.lista_negocios = response.data.negocios;
-					self.lista_parientes_dependientes =
+				.then((response) => {
+					this.lista_parientes = response.data.parientes;
+					this.lista_avales = response.data.avales;
+					this.lista_negocios = response.data.negocios;
+					this.lista_parientes_dependientes =
 						response.data.parientes_dependientes;
-					self.lista_avales_dependientes = response.data.avales_dependientes;
+					this.lista_avales_dependientes = response.data.avales_dependientes;
 				});
 		},
 		VerParientes() {

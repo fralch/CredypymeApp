@@ -110,6 +110,7 @@
 													}}
 												</th>
 												<th style="min-width: 75px !important">EXPEDIENTE</th>
+												<th style="min-width: 100px !important">AGENCIA</th>
 												<th style="min-width: 75px !important">DNI</th>
 											</tr>
 										</thead>
@@ -165,6 +166,9 @@
 													}}
 												</td>
 												<td align="center">
+													{{ item.agencia }}
+												</td>
+												<td align="center">
 													{{ item.dni }}
 												</td>
 											</tr>
@@ -207,7 +211,10 @@
 															oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 															@keyup="BuscarParienteAval"
 															v-model="frmParienteAval.dni"
-															:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+															:disabled="
+																frmParienteAval.modo == 'NO-EDITAR' ||
+																frmParienteAval.modo == 'EDITAR-EXT'
+															"
 															v-if="frmParienteAval.cantidad_creditos == 0"
 														/>
 													</form>
@@ -238,7 +245,10 @@
 																	: '',
 															]"
 															v-model="frmParienteAval.apellido_paterno"
-															:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+															:disabled="
+																frmParienteAval.modo == 'NO-EDITAR' ||
+																frmParienteAval.modo == 'EDITAR-EXT'
+															"
 															v-if="frmParienteAval.cantidad_creditos == 0"
 														></textarea>
 													</form>
@@ -267,7 +277,10 @@
 																	: '',
 															]"
 															v-model="frmParienteAval.apellido_materno"
-															:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+															:disabled="
+																frmParienteAval.modo == 'NO-EDITAR' ||
+																frmParienteAval.modo == 'EDITAR-EXT'
+															"
 															v-if="frmParienteAval.cantidad_creditos == 0"
 														></textarea>
 													</form>
@@ -297,7 +310,10 @@
 																	: '',
 															]"
 															v-model="frmParienteAval.nombres"
-															:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+															:disabled="
+																frmParienteAval.modo == 'NO-EDITAR' ||
+																frmParienteAval.modo == 'EDITAR-EXT'
+															"
 															v-if="frmParienteAval.cantidad_creditos == 0"
 														></textarea>
 													</form>
@@ -318,7 +334,10 @@
 																: '',
 														]"
 														v-model="frmParienteAval.fecha_nacimiento"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													/>
 												</div>
 												<div class="form-group col-md-3 col-6">
@@ -334,7 +353,10 @@
 																: '',
 														]"
 														v-model="frmParienteAval.estado_civil"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													>
 														<option value="0" selected disabled>
 															Seleccione...
@@ -359,7 +381,10 @@
 																: '',
 														]"
 														v-model="frmParienteAval.sexo"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													>
 														<option value="0" selected disabled>
 															Seleccione...
@@ -444,7 +469,10 @@
 												<select
 													class="form-control center"
 													v-model="frmParienteAval.central_riesgo"
-													:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+													:disabled="
+														frmParienteAval.modo == 'NO-EDITAR' ||
+														frmParienteAval.modo == 'EDITAR-EXT'
+													"
 												>
 													<option value="NORMAL">NORMAL</option>
 													<option value="CPP">CPP</option>
@@ -463,7 +491,10 @@
 														class="form-control mayus text-row"
 														rows="2"
 														v-model="frmParienteAval.notas"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													></textarea>
 												</form>
 											</div>
@@ -512,7 +543,10 @@
 														]"
 														rows="1"
 														v-model="frmParienteAval.direccion"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													></textarea>
 												</form>
 											</div>
@@ -530,7 +564,10 @@
 													]"
 													@change="FiltrarProvincias"
 													v-model="frmParienteAval.departamento_id"
-													:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+													:disabled="
+														frmParienteAval.modo == 'NO-EDITAR' ||
+														frmParienteAval.modo == 'EDITAR-EXT'
+													"
 												>
 													<option value="0" selected disabled>
 														Seleccione...
@@ -558,7 +595,10 @@
 													]"
 													@change="FiltrarDistritos"
 													v-model="frmParienteAval.provincia_id"
-													:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+													:disabled="
+														frmParienteAval.modo == 'NO-EDITAR' ||
+														frmParienteAval.modo == 'EDITAR-EXT'
+													"
 												>
 													<option value="0" selected disabled>
 														Seleccione...
@@ -585,7 +625,10 @@
 															: '',
 													]"
 													v-model="frmParienteAval.distrito_id"
-													:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+													:disabled="
+														frmParienteAval.modo == 'NO-EDITAR' ||
+														frmParienteAval.modo == 'EDITAR-EXT'
+													"
 												>
 													<option value="0" selected disabled>
 														Seleccione...
@@ -616,7 +659,10 @@
 														]"
 														rows="3"
 														v-model="frmParienteAval.referencia_direccion"
-														:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+														:disabled="
+															frmParienteAval.modo == 'NO-EDITAR' ||
+															frmParienteAval.modo == 'EDITAR-EXT'
+														"
 													/>
 												</form>
 											</div>
@@ -650,7 +696,10 @@
 																min="0"
 																oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 																v-model="frmParienteAval.telefonos.t1"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															/>
 														</div>
 													</div>
@@ -676,7 +725,10 @@
 																		: '',
 																]"
 																v-model="frmParienteAval.telefonos.o1"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															>
 																<option :value="0" selected disabled>
 																	Seleccione...
@@ -711,7 +763,10 @@
 																		: '',
 																]"
 																v-model="frmParienteAval.telefonos.n1"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															></textarea>
 														</div>
 													</div>
@@ -740,7 +795,10 @@
 																maxlength="9"
 																oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 																v-model="frmParienteAval.telefonos.t2"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															/>
 														</div>
 													</div>
@@ -756,7 +814,10 @@
 															<select
 																class="form-control center"
 																v-model="frmParienteAval.telefonos.o2"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															>
 																<option value="0" selected disabled>
 																	Seleccione...
@@ -783,7 +844,10 @@
 																rows="1"
 																class="form-control mayus"
 																v-model="frmParienteAval.telefonos.n2"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															></textarea>
 														</div>
 													</div>
@@ -804,7 +868,10 @@
 																min="0"
 																oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 																v-model="frmParienteAval.telefonos.t3"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															/>
 														</div>
 													</div>
@@ -819,7 +886,10 @@
 															<select
 																class="form-control center"
 																v-model="frmParienteAval.telefonos.o3"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															>
 																<option value="0" selected disabled>
 																	Seleccione...
@@ -845,7 +915,10 @@
 																rows="1"
 																class="form-control mayus"
 																v-model="frmParienteAval.telefonos.n3"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															></textarea>
 														</div>
 													</div>
@@ -865,7 +938,10 @@
 																min="0"
 																oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 																v-model="frmParienteAval.telefonos.t4"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															/>
 														</div>
 													</div>
@@ -880,7 +956,10 @@
 															<select
 																class="form-control center"
 																v-model="frmParienteAval.telefonos.o4"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															>
 																<option value="0" selected disabled>
 																	Seleccione...
@@ -906,7 +985,10 @@
 																rows="1"
 																class="form-control mayus"
 																v-model="frmParienteAval.telefonos.n4"
-																:disabled="frmParienteAval.modo == 'NO-EDITAR'"
+																:disabled="
+																	frmParienteAval.modo == 'NO-EDITAR' ||
+																	frmParienteAval.modo == 'EDITAR-EXT'
+																"
 															></textarea>
 														</div>
 													</div>
@@ -947,7 +1029,7 @@
 <script>
 import { required } from "vuelidate/lib/validators";
 import headerCloseModal from "@/Pages/Creditos/Components/header_close_modal.vue";
-
+const api_externa = import.meta.env.VITE_S_API_EXTERNA;
 const noZero = (value) => value != 0;
 export default {
 	components: { headerCloseModal },
@@ -1160,13 +1242,11 @@ export default {
 
 			this.ResetearFrmParienteAval();
 		},
-		EditarParienteAval(cliente) {
-			const self = this;
+		async EditarParienteAval(cliente) {
 			let datos_cliente = cliente;
 
 			this.frmParienteAval.cliente_vinculado_id =
 				datos_cliente.pariente_aval_id;
-			this.frmParienteAval.modo = "EDITAR";
 
 			this.frmParienteAval.id = cliente.id;
 			this.frmParienteAval.agencia_id = cliente.agencia_id;
@@ -1201,38 +1281,48 @@ export default {
 
 			this.frmParienteAval.telefonos = telefonos;
 
-			axios
-				.get(
-					route("cli.listado_registro.cantidad_creditos", {
-						agencia_id: cliente.agencia_id,
-						cliente_id: datos_cliente.pariente_aval_id,
-					})
-				)
-				.then(function (response) {
-					let cantidad_creditos = response.data.cantidad_creditos;
+			if ([1, 4, 6].includes(cliente.agencia_id)) {
+				this.frmParienteAval.modo = "EDITAR-EXT";
+				this.frmParienteAval.cantidad_creditos = 1;
+			} else {
+				this.frmParienteAval.modo = "EDITAR";
+				await axios
+					.get(
+						route("cli.listado_registro.cantidad_creditos", {
+							agencia_id: cliente.agencia_id,
+							cliente_id: datos_cliente.pariente_aval_id,
+						})
+					)
+					.then((response) => {
+						let cantidad_creditos = response.data.cantidad_creditos;
 
-					self.frmParienteAval.cantidad_creditos = cantidad_creditos;
-				});
+						this.frmParienteAval.cantidad_creditos = cantidad_creditos;
+					});
+			}
 
 			$("#datosParienteAval2-tab").tab("show");
 		},
-		DatosPersonales(cliente) {
+		async DatosPersonales(cliente) {
 			let mdlDatosPersonales =
 				this.$parent.$parent.$parent.$refs.mdlDatosPersonales;
 
-			axios
-				.get(
-					route("cli.listado_registro.cantidad_creditos", {
-						agencia_id: cliente.agencia_id,
-						cliente_id: cliente.id,
-					})
-				)
-				.then(function (response) {
-					let cantidad_creditos = response.data.cantidad_creditos;
+			if ([1, 4, 6].includes(cliente.agencia_id)) {
+				this.frmParienteAval.cantidad_creditos = 1;
+			} else {
+				await axios
+					.get(
+						route("cli.listado_registro.cantidad_creditos", {
+							agencia_id: cliente.agencia_id,
+							cliente_id: cliente.id,
+						})
+					)
+					.then((response) => {
+						let cantidad_creditos = response.data.cantidad_creditos;
 
-					mdlDatosPersonales.frmDatosCliente.cantidad_creditos =
-						cantidad_creditos;
-				});
+						mdlDatosPersonales.frmDatosCliente.cantidad_creditos =
+							cantidad_creditos;
+					});
+			}
 
 			mdlDatosPersonales.submited = false;
 			mdlDatosPersonales.title_modal = "CLIENTE ENCONTRADO";
@@ -1333,8 +1423,7 @@ export default {
 			formulario.cantidad_creditos = 0;
 		},
 
-		BuscarParienteAval() {
-			let self = this;
+		async BuscarParienteAval() {
 			let texto_buscar = this.frmParienteAval.dni;
 
 			if (texto_buscar && texto_buscar.length == 8) {
@@ -1344,13 +1433,13 @@ export default {
 				data.append("tipo_filtro", "dni");
 				data.append("agencia", "TODAS");
 
-				axios
+				await axios
 					.post(route("cli.listado_registro.buscar"), data)
-					.then(function (response) {
+					.then((response) => {
 						if (response.data.length > 0) {
 							if (
-								self.frmParienteAval.cliente_id == response.data[0].id &&
-								self.agencia_seleccionada == response.data[0].agencia_id
+								this.frmParienteAval.cliente_id == response.data[0].id &&
+								this.agencia_seleccionada == response.data[0].agencia_id
 							) {
 								Swal.fire({
 									icon: "error",
@@ -1358,18 +1447,18 @@ export default {
 									text: "Usted no puede ser su propio pariente o aval",
 								});
 								$("#datosParienteAval2-tab").tab("show");
-								self.frmParienteAval.dni = null;
+								this.frmParienteAval.dni = null;
 								return false;
 							} else if (
-								self.lista_parientes_avales.filter(
+								this.lista_parientes_avales.filter(
 									(item) => item.dni == texto_buscar
 								).length > 0
 							) {
 								let mensaje = "";
-								if (self.frmParienteAval.tipo == "PARIENTE") {
+								if (this.frmParienteAval.tipo == "PARIENTE") {
 									mensaje =
 										"El DNI ingresado ya está registrado como su pariente";
-								} else if (self.frmParienteAval.tipo == "AVAL") {
+								} else if (this.frmParienteAval.tipo == "AVAL") {
 									mensaje = "El DNI ingresado ya está registrado como su aval";
 								}
 
@@ -1379,10 +1468,10 @@ export default {
 									text: mensaje,
 								});
 								$("#datosParienteAval1-tab").tab("show");
-								self.ResetearFrmParienteAval();
+								this.ResetearFrmParienteAval();
 								return false;
 							} else if (
-								self.agencia_seleccionada != response.data[0].agencia_id
+								this.agencia_seleccionada != response.data[0].agencia_id
 							) {
 								let agencia = response.data[0].agencia;
 
@@ -1400,19 +1489,61 @@ export default {
 								}).then((result) => {
 									if (result.isConfirmed) {
 										let modo = "PARIENTE_AVAL";
-										self.DatosPersonales(response.data[0], modo);
+										this.DatosPersonales(response.data[0], modo);
 									} else {
 										$("#datosParienteAval2-tab").tab("show");
-										self.frmParienteAval.dni = null;
+										this.frmParienteAval.dni = null;
 										return false;
 									}
 								});
 							} else {
 								let modo = "PARIENTE_AVAL";
-								self.DatosPersonales(response.data[0], modo);
+								this.DatosPersonales(response.data[0], modo);
 							}
 						}
 					});
+
+				// VERIFICACIÓN EXTERNA --------------------------------------------------------
+				const params = {
+					dni: texto_buscar,
+				};
+
+				await axios
+					.get(api_externa + "/api/cli/listado_externa/verificar", {
+						params,
+					})
+					.then((response) => {
+						const lista_clientes = response.data.lista_clientes;
+						if (lista_clientes.length > 0) {
+							if (this.agencia_seleccionada != lista_clientes[0].agencia_id) {
+								let agencia = lista_clientes[0].agencia;
+
+								return Swal.fire({
+									icon: "warning",
+									title: "Se encontró este cliente en la agencia " + agencia,
+									text: "¿Desea continuar?",
+									confirmButtonText:
+										'<i class="fas fa-check" style="color:white;"></i>   Si',
+									confirmButtonColor: "var(--colorAlto)",
+									showCancelButton: true,
+									cancelButtonText: '<i class="fas fa-times"></i>   No',
+									cancelButtonColor: "var(--plomoOscuroEmpresarial)",
+									allowOutsideClick: false,
+								}).then((result) => {
+									if (result.isConfirmed) {
+										let modo = "PARIENTE_AVAL";
+										this.DatosPersonales(lista_clientes[0], modo);
+									} else {
+										$("#datosParienteAval2-tab").tab("show");
+										this.frmParienteAval.dni = null;
+										return false;
+									}
+								});
+							}
+						}
+					});
+
+				// ------------------------------------------
 			}
 		},
 
@@ -1520,7 +1651,6 @@ export default {
 		},
 
 		GuardarParienteAval() {
-			let self = this;
 			this.submited = true;
 
 			if (this.$v.frmParienteAval.$invalid) {
@@ -1532,7 +1662,7 @@ export default {
 				$("#datosParienteAval2-tab").tab("show");
 				return false;
 			}
-			if (self.frmParienteAval.telefonos.t1.length < 9) {
+			if (this.frmParienteAval.telefonos.t1.length < 9) {
 				Swal.fire({
 					icon: "error",
 					title: "¡Ups!",
@@ -1569,6 +1699,12 @@ export default {
 							data.append("parentesco", this.frmParienteAval.parentesco);
 						} else if (this.frmParienteAval.modo == "EDITAR") {
 							data.append("modo_asignacion", "NUEVO-EDITAR");
+							data.append(
+								"datos_cliente",
+								JSON.stringify(this.frmParienteAval)
+							);
+						} else if (this.frmParienteAval.modo == "EDITAR-EXT") {
+							data.append("modo_asignacion", "EDITAR-EXT");
 							data.append(
 								"datos_cliente",
 								JSON.stringify(this.frmParienteAval)
@@ -1626,26 +1762,26 @@ export default {
 								title: "¡ÉXITO!",
 								allowOutsideClick: false,
 								preConfirm: (result) => {
-									self.frmParienteAval.modo = "NO-EDITAR";
-									self.submited = false;
-									self.frmParienteAval.cliente_vinculado_id = null;
+									this.frmParienteAval.modo = "NO-EDITAR";
+									this.submited = false;
+									this.frmParienteAval.cliente_vinculado_id = null;
 									let route_name_2 = "";
-									if (self.frmParienteAval.tipo == "PARIENTE") {
+									if (this.frmParienteAval.tipo == "PARIENTE") {
 										route_name_2 = "cli.listado_registro.listar_parientes";
-									} else if (self.frmParienteAval.tipo == "AVAL") {
+									} else if (this.frmParienteAval.tipo == "AVAL") {
 										route_name_2 = "cli.listado_registro.listar_avales";
 									}
 									axios
 										.post(
 											route(route_name_2, {
-												cliente_id: self.frmParienteAval.cliente_id,
-												agencia_id: self.agencia_seleccionada,
+												cliente_id: this.frmParienteAval.cliente_id,
+												agencia_id: this.agencia_seleccionada,
 											})
 										)
-										.then(function (response) {
-											self.lista_parientes_avales = response.data;
+										.then((response) => {
+											this.lista_parientes_avales = response.data;
 										});
-									self.ResetearFrmParienteAval();
+									this.ResetearFrmParienteAval();
 									$("#datosParienteAval1-tab").tab("show");
 								},
 							});

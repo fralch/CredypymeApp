@@ -363,16 +363,15 @@ export default {
 			});
 		},
 
-		ListarCreditos() {
-			let self = this;
+		async ListarCreditos() {
 			let data = new FormData();
-			data.append("agencia_id", self.agencia_seleccionada);
+			data.append("agencia_id", this.agencia_seleccionada);
 
-			axios
+			await axios
 				.post(route("cre.aprobacion.listar_detallado"), data)
-				.then(function (response) {
-					self.lista_creditos = response.data.aprobaciones;
-					self.fechas_vencimiento = response.data.fechas_vencimiento;
+				.then((response) => {
+					this.lista_creditos = response.data.aprobaciones;
+					this.fechas_vencimiento = response.data.fechas_vencimiento;
 				});
 		},
 

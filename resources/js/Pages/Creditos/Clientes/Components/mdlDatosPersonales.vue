@@ -1333,9 +1333,6 @@ export default {
 				).length > 0
 			);
 		},
-		datos_sesion() {
-			return this.$inertia.page.props.user_session;
-		},
 	},
 	methods: {
 		Redondear(e) {
@@ -1417,21 +1414,17 @@ export default {
 				return false;
 			}
 
-			// NO BORRAR ----------------------------------------------------------
+			// const response = await this.BusquedaExterna();
 
-			const response = await this.BusquedaExterna();
-
-			if (response.resultado == "RESTRINGIDO") {
-				const agencia = response.agencia;
-				Swal.fire({
-					icon: "error",
-					title: "¡Error!",
-					text: "El cliente está RESTRINGIDO por la agencia " + agencia,
-				});
-				return false;
-			}
-
-			// ------------------------------------------------------------------
+			// if (response.resultado == "RESTRINGIDO") {
+			// 	const agencia = response.agencia;
+			// 	Swal.fire({
+			// 		icon: "error",
+			// 		title: "¡Error!",
+			// 		text: "El cliente está RESTRINGIDO por la agencia " + agencia,
+			// 	});
+			// 	return false;
+			// }
 
 			Swal.fire({
 				title: "BUSCANDO",
@@ -1487,21 +1480,18 @@ export default {
 			});
 		},
 
-		// NO BORRAR --------------------------------------------------------
-		async BusquedaExterna() {
-			const params = {
-				dni: this.frmDatosCliente.dni,
-				agencia_id: this.agencia_seleccionada,
-				acceso: JSON.stringify(this.datos_sesion),
-			};
+		// async BusquedaExterna() {
+		// 	const params = {
+		// 		dni: this.frmDatosCliente.dni,
+		// 	};
 
-			return axios
-				.get(api_externa + "/api/cli/listado_externa/buscar", { params })
-				.then((response) => {
-					return response.data;
-				});
-		},
-		// ------------------------------------------------------------------
+		// 	return axios
+		// 		.get(api_externa + "/api/cli/listado_externa/buscar", { params })
+		// 		.then((response) => {
+		// 			console.log(response.data);
+		// 			return response.data;
+		// 		});
+		// },
 
 		FiltrarProvincias() {
 			let departamento_id = this.frmDatosCliente.departamento_id;
@@ -1675,7 +1665,7 @@ export default {
 			let form_1 = this.mdlParientesAvales.frmParienteAval;
 			let form_2 = this.frmDatosCliente;
 
-			form_1.dni = form_2.dni;
+			// form_1.dni = form_2.dni;
 			form_1.apellido_paterno = form_2.apellido_paterno;
 			form_1.apellido_materno = form_2.apellido_materno;
 			form_1.nombres = form_2.nombres;
@@ -1702,8 +1692,12 @@ export default {
 
 			form_1.modo = "NO-EDITAR";
 
-			$("#mdlDatosPersonales").css("display", "none");
-			$("#datosParienteAval2-tab").tab("show");
+			console.log(form_2.agencia_id);
+			// Esperar a que Vue reactive los datos antes de abrir modal/tab
+			this.$nextTick(() => {
+				$("#mdlDatosPersonales").css("display", "none");
+				$("#datosParienteAval2-tab").tab("show");
+			});
 		},
 
 		CerrarModalRegistro() {

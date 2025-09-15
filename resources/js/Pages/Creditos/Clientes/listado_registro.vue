@@ -593,7 +593,7 @@ export default {
 			}
 		},
 
-		ParientesAvalesNegocio(item) {
+		async ParientesAvalesNegocio(item) {
 			let mdlParientesAvalesNegocios = this.$refs.mdlParientesAvalesNegocios;
 
 			mdlParientesAvalesNegocios.frmParienteAval.cliente_id = item.id;
@@ -601,7 +601,7 @@ export default {
 			mdlParientesAvalesNegocios.frmNegocio.cliente_id = item.id;
 			mdlParientesAvalesNegocios.frmNegocio.agencia_id = item.agencia_id;
 
-			mdlParientesAvalesNegocios.ListarParientesAvalesNegocios();
+			await mdlParientesAvalesNegocios.ListarParientesAvalesNegocios();
 			$("#mdlParientesAvalesNegocio").modal({
 				backdrop: "false",
 				keyboard: true,

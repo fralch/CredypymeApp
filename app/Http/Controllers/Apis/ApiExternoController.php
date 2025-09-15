@@ -19,6 +19,8 @@ use App\Models\General\Banco;
 use App\Models\Creditos\Credito\Notificacion;
 use App\Models\Creditos\Credito\CarritoDetalle;
 use App\Models\Creditos\Clientes\Prenda;
+use App\Models\Creditos\Clientes\Pariente;
+use App\Models\Creditos\Clientes\Aval;
 
 use App\Models\Creditos\Caja\Caja;
 use App\Models\Creditos\Caja\PagoCuota;
@@ -1864,6 +1866,248 @@ class ApiExternoController extends Controller
             'status' => 'success',
             'resultado' => $resultado,
             'agencia' => $agencia
+        ]);
+    }
+
+    public function datos_cliente(Request $request)
+    {
+
+        $conexion = 'master_' .  $request->agencia_id;
+
+        $datos_cliente = Cliente::on($conexion)->from('cliente_registros as cli_reg')
+            ->select(
+                'cli_reg.dni',
+                'cli_reg.apellido_paterno',
+                'cli_reg.apellido_materno',
+                'cli_reg.nombres',
+                'cli_reg.fecha_nacimiento',
+                'cli_reg.estado_civil',
+                'cli_reg.sexo',
+                'cli_reg.agencia_id',
+                'cli_reg.codigo_expediente',
+                'cli_reg.asesor_id',
+                'cli_reg.promotor_id',
+                'cli_reg.central_riesgo',
+                'cli_reg.canal_referencia',
+                'cli_reg.monto_maximo',
+                'cli_reg.notas',
+                'cli_reg.reportar_equifax',
+                'cli_reg.direccion',
+                'cli_reg.departamento_id',
+                'cli_reg.provincia_id',
+                'cli_reg.distrito_id',
+                'cli_reg.referencia_direccion',
+                'cli_reg.telefonos',
+
+                'ag.nombre as agencia',
+
+                'dep.departamento',
+                'pro.provincia',
+                'dis.distrito'
+            )
+            ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli_reg.agencia_id')
+            ->join('solucion_master.departamentos as dep', 'dep.id', 'cli_reg.departamento_id')
+            ->join('solucion_master.provincias as pro', 'pro.id', 'cli_reg.provincia_id')
+            ->join('solucion_master.distritos as dis', 'dis.id', 'cli_reg.distrito_id')
+            ->where('cli_reg.id', $request->cliente_id)
+            ->get()->last();
+
+        return response()->json([
+            'status' => 200,
+            'datos_cliente' => $datos_cliente
+        ]);
+    }
+
+    public function verificar_cliente(Request $request)
+    {
+        $dni = $request->dni;
+
+        $agencias = Agencia::all();
+
+        $lista_clientes = [];
+        foreach ($agencias as $item) {
+            $conexion = 'master_' . $item->id_agencia;
+
+            $lista_clientes = Cliente::on($conexion)->from('cliente_registros as cli')
+                ->select(
+                    'cli.id',
+                    'cli.dni',
+
+                    'cli.apellido_paterno',
+                    'cli.apellido_materno',
+                    'cli.nombres',
+                    'cli.fecha_nacimiento',
+                    'cli.estado_civil',
+                    'cli.sexo',
+                    'cli.hijos',
+                    'cli.agencia_id',
+                    'ag.nombre as agencia',
+                    'cli.correo_electronico',
+
+                    'cli.codigo_expediente',
+                    DB::raw("IFNULL(cli.asesor_id,0) as asesor_id"),
+                    'us.usuario as usuario_asesor',
+                    DB::raw("IFNULL(cli.promotor_id,0) as promotor_id"),
+                    'cli.central_riesgo',
+                    'cli.canal_referencia',
+
+                    'cli.monto_maximo',
+                    'cli.notas',
+                    'cli.reportar_equifax',
+
+                    'cli.direccion',
+                    'cli.departamento_id',
+                    'dep.departamento',
+                    'cli.provincia_id',
+                    'pro.provincia',
+                    'cli.distrito_id',
+                    'dis.distrito',
+                    'cli.referencia_direccion',
+                    'cli.telefonos',
+
+                    'cli.imagen_dni',
+                    'cli.observaciones',
+                )
+                ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli.agencia_id')
+                ->join('solucion_master.departamentos as dep', 'dep.id', 'cli.departamento_id')
+                ->join('solucion_master.provincias as pro', 'pro.id', 'cli.provincia_id')
+                ->join('solucion_master.distritos as dis', 'dis.id', 'cli.distrito_id')
+                ->leftjoin('solucion_master.usuarios as us', 'cli.asesor_id', 'us.dni')
+                ->where('cli.dni', $dni)
+                ->get();
+            if (count($lista_clientes) > 0) {
+                break;
+            }
+        }
+        return response()->json([
+            'status' => 'success',
+            'lista_clientes' => $lista_clientes
+        ]);
+    }
+
+    public function buscar_parientes_avales(Request $request)
+    {
+        $tipo = $request->tipo;
+        $agencia_busqueda = $request->agencia_id;
+        $cliente_busqueda = $request->cliente_id;
+
+        $agencias = Agencia::all();
+
+        $lista = [];
+        if ($tipo == 'PARIENTE') {
+            foreach ($agencias as $item) {
+                $conexion = 'master_' .  $item->id_agencia;
+                $parientes = Pariente::on($conexion)->from('cliente_parientes as cli_par')
+                    ->select(
+                        'cli_par.id',
+                        'cli_par.cliente_id',
+                        'cli_par.pariente_id as pariente_aval_id',
+                        'cli_par.vinculado',
+                        'cli_par.parentesco',
+                        'cli_reg.dni',
+                        'cli_reg.apellido_paterno',
+                        'cli_reg.apellido_materno',
+                        'cli_reg.nombres',
+                        'cli_reg.codigo_expediente',
+                        'cli_reg.direccion',
+
+                        'dep.departamento',
+                        'pro.provincia',
+                        'dis.distrito',
+
+                        'cli_reg.referencia_direccion',
+                        'cli_par.datos_creacion',
+                        'cli_par.datos_actualizacion',
+
+                        'us_1.usuario as usuario_creacion',
+                        'us_2.usuario as usuario_actualizacion'
+                    )
+                    ->join('cliente_registros as cli_reg', 'cli_reg.id', 'cli_par.cliente_id')
+                    ->join('solucion_master.departamentos as dep', 'dep.id', 'cli_reg.departamento_id')
+                    ->join('solucion_master.provincias as pro', 'pro.id', 'cli_reg.provincia_id')
+                    ->join('solucion_master.distritos as dis', 'dis.id', 'cli_reg.distrito_id')
+                    ->leftjoin('solucion_master.usuarios as us_1', DB::raw("SUBSTRING(cli_par.datos_creacion, 42, 8)"), 'us_1.dni')
+                    ->leftjoin('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cli_par.datos_actualizacion, 42, 8)"), 'us_2.dni')
+                    ->where([
+                        ['cli_par.pariente_id', $cliente_busqueda],
+                        ['cli_par.agencia_pariente', $agencia_busqueda]
+                    ])
+                    ->get();
+
+                foreach ($parientes as $item_1) {
+                    $lista[] = $item_1;
+                }
+            }
+        } else if ($tipo == 'AVAL') {
+
+
+            foreach ($agencias as $item) {
+                $conexion = 'master_' .  $item->id_agencia;
+                $avales = Aval::on($conexion)->from('cliente_avales as cli_ava')
+                    ->select(
+                        'cli_ava.id',
+                        'cli_ava.cliente_id',
+                        'cli_ava.aval_id as pariente_aval_id',
+                        'cli_ava.vinculado',
+                        'cli_reg.dni',
+                        'cli_reg.apellido_paterno',
+                        'cli_reg.apellido_materno',
+                        'cli_reg.nombres',
+                        'cli_reg.codigo_expediente',
+                        'cli_reg.direccion',
+                        'cli_reg.referencia_direccion',
+
+                        'dep.departamento',
+                        'pro.provincia',
+                        'dis.distrito',
+
+                        'cli_ava.datos_creacion',
+                        'cli_ava.datos_actualizacion',
+
+                        'us_1.usuario as usuario_creacion',
+                        'us_2.usuario as usuario_actualizacion'
+                    )
+                    ->join('cliente_registros as cli_reg', 'cli_reg.id', 'cli_ava.cliente_id')
+                    ->join('solucion_master.departamentos as dep', 'dep.id', 'cli_reg.departamento_id')
+                    ->join('solucion_master.provincias as pro', 'pro.id', 'cli_reg.provincia_id')
+                    ->join('solucion_master.distritos as dis', 'dis.id', 'cli_reg.distrito_id')
+                    ->leftjoin('solucion_master.usuarios as us_1', DB::raw("SUBSTRING(cli_ava.datos_creacion, 42, 8)"), 'us_1.dni')
+                    ->leftjoin('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cli_ava.datos_actualizacion, 42, 8)"), 'us_2.dni')
+                    ->where([
+                        ['cli_ava.aval_id', $cliente_busqueda],
+                        ['cli_ava.agencia_aval', $agencia_busqueda]
+                    ])
+                    ->get();
+
+                foreach ($avales as $item_1) {
+                    $lista[] = $item_1;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'clientes' => $lista
+        ]);
+    }
+
+    public function datos_pariente_aval(Request $request)
+    {
+        $conexion_aval = 'master_' . $request->agencia_id;
+
+        $datos_pariente_aval = Pariente::on($conexion_aval)->select(
+            'id',
+            'agencia_pariente',
+            'pariente_id as pariente_aval_id',
+            'parentesco'
+        )->where([
+            ['cliente_id', $request->cliente_id],
+            ['vinculado', 1]
+        ])->get()->last();
+
+        return response()->json([
+            'status' => 'success',
+            'datos_pariente_aval' => $datos_pariente_aval
         ]);
     }
 }

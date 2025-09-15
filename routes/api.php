@@ -41,3 +41,9 @@ Route::GET('/inv/meta_externa/listar_recursos', [ApiExternoController::class, 'l
 Route::POST('/inv/meta_externa/abonar', [ApiExternoController::class, 'abonar_inversion']);
 
 Route::GET('/cli/listado_externa/buscar', [ApiExternoController::class, 'buscar_cliente']);
+Route::GET('/cli/listado_externa/datos_cliente', [ApiExternoController::class, 'datos_cliente']);
+Route::GET('/cli/listado_externa/verificar', [ApiExternoController::class, 'verificar_cliente']);
+
+Route::GET('/cli/listado_externa/buscar_parientes_avales', [ApiExternoController::class, 'buscar_parientes_avales']);
+
+Route::GET('/cli/listado_externa/datos_pariente_aval', [ApiExternoController::class, 'datos_pariente_aval']);

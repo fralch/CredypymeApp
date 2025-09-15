@@ -35,6 +35,10 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 use App\Models\General\Agencia;
 
+use Illuminate\Support\Facades\Http;
+
+define('API_RDM_URL',  getenv('VITE_S_API_EXTERNA'));
+
 
 class ReporteDiasMoraController extends Controller
 {
@@ -161,7 +165,7 @@ class ReporteDiasMoraController extends Controller
             )
             ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
             ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
-            ->join('solucion_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
+            ->join('credipyme_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
             ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
             ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
             ->whereBetween('cre_reg.dias_atraso', [$desde_dias, $hasta_dias])
@@ -305,10 +309,10 @@ class ReporteDiasMoraController extends Controller
             ->join('credito_estados as cre_est', 'cre_reg.estado_id', 'cre_est.id')
             ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
             ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
-            ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
-            ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
-            ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
-            ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+            ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
+            ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
+            ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
+            ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
             ->where('cre_reg.id', $credito_id)
             ->get()->last();
 
@@ -317,7 +321,7 @@ class ReporteDiasMoraController extends Controller
 
         if ($datos_credito->pariente_id != null) {
 
-            if (in_array($datos_credito->agencia_pariente, [2, 3])) {
+            if (in_array($datos_credito->agencia_pariente, [2, 3, 5])) {
                 $conexion_pariente = 'master_' .  $datos_credito->agencia_pariente;
 
                 $pariente = Cliente::on($conexion_pariente)->from('cliente_registros as cli_reg')
@@ -347,18 +351,37 @@ class ReporteDiasMoraController extends Controller
                         'usu.usuario as usuario_asesor'
                     )
 
-                    ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
-                    ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
-                    ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
-                    ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                    ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
+                    ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
+                    ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
+                    ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                     ->where('cli_reg.id', $datos_credito->pariente_id)
                     ->get()->last();
+            } else if (in_array($datos_credito->agencia_pariente, [1, 4, 6])) {
+
+                $params =
+                    [
+                        'agencia_id' => $datos_credito->agencia_pariente,
+                        'cliente_id' => $datos_credito->pariente_id
+                    ];
+
+                $response = Http::get(API_RDM_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                if ($response->successful()) {
+
+                    $response = $response->json();
+
+                    $pariente = (new Cliente)->newInstance($response['datos_cliente'], true);
+                } else {
+                    $pariente = null;
+                }
             }
         }
 
         if ($datos_credito->aval_id != null) {
 
-            if (in_array($datos_credito->agencia_aval, [2, 3])) {
+            if (in_array($datos_credito->agencia_pariente, [2, 3, 5])) {
                 $conexion_aval = 'master_' .  $datos_credito->agencia_aval;
 
                 $aval = Cliente::on($conexion_aval)->from('cliente_registros as cli_reg')
@@ -388,12 +411,31 @@ class ReporteDiasMoraController extends Controller
                         'usu.usuario as usuario_asesor'
                     )
 
-                    ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
-                    ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
-                    ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
-                    ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                    ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id', 'dep.id')
+                    ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id', 'pro.id')
+                    ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id', 'dis.id')
+                    ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                     ->where('cli_reg.id', $datos_credito->aval_id)
                     ->get()->last();
+            } else if (in_array($datos_credito->agencia_aval, [1, 4, 6])) {
+
+                $params =
+                    [
+                        'agencia_id' => $datos_credito->agencia_aval,
+                        'cliente_id' => $datos_credito->aval_id
+                    ];
+
+                $response = Http::get(API_RDM_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                if ($response->successful()) {
+
+                    $response = $response->json();
+
+                    $aval = (new Cliente)->newInstance($response['datos_cliente'], true);
+                } else {
+                    $aval = null;
+                }
             }
         }
 
@@ -454,9 +496,9 @@ class ReporteDiasMoraController extends Controller
                 'pro.provincia',
                 'dis.distrito'
             )
-            ->join('solucion_master.departamentos as dep', 'cli_neg.departamento_id', 'dep.id')
-            ->join('solucion_master.provincias as pro', 'cli_neg.provincia_id', 'pro.id')
-            ->join('solucion_master.distritos as dis', 'cli_neg.distrito_id', 'dis.id')
+            ->join('credipyme_master.departamentos as dep', 'cli_neg.departamento_id', 'dep.id')
+            ->join('credipyme_master.provincias as pro', 'cli_neg.provincia_id', 'pro.id')
+            ->join('credipyme_master.distritos as dis', 'cli_neg.distrito_id', 'dis.id')
             ->where('cli_neg.id', $datos_credito->negocio_id)
             ->get()->last();
 
@@ -486,8 +528,8 @@ class ReporteDiasMoraController extends Controller
                 'car.cargo'
             )
             ->where('cre_com.credito_id', $credito_id)
-            ->join('solucion_master.usuarios as us_1', DB::raw("SUBSTRING(cre_com.datos_creacion,42,8)"), 'us_1.dni')
-            ->join('solucion_master.cargos as car', 'us_1.cargo_id', 'car.id')
+            ->join('credipyme_master.usuarios as us_1', DB::raw("SUBSTRING(cre_com.datos_creacion,42,8)"), 'us_1.dni')
+            ->join('credipyme_master.cargos as car', 'us_1.cargo_id', 'car.id')
             ->orderby('cre_com.id', 'desc')
             ->get();
 
@@ -511,8 +553,8 @@ class ReporteDiasMoraController extends Controller
                 'us_2.usuario as usuario_registro'
             )
             ->join('credito_notificaciones_tipos as cre_not_tip', 'cre_not.tipo_id', 'cre_not_tip.id')
-            ->leftjoin('solucion_master.usuarios as us_1', 'cre_not.usuario_envio', 'us_1.dni')
-            ->join('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cre_not.datos_creacion,42,8)"), 'us_2.dni')
+            ->leftjoin('credipyme_master.usuarios as us_1', 'cre_not.usuario_envio', 'us_1.dni')
+            ->join('credipyme_master.usuarios as us_2', DB::raw("SUBSTRING(cre_not.datos_creacion,42,8)"), 'us_2.dni')
             ->where('cre_not.credito_id', $credito_id)
             ->orderby('cre_not.id', 'asc')
             ->get();

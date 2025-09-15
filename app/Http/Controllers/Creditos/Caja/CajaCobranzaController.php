@@ -6,15 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\General\PermisosController;
 use App\Http\Controllers\Creditos\CreditosController;
 
-use App\Models\Creditos\Caja\Caja;
 use App\Models\Creditos\Caja\PagoCuota;
 use App\Models\Creditos\Caja\PagoMora;
 use App\Models\Creditos\Caja\PagoNotificacion;
 use App\Models\Creditos\Caja\PagoVoucher;
 
 use App\Models\Creditos\Clientes\Pariente;
-use App\Models\Creditos\Clientes\Aval;
 use App\Models\Creditos\Clientes\Cliente;
+use App\Models\Creditos\Clientes\Aval;
 use App\Models\Creditos\Clientes\Prenda;
 use App\Models\Creditos\Credito\Carrito;
 use App\Models\Creditos\Credito\CarritoDetalle;
@@ -27,9 +26,6 @@ use App\Models\Creditos\Mantenimiento\Credito\Estado;
 use App\Models\Creditos\Mantenimiento\Credito\Producto;
 use App\Models\General\Banco;
 use App\Models\Creditos\Cuenta\BancoMovimiento;
-use App\Models\Creditos\Inversion\InversionMeta;
-use App\Models\Creditos\Inversion\InversionMetaMovimiento;
-use App\Models\Creditos\Mantenimiento\Inversion\ProductosMeta;
 use App\Models\Gth\Usuarios\Usuario;
 use App\Models\General\Agencia;
 use App\Models\General\Cargo;
@@ -43,6 +39,7 @@ use Illuminate\Support\Facades\Session;
 
 class CajaCobranzaController extends Controller
 {
+
     public function cobranza($credito_id, $agencia_id)
     {
         $datos_voucher = null;
@@ -64,9 +61,7 @@ class CajaCobranzaController extends Controller
         } else {
             $band = (new PermisosController)->verificarPermiso($x['usuario_dni'], 'COBRANZA', 'CREDITOS_CAJA');
             if ($band == 1) {
-
                 $conexion = 'master_' .  $agencia_id;
-                $main_db = 'solucion_master';
 
                 $datos_credito = Credito::on($conexion)->from('credito_registros as cre_reg')
                     ->select(
@@ -139,7 +134,7 @@ class CajaCobranzaController extends Controller
                     ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
                     ->join('credito_estados as cre_est', 'cre_reg.estado_id', 'cre_est.id')
                     ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
-                    ->join("$main_db.usuarios as usu", 'cli_reg.asesor_id', 'usu.dni')
+                    ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                     ->where('cre_reg.id', $credito_id)
                     ->get()->last();
 
@@ -163,8 +158,8 @@ class CajaCobranzaController extends Controller
                         'us_2.usuario as usuario_registro'
                     )
                     ->join('credito_notificaciones_tipos as cre_not_tip', 'cre_not.tipo_id', 'cre_not_tip.id')
-                    ->leftjoin("$main_db.usuarios as us_1", 'cre_not.usuario_envio', 'us_1.dni')
-                    ->join("$main_db.usuarios as us_2", DB::raw("SUBSTRING(cre_not.datos_creacion,42,8)"), 'us_2.dni')
+                    ->leftjoin('solucion_master.usuarios as us_1', 'cre_not.usuario_envio', 'us_1.dni')
+                    ->join('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cre_not.datos_creacion,42,8)"), 'us_2.dni')
                     ->where('cre_not.credito_id', $credito_id)
                     ->orderby('cre_not.id', 'asc')
                     ->get();
@@ -234,11 +229,8 @@ class CajaCobranzaController extends Controller
                     // Pariente,aval o pariente_aval del cliente
 
                     if ($value != null) {
-
-                        if (in_array($value->agencia_id, [2, 3])) {
+                        if (in_array($value->agencia_id, [2, 3, 5])) {
                             $conexion_1 = 'master_' .  $value->agencia_id;
-                            $main_db_1 = 'solucion_master';
-
                             $credito_de = Credito::on($conexion_1)->from('credito_registros as cre_reg')
                                 ->select(
                                     'cre_reg.id',
@@ -265,7 +257,7 @@ class CajaCobranzaController extends Controller
                                 ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
                                 ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
                                 ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                                ->join("$main_db_1.usuarios as usu",  'cli_reg.asesor_id', 'usu.dni')
+                                ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                                 ->where([
                                     ['cre_reg.cliente_id', $value->cliente_id],
                                     ['cre_reg.estado_id', $estado_id]
@@ -294,10 +286,8 @@ class CajaCobranzaController extends Controller
                     $agencias = Agencia::all();
                     foreach ($agencias as $item_1) {
 
-                        if (in_array($item_1->id_agencia, [2, 3])) {
-
+                        if (in_array($item_1->id_agencia, [2, 3, 5])) {
                             $conexion_2 = 'master_' .  $item_1->id_agencia;
-                            $main_db_2 = 'solucion_master';
 
                             $credito_a = Credito::on($conexion_2)->from('credito_registros as cre_reg')
                                 ->select(
@@ -326,7 +316,7 @@ class CajaCobranzaController extends Controller
                                 ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
                                 ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
                                 ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
-                                ->join("$main_db_2.usuarios as usu", 'cli_reg.asesor_id', 'usu.dni')
+                                ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                                 ->where([
                                     ["cre_pro.$columna_1", $agencia_id],
                                     ["cre_pro.$columna_2", $datos_credito->cliente_id],
@@ -374,7 +364,8 @@ class CajaCobranzaController extends Controller
                     ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
                     ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
                     ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
-                    ->join("$main_db.usuarios as usu", 'cli_reg.asesor_id', 'usu.dni')
+                    ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+
                     ->where([
                         ['cre_reg.id', '<>', $credito_id],
                         ['cre_reg.cliente_id', $cliente_id],
@@ -414,16 +405,43 @@ class CajaCobranzaController extends Controller
         }
     }
 
+    public function verificar_recibo(Request $request)
+    {
+
+        $agencia_id = $request->agencia_id;
+        $conexion = 'master_' .  $agencia_id;
+
+        $numero_recibo = trim($request->numero_recibo);
+
+        $resultado = 'NO_EXISTE';
+
+        $existe = PagoCuota::on($conexion)->where('numero_recibo', $numero_recibo)->get()->count();
+
+        if ($existe == 0) {
+            $existe = PagoMora::on($conexion)->where('numero_recibo', $numero_recibo)->get()->count();
+
+            if ($existe == 0) {
+                $existe = PagoNotificacion::on($conexion)->where('numero_recibo', $numero_recibo)->get()->count();
+
+                if ($existe == 0) {
+                    $resultado = 'NO_EXISTE';
+                } else {
+                    $resultado = 'EXISTE';
+                }
+            } else {
+                $resultado = 'EXISTE';
+            }
+        } else {
+            $resultado = 'EXISTE';
+        }
+
+        return $resultado;
+    }
 
     public function pagar(Request $request)
     {
         $agencia_id = $request->agencia_id;
-
         $conexion = 'master_' .  $agencia_id;
-        $main_db = 'solucion_master';
-
-        $agencia_caja = session('id_agencia');
-        $caja_id = $request->caja_id;
 
         $datos_registro = (new CreditosController)->datos_registro($agencia_id);
         $fecha_larga = (new CreditosController)->fecha_larga_aplicacion($agencia_id);
@@ -432,6 +450,7 @@ class CajaCobranzaController extends Controller
         $datos_cobranza = json_decode($request->datos_cobranza);
         // dd($datos_cobranza);
         $asesor_id = $request->asesor_id;
+        $caja_id = $request->caja_id;
 
         $datos_credito = Credito::on($conexion)->where('id', $credito_id)->get()->last();
         // Obteniendo los datos del crédito
@@ -543,7 +562,7 @@ class CajaCobranzaController extends Controller
                     PagoCuota::on($conexion)->create([
                         'credito_id' => $credito_id,
                         'numero_cuota' => $numero_cuota,
-                        'agencia_caja' => $agencia_caja,
+                        'agencia_caja' => session('id_agencia'),
                         'caja_id' => $caja_id,
                         'monto' => $monto_cuota,
                         'capital_pagado' => $saldo_capital,
@@ -669,7 +688,7 @@ class CajaCobranzaController extends Controller
                         PagoCuota::on($conexion)->create([
                             'credito_id' => $credito_id,
                             'numero_cuota' => $numero_cuota,
-                            'agencia_caja' =>  $agencia_caja,
+                            'agencia_caja' => session('id_agencia'),
                             'caja_id' => $caja_id,
                             'monto' => $monto_cuota,
                             'capital_pagado' => $capital_pago,
@@ -705,7 +724,7 @@ class CajaCobranzaController extends Controller
 
                 PagoMora::on($conexion)->create([
                     'credito_id' => $credito_id,
-                    'agencia_caja' =>  $agencia_caja,
+                    'agencia_caja' => session('id_agencia'),
                     'caja_id' => $caja_id,
                     'monto' => $datos_cobranza->pago_mora_monto,
                     'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -747,7 +766,7 @@ class CajaCobranzaController extends Controller
 
                             PagoNotificacion::on($conexion)->create([
                                 'notificacion_id' => $notificacion_id,
-                                'agencia_caja' =>  $agencia_caja,
+                                'agencia_caja' => session('id_agencia'),
                                 'caja_id' => $caja_id,
                                 'monto' => $restante_notificacion,
                                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -766,7 +785,7 @@ class CajaCobranzaController extends Controller
 
                             PagoNotificacion::on($conexion)->create([
                                 'notificacion_id' => $notificacion_id,
-                                'agencia_caja' =>  $agencia_caja,
+                                'agencia_caja' => session('id_agencia'),
                                 'caja_id' => $caja_id,
                                 'monto' => $monto_notificacion,
                                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -881,7 +900,7 @@ class CajaCobranzaController extends Controller
 
             PagoMora::on($conexion)->create([
                 'credito_id' => $credito_id,
-                'agencia_caja' => $agencia_caja,
+                'agencia_caja' => session('id_agencia'),
                 'caja_id' => $caja_id,
                 'monto' => $datos_cobranza->pago_mora_monto,
                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -923,7 +942,7 @@ class CajaCobranzaController extends Controller
 
                             PagoNotificacion::on($conexion)->create([
                                 'notificacion_id' => $notificacion_id,
-                                'agencia_caja' =>  $agencia_caja,
+                                'agencia_caja' => session('id_agencia'),
                                 'caja_id' => $caja_id,
                                 'monto' => $restante_notificacion,
                                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -942,7 +961,7 @@ class CajaCobranzaController extends Controller
 
                             PagoNotificacion::on($conexion)->create([
                                 'notificacion_id' => $notificacion_id,
-                                'agencia_caja' =>  $agencia_caja,
+                                'agencia_caja' => session('id_agencia'),
                                 'caja_id' => $caja_id,
                                 'monto' => $monto_notificacion,
                                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -1060,7 +1079,7 @@ class CajaCobranzaController extends Controller
 
                         PagoNotificacion::on($conexion)->create([
                             'notificacion_id' => $notificacion_id,
-                            'agencia_caja' =>  $agencia_caja,
+                            'agencia_caja' => session('id_agencia'),
                             'caja_id' => $caja_id,
                             'monto' => $restante_notificacion,
                             'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -1079,7 +1098,7 @@ class CajaCobranzaController extends Controller
 
                         PagoNotificacion::on($conexion)->create([
                             'notificacion_id' => $notificacion_id,
-                            'agencia_caja' =>  $agencia_caja,
+                            'agencia_caja' => session('id_agencia'),
                             'caja_id' => $caja_id,
                             'monto' => $monto_notificacion,
                             'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cobranza->usuario_cobrador),
@@ -1184,7 +1203,7 @@ class CajaCobranzaController extends Controller
 
         PagoVoucher::on($conexion)->create([
             'credito_id' => $credito_id,
-            'agencia_id' =>  $agencia_caja,
+            'agencia_id' => session('id_agencia'),
             'caja_id' => $caja_id,
             'datos_voucher' =>  $voucher,
             'datos_creacion' => $datos_registro,
@@ -1208,7 +1227,7 @@ class CajaCobranzaController extends Controller
                 'modo' => 'DE_CAJA',
                 'monto' => $datos_cobranza->total_cobro,
                 'fecha_movimiento' => $fecha_larga,
-                'agencia_operacion' =>  $agencia_caja,
+                'agencia_operacion' => session('id_agencia'),
                 'caja_operacion' => $caja_id,
                 'descripcion' => 'COBRANZA CLIENTE: ' . $cliente,
                 'datos_creacion' => $datos_registro
@@ -1224,8 +1243,6 @@ class CajaCobranzaController extends Controller
             $banco->save();
         }
 
-        // Registrar en INVERSION META la COBRANZA EXTERNA ----------------
-
         Session::put('cancelado', $cancelado);
         Session::put('datos_voucher', $datos_voucher);
 
@@ -1239,12 +1256,7 @@ class CajaCobranzaController extends Controller
     {
 
         $agencia_id = $request->agencia_id;
-
         $conexion = 'master_' .  $agencia_id;
-        $main_db = 'solucion_master';
-
-        $agencia_caja = session('id_agencia');
-        $caja_id = $request->caja_id;
 
         $datos_registro = (new CreditosController)->datos_registro($agencia_id);
         $fecha_larga = (new CreditosController)->fecha_larga_aplicacion($agencia_id);
@@ -1260,6 +1272,7 @@ class CajaCobranzaController extends Controller
         $total_descuento = $dscto_moras + $dscto_notificaciones + $dscto_interes;
 
         $asesor_id = $request->asesor_id;
+        $caja_id = $request->caja_id;
 
         $datos_credito = Credito::on($conexion)->where('id', $credito_id)->get()->last();
 
@@ -1349,7 +1362,7 @@ class CajaCobranzaController extends Controller
             PagoCuota::on($conexion)->create([
                 'credito_id' => $credito_id,
                 'numero_cuota' => $numero_cuota,
-                'agencia_caja' => $agencia_caja,
+                'agencia_caja' => session('id_agencia'),
                 'caja_id' => $caja_id,
                 'monto' => $monto_cuota,
                 'capital_pagado' => $saldo_capital,
@@ -1391,7 +1404,7 @@ class CajaCobranzaController extends Controller
         if ($mora_pago > 0) {
             PagoMora::on($conexion)->create([
                 'credito_id' => $credito_id,
-                'agencia_caja' => $agencia_caja,
+                'agencia_caja' => session('id_agencia'),
                 'caja_id' => $caja_id,
                 'monto' => $mora_pago,
                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cancelacion->usuario_cobrador),
@@ -1404,6 +1417,8 @@ class CajaCobranzaController extends Controller
                 'datos_creacion' => $datos_registro
             ]);
         }
+
+
 
         $notificaciones_pagar = Notificacion::on($conexion)->where([
             ['credito_id', $credito_id],
@@ -1424,7 +1439,7 @@ class CajaCobranzaController extends Controller
 
             PagoNotificacion::on($conexion)->create([
                 'notificacion_id' => $notificacion_id,
-                'agencia_caja' => $agencia_caja,
+                'agencia_caja' => session('id_agencia'),
                 'caja_id' => $caja_id,
                 'monto' => $restante_notificacion,
                 'usuario_cobrador' => (new CreditosController)->verificar_nulo($datos_cancelacion->usuario_cobrador),
@@ -1457,7 +1472,7 @@ class CajaCobranzaController extends Controller
             'dscto_interes_cancelado' => $dscto_interes,
             'comentario_cancelado' =>  $comentario,
             'documento_cancelado' => $nombre_documento,
-            'agencia_caja_cancelado' => $agencia_caja,
+            'agencia_caja_cancelado' => session('id_agencia'),
             'caja_cancelado_id' => $caja_id,
             'fecha_hora_cancelado' => $fecha_larga,
 
@@ -1489,7 +1504,7 @@ class CajaCobranzaController extends Controller
 
         PagoVoucher::on($conexion)->create([
             'credito_id' => $credito_id,
-            'agencia_id' => $agencia_caja,
+            'agencia_id' => session('id_agencia'),
             'caja_id' => $caja_id,
             'datos_voucher' =>  $voucher,
             'datos_creacion' => $datos_registro,
@@ -1514,7 +1529,7 @@ class CajaCobranzaController extends Controller
                 'monto' => $datos_cancelacion->total_cancelar,
                 'modo' => 'DE_CAJA',
                 'fecha_movimiento' => $fecha_larga,
-                'agencia_operacion' => $agencia_caja,
+                'agencia_operacion' => session('id_agencia'),
                 'caja_operacion' => $caja_id,
                 'descripcion' => 'COBRANZA CLIENTE: ' . $cliente,
                 'datos_creacion' => $datos_registro
@@ -1542,7 +1557,6 @@ class CajaCobranzaController extends Controller
     public function calcular_dias_atraso($credito_id, $agencia_id, $fecha_calculo)
     {
         $conexion = 'master_' .  $agencia_id;
-        $main_db = 'solucion_master';
 
         $resultado = 0;
 
@@ -1653,11 +1667,9 @@ class CajaCobranzaController extends Controller
     public function verificar_carrito(Request $request)
     {
         $agencia_id = $request->input('agencia_id');
+        $credito_id = $request->input('credito_id');
 
         $conexion = 'master_' .  $agencia_id;
-        $main_db = 'solucion_master';
-
-        $credito_id = $request->input('credito_id');
 
         $existe_en_carrito = CarritoDetalle::on($conexion)
             ->where([

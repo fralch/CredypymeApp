@@ -39,6 +39,10 @@ use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+use Illuminate\Support\Facades\Http;
+
+define('API_PRO_URL',  getenv('VITE_S_API_EXTERNA'));
+
 class PropuestaController extends Controller
 {
     public function propuesta($cliente_id, $propuesta_id = 0, $agencia_id)
@@ -77,10 +81,10 @@ class PropuestaController extends Controller
                         'pro.provincia',
                         'dis.distrito'
                     )
-                    ->join('solucion_master.ciiu', 'cli_neg.ciiu_id', 'ciiu.id')
-                    ->join('solucion_master.departamentos as dep', 'cli_neg.departamento_id',  'dep.id')
-                    ->join('solucion_master.provincias as pro', 'cli_neg.provincia_id',  'pro.id')
-                    ->join('solucion_master.distritos as dis', 'cli_neg.distrito_id',  'dis.id')
+                    ->join('credipyme_master.ciiu', 'cli_neg.ciiu_id', 'ciiu.id')
+                    ->join('credipyme_master.departamentos as dep', 'cli_neg.departamento_id',  'dep.id')
+                    ->join('credipyme_master.provincias as pro', 'cli_neg.provincia_id',  'pro.id')
+                    ->join('credipyme_master.distritos as dis', 'cli_neg.distrito_id',  'dis.id')
                     ->where([['cliente_id', $cliente_id], ['vinculado', 1]])
                     ->get()->last();
 
@@ -132,9 +136,9 @@ class PropuestaController extends Controller
                         ->leftjoin('credito_subproductos as cre_sub', 'cre_pro.subproducto_id', 'cre_sub.id')
                         ->join('credito_tipos as cre_tip', 'cre_pro.tipo_id', 'cre_tip.id')
                         ->join('credito_garantias as cre_gar', 'cre_pro.garantia_id', 'cre_gar.id')
-                        ->join('solucion_master.usuarios as us_1', 'cre_pro.promotor_id',  'us_1.dni')
+                        ->join('credipyme_master.usuarios as us_1', 'cre_pro.promotor_id',  'us_1.dni')
                         ->join(
-                            'solucion_master.usuarios as us_2',
+                            'credipyme_master.usuarios as us_2',
                             DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"),
                             'us_2.dni'
                         )
@@ -147,14 +151,15 @@ class PropuestaController extends Controller
 
                     if ($pariente_id != null) {
 
-                        if (in_array($datos_propuesta->agencia_pariente, [2, 3])) {
+                        $datos_pariente = (object)[
+                            'agencia_pariente' => $datos_propuesta->agencia_pariente,
+                            'pariente_id' => $pariente_id
+                        ];
+
+                        if (in_array($datos_propuesta->agencia_pariente, [2, 3, 5])) {
+
                             $agencia_pariente = $datos_propuesta->agencia_pariente;
                             $conexion_pariente_1 = 'master_' . $agencia_pariente;
-
-                            $datos_pariente = (object)[
-                                'agencia_pariente' => $agencia_pariente,
-                                'pariente_id' => $pariente_id
-                            ];
 
                             $datos = Cliente::on($conexion_pariente_1)
                                 ->select(
@@ -167,10 +172,32 @@ class PropuestaController extends Controller
                                 )
                                 ->where('id', $pariente_id)
                                 ->get()->last()->toArray();
+                        } else if (in_array($datos_propuesta->agencia_pariente, [1, 4, 6])) {
+                            $params =
+                                [
+                                    'agencia_id' => $datos_propuesta->agencia_pariente,
+                                    'cliente_id' => $pariente_id
+                                ];
 
-                            foreach ($datos as $key => $value) {
-                                $datos_pariente->$key = $value;
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                if ($response['datos_cliente']) {
+                                    $datos = collect($response['datos_cliente'])->toArray();
+                                } else {
+                                    $datos = [];
+                                }
+                            } else {
+                                $datos = [];
                             }
+                        }
+
+
+                        foreach ($datos as $key => $value) {
+                            $datos_pariente->$key = $value;
                         }
                     }
 
@@ -178,14 +205,16 @@ class PropuestaController extends Controller
                     $datos_aval = null;
 
                     if ($aval_id != null) {
-                        if (in_array($datos_propuesta->agencia_aval, [2, 3])) {
+
+
+                        $datos_aval = (object)[
+                            'agencia_aval' => $datos_propuesta->agencia_aval,
+                            'aval_id' => $aval_id
+                        ];
+
+                        if (in_array($datos_propuesta->agencia_aval, [2, 3, 5])) {
                             $agencia_aval = $datos_propuesta->agencia_aval;
                             $conexion_aval_1 = 'master_' . $agencia_aval;
-
-                            $datos_aval = (object)[
-                                'agencia_aval' => $agencia_aval,
-                                'aval_id' => $aval_id
-                            ];
 
                             $datos = Cliente::on($conexion_aval_1)->from('cliente_registros as cli_reg')
                                 ->select(
@@ -202,15 +231,36 @@ class PropuestaController extends Controller
                                     'pro.provincia',
                                     'dis.distrito'
                                 )
-                                ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                                ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                                ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                                ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                                ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                                ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                                 ->where('cli_reg.id', $aval_id)
                                 ->get()->last()->toArray();
+                        } else if (in_array($datos_propuesta->agencia_aval, [1, 4, 6])) {
+                            $params =
+                                [
+                                    'agencia_id' => $datos_propuesta->agencia_aval,
+                                    'cliente_id' => $aval_id
+                                ];
 
-                            foreach ($datos as $key => $value) {
-                                $datos_aval->$key = $value;
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                if ($response['datos_cliente']) {
+                                    $datos = collect($response['datos_cliente'])->toArray();
+                                } else {
+                                    $datos = [];
+                                }
+                            } else {
+                                $datos = [];
                             }
+                        }
+
+                        foreach ($datos as $key => $value) {
+                            $datos_aval->$key = $value;
                         }
                     }
 
@@ -219,14 +269,15 @@ class PropuestaController extends Controller
 
                     if ($pariente_aval_id != null) {
 
-                        if (in_array($datos_propuesta->agencia_pariente_aval, [2, 3])) {
+                        $datos_pariente_aval = (object)[
+                            'agencia_pariente' => $datos_propuesta->agencia_pariente_aval,
+                            'pariente_aval_id' => $pariente_aval_id
+                        ];
+
+
+                        if (in_array($datos_propuesta->agencia_pariente_aval, [2, 3, 5])) {
                             $agencia_pariente_aval = $datos_propuesta->agencia_pariente_aval;
                             $conexion_pariente_aval_1 = 'master_' . $agencia_pariente_aval;
-
-                            $datos_pariente_aval = (object)[
-                                'agencia_pariente' => $agencia_pariente_aval,
-                                'pariente_aval_id' => $pariente_aval_id
-                            ];
 
                             $datos = Cliente::on($conexion_pariente_aval_1)
                                 ->select(
@@ -239,10 +290,32 @@ class PropuestaController extends Controller
                                 )
                                 ->where('id', $pariente_aval_id)
                                 ->get()->last()->toArray();
+                        } else if (in_array($datos_propuesta->agencia_pariente_aval, [1, 4, 6])) {
 
-                            foreach ($datos as $key => $value) {
-                                $datos_pariente_aval->$key = $value;
+                            $params =
+                                [
+                                    'agencia_id' => $datos_propuesta->agencia_aval,
+                                    'cliente_id' => $pariente_aval_id
+                                ];
+
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                if ($response['datos_cliente']) {
+                                    $datos = collect($response['datos_cliente'])->toArray();
+                                } else {
+                                    $datos = [];
+                                }
+                            } else {
+                                $datos = [];
                             }
+                        }
+
+                        foreach ($datos as $key => $value) {
+                            $datos_pariente_aval->$key = $value;
                         }
                     }
 
@@ -257,7 +330,7 @@ class PropuestaController extends Controller
                         $model = Prenda::on($conexion)->from('cliente_prendas as cli_pre');
                         $model->getModel()->setTable('cli_pre');
 
-                        $datos_prendas = $model->join('solucion_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
+                        $datos_prendas = $model->join('credipyme_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
                             ->select(
                                 [
                                     'cli_pre.id',
@@ -289,6 +362,7 @@ class PropuestaController extends Controller
                 } else {
                     $datos_propuesta = null;
 
+
                     $datos_pariente = Pariente::on($conexion)->select(
                         'id',
                         'agencia_pariente',
@@ -300,8 +374,7 @@ class PropuestaController extends Controller
                     ])->get()->last();
 
                     if ($datos_pariente != null) {
-
-                        if (in_array($datos_pariente->agencia_pariente, [2, 3])) {
+                        if (in_array($datos_pariente->agencia_pariente, [2, 3, 5])) {
                             $conexion_pariente_2 = 'master_' . $datos_pariente->agencia_pariente;
 
                             $datos = Cliente::on($conexion_pariente_2)
@@ -314,12 +387,32 @@ class PropuestaController extends Controller
                                 )
                                 ->where('id', $datos_pariente->pariente_id)
                                 ->get()->last()->toArray();
+                        } else if (in_array($datos_pariente->agencia_pariente, [1, 4, 6])) {
 
-                            foreach ($datos as $key => $value) {
-                                $datos_pariente->$key = $value;
+                            $params =
+                                [
+                                    'agencia_id' => $datos_pariente->agencia_pariente,
+                                    'cliente_id' => $datos_pariente->pariente_id
+                                ];
+
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                if ($response['datos_cliente']) {
+                                    $datos = collect($response['datos_cliente'])->toArray();
+                                } else {
+                                    $datos = [];
+                                }
+                            } else {
+                                $datos = [];
                             }
-                        } else {
-                            $datos_pariente = null;
+                        }
+
+                        foreach ($datos as $key => $value) {
+                            $datos_pariente->$key = $value;
                         }
                     }
 
@@ -334,10 +427,7 @@ class PropuestaController extends Controller
 
 
                     if ($datos_aval != null) {
-
-
-                        if (in_array($datos_aval->agencia_aval, [2, 3])) {
-
+                        if (in_array($datos_aval->agencia_aval, [2, 3, 5])) {
                             $conexion_aval_2 = 'master_' . $datos_aval->agencia_aval;
 
                             $datos = Cliente::on($conexion_aval_2)->from('cliente_registros as cli_reg')
@@ -355,43 +445,77 @@ class PropuestaController extends Controller
                                     'pro.provincia',
                                     'dis.distrito'
                                 )
-                                ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                                ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                                ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                                ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                                ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                                ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                                 ->where('cli_reg.id', $datos_aval->aval_id)
                                 ->get()->last()->toArray();
+                        } else if (in_array($datos_aval->agencia_aval, [1, 4, 6])) {
+                            $params =
+                                [
+                                    'agencia_id' => $datos_aval->agencia_aval,
+                                    'cliente_id' => $datos_aval->aval_id
+                                ];
+
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
 
 
-                            foreach ($datos as $key => $value) {
-                                $datos_aval->$key = $value;
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                if ($response['datos_cliente']) {
+                                    $datos = collect($response['datos_cliente'])->toArray();
+                                } else {
+                                    $datos = [];
+                                }
+                            } else {
+                                $datos = [];
                             }
-                        } else {
-                            $datos_aval = null;
                         }
-                    } else {
-                        $datos_aval = null;
+
+                        foreach ($datos as $key => $value) {
+                            $datos_aval->$key = $value;
+                        }
                     }
 
 
                     if ($datos_aval != null) {
 
+                        if (in_array($datos_aval->agencia_aval, [2, 3, 5])) {
+                            $conexion_aval = 'master_' . $datos_aval->agencia_aval;
 
-                        $conexion_aval = 'master_' . $datos_aval->agencia_aval;
+                            $datos_pariente_aval = Pariente::on($conexion_aval)->select(
+                                'id',
+                                'agencia_pariente',
+                                'pariente_id as pariente_aval_id',
+                                'parentesco'
+                            )->where([
+                                ['cliente_id', $datos_aval->aval_id],
+                                ['vinculado', 1]
+                            ])->get()->last();
+                        } else if (in_array($datos_aval->agencia_aval, [1, 4, 6])) {
 
-                        $datos_pariente_aval = Pariente::on($conexion_aval)->select(
-                            'id',
-                            'agencia_pariente',
-                            'pariente_id as pariente_aval_id',
-                            'parentesco'
-                        )->where([
-                            ['cliente_id', $datos_aval->aval_id],
-                            ['vinculado', 1]
-                        ])->get()->last();
+                            $params =
+                                [
+                                    'agencia_id' => $datos_aval->agencia_aval,
+                                    'cliente_id' => $datos_aval->aval_id
+                                ];
 
+                            $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_pariente_aval", $params);
+
+
+                            if ($response->successful()) {
+
+                                $response = $response->json();
+                                $datos_pariente_aval = $response['datos_pariente_aval'];
+                            } else {
+                                $datos_pariente_aval = null;
+                            }
+                        }
 
                         if ($datos_pariente_aval != null) {
 
-                            if (in_array($datos_pariente_aval->agencia_pariente, [2, 3])) {
+                            if (in_array($datos_pariente_aval->agencia_pariente, [2, 3, 5])) {
                                 $conexion_pariente_aval_2 = 'master_' . $datos_pariente_aval->agencia_pariente;
 
                                 $datos = Cliente::on($conexion_pariente_aval_2)
@@ -404,12 +528,33 @@ class PropuestaController extends Controller
                                     )
                                     ->where('id', $datos_pariente_aval->pariente_aval_id)
                                     ->get()->last()->toArray();
+                            } else if (in_array($datos_pariente_aval->agencia_pariente, [1, 4, 6])) {
 
-                                foreach ($datos as $key => $value) {
-                                    $datos_pariente_aval->$key = $value;
+
+                                $params =
+                                    [
+                                        'agencia_id' => $datos_pariente_aval->agencia_pariente,
+                                        'cliente_id' => $datos_pariente_aval->pariente_aval_id
+                                    ];
+
+                                $response = Http::get(API_PRO_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                                if ($response->successful()) {
+
+                                    $response = $response->json();
+                                    if ($response['datos_cliente']) {
+                                        $datos = collect($response['datos_cliente'])->toArray();
+                                    } else {
+                                        $datos = [];
+                                    }
+                                } else {
+                                    $datos = [];
                                 }
-                            } else {
-                                $datos_pariente_aval = null;
+                            }
+
+                            foreach ($datos as $key => $value) {
+                                $datos_pariente_aval->$key = $value;
                             }
                         }
                     } else {
@@ -421,7 +566,7 @@ class PropuestaController extends Controller
 
                     $model = Prenda::on($conexion)->from('cliente_prendas as cli_pre');
                     $model->getModel()->setTable('cli_pre');
-                    $datos_prendas = $model->join('solucion_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
+                    $datos_prendas = $model->join('credipyme_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
                         ->select(
                             [
                                 'cli_pre.id',
@@ -480,12 +625,12 @@ class PropuestaController extends Controller
                         'pro.provincia',
                         'dis.distrito'
                     )
-                    ->join('solucion_master.agencias as ag', 'cli_reg.agencia_id', 'ag.id_agencia')
+                    ->join('credipyme_master.agencias as ag', 'cli_reg.agencia_id', 'ag.id_agencia')
                     ->join('cliente_negocios as cli_neg', 'cli_reg.id', 'cli_neg.cliente_id')
-                    ->join('solucion_master.usuarios as us', 'cli_reg.asesor_id', 'us.dni')
-                    ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                    ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                    ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                    ->join('credipyme_master.usuarios as us', 'cli_reg.asesor_id', 'us.dni')
+                    ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                    ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                    ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                     ->where([
                         ['cli_reg.id', $cliente_id],
                         ['cli_neg.vinculado', 1]
@@ -522,40 +667,42 @@ class PropuestaController extends Controller
                     // Pariente,aval o pariente_aval del cliente
 
                     if ($value != null) {
-                        $conexion_1 = 'master_' .  $value->agencia_id;
-                        $credito_de = Credito::on($conexion_1)->from('credito_registros as cre_reg')
-                            ->select(
-                                'cre_reg.id',
-                                'cli_reg.id as cliente_id',
-                                'cre_reg.capital_total',
 
-                                'cli_reg.apellido_paterno',
-                                'cli_reg.apellido_materno',
-                                'cli_reg.nombres',
-                                'cli_reg.codigo_expediente',
-                                'cli_reg.agencia_id',
+                        if (in_array($value->agencia_id, [2, 3, 5])) {
+                            $conexion_1 = 'master_' .  $value->agencia_id;
+                            $credito_de = Credito::on($conexion_1)->from('credito_registros as cre_reg')
+                                ->select(
+                                    'cre_reg.id',
+                                    'cli_reg.id as cliente_id',
+                                    'cre_reg.capital_total',
 
-                                'cre_apr.plazo',
-                                'cre_apr.periodo_pago',
+                                    'cli_reg.apellido_paterno',
+                                    'cli_reg.apellido_materno',
+                                    'cli_reg.nombres',
+                                    'cli_reg.codigo_expediente',
+                                    'cli_reg.agencia_id',
 
-                                'cre_tip.tipo',
+                                    'cre_apr.plazo',
+                                    'cre_apr.periodo_pago',
 
-                                'caj_des.datos_creacion',
+                                    'cre_tip.tipo',
 
-                                'usu.usuario as usuario_asesor',
+                                    'caj_des.datos_creacion',
 
-                                DB::raw("'$key' as vinculo")
-                            )
-                            ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
-                            ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
-                            ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
-                            ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                            ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
-                            ->where([['cre_reg.cliente_id', $value->cliente_id], ['cre_reg.estado_id', $estado_id]])
-                            ->get();
+                                    'usu.usuario as usuario_asesor',
 
-                        foreach ($credito_de as $item) {
-                            $creditos_vinculados_de[] = $item;
+                                    DB::raw("'$key' as vinculo")
+                                )
+                                ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
+                                ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
+                                ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
+                                ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
+                                ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                                ->where([['cre_reg.cliente_id', $value->cliente_id], ['cre_reg.estado_id', $estado_id]])
+                                ->get();
+                            foreach ($credito_de as $item) {
+                                $creditos_vinculados_de[] = $item;
+                            }
                         }
                     }
 
@@ -574,45 +721,48 @@ class PropuestaController extends Controller
 
                     $agencias = Agencia::all();
                     foreach ($agencias as $item_1) {
-                        $conexion_2 = 'master_' .  $item_1->id_agencia;
 
-                        $credito_a = Credito::on($conexion_2)->from('credito_registros as cre_reg')
-                            ->select(
-                                'cre_reg.id',
-                                'cre_reg.capital_total',
-                                'cli_reg.id as cliente_id',
-                                'cli_reg.apellido_paterno',
-                                'cli_reg.apellido_materno',
-                                'cli_reg.nombres',
-                                'cli_reg.codigo_expediente',
-                                'cli_reg.agencia_id',
+                        if (in_array($item_1->id_agencia, [2, 3, 5])) {
 
-                                'cre_apr.plazo',
-                                'cre_apr.periodo_pago',
+                            $conexion_2 = 'master_' .  $item_1->id_agencia;
+                            $credito_a = Credito::on($conexion_2)->from('credito_registros as cre_reg')
+                                ->select(
+                                    'cre_reg.id',
+                                    'cre_reg.capital_total',
+                                    'cli_reg.id as cliente_id',
+                                    'cli_reg.apellido_paterno',
+                                    'cli_reg.apellido_materno',
+                                    'cli_reg.nombres',
+                                    'cli_reg.codigo_expediente',
+                                    'cli_reg.agencia_id',
 
-                                'cre_tip.tipo',
+                                    'cre_apr.plazo',
+                                    'cre_apr.periodo_pago',
 
-                                'caj_des.datos_creacion',
+                                    'cre_tip.tipo',
 
-                                'usu.usuario as usuario_asesor',
+                                    'caj_des.datos_creacion',
 
-                                DB::raw("'$key' as vinculo")
-                            )
-                            ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
-                            ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
-                            ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
-                            ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                            ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
-                            ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
-                            ->where([
-                                ["cre_pro.$columna_1", $agencia_id],
-                                ["cre_pro.$columna_2", $cliente_id],
-                                ['cre_reg.estado_id', $estado_id]
-                            ])
-                            ->get();
+                                    'usu.usuario as usuario_asesor',
 
-                        foreach ($credito_a as $item) {
-                            $creditos_vinculados_a[] = $item;
+                                    DB::raw("'$key' as vinculo")
+                                )
+                                ->join('cliente_registros as cli_reg', 'cre_reg.cliente_id', 'cli_reg.id')
+                                ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
+                                ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
+                                ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
+                                ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
+                                ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                                ->where([
+                                    ["cre_pro.$columna_1", $agencia_id],
+                                    ["cre_pro.$columna_2", $cliente_id],
+                                    ['cre_reg.estado_id', $estado_id]
+                                ])
+                                ->get();
+
+                            foreach ($credito_a as $item) {
+                                $creditos_vinculados_a[] = $item;
+                            }
                         }
                     }
                 }
@@ -985,9 +1135,9 @@ class PropuestaController extends Controller
                 'us_2.usuario as usuario_registro',
 
             )->join('cliente_registros as cli_reg', 'cre_pro.cliente_id', 'cli_reg.id')
-            ->join('solucion_master.agencias as age', 'cre_pro.agencia_id', 'age.id_agencia')
-            ->join('solucion_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
-            ->join('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"), 'us_2.dni')
+            ->join('credipyme_master.agencias as age', 'cre_pro.agencia_id', 'age.id_agencia')
+            ->join('credipyme_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
+            ->join('credipyme_master.usuarios as us_2', DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"), 'us_2.dni')
             ->join('credito_estados as cre_est', 'cre_pro.estado_id', 'cre_est.id')
             ->where([
                 ['cre_pro.estado_id', $estado_id],
