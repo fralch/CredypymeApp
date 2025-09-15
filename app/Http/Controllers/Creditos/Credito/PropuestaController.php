@@ -81,10 +81,10 @@ class PropuestaController extends Controller
                         'pro.provincia',
                         'dis.distrito'
                     )
-                    ->join('credipyme_master.ciiu', 'cli_neg.ciiu_id', 'ciiu.id')
-                    ->join('credipyme_master.departamentos as dep', 'cli_neg.departamento_id',  'dep.id')
-                    ->join('credipyme_master.provincias as pro', 'cli_neg.provincia_id',  'pro.id')
-                    ->join('credipyme_master.distritos as dis', 'cli_neg.distrito_id',  'dis.id')
+                    ->join('solucion_master.ciiu', 'cli_neg.ciiu_id', 'ciiu.id')
+                    ->join('solucion_master.departamentos as dep', 'cli_neg.departamento_id',  'dep.id')
+                    ->join('solucion_master.provincias as pro', 'cli_neg.provincia_id',  'pro.id')
+                    ->join('solucion_master.distritos as dis', 'cli_neg.distrito_id',  'dis.id')
                     ->where([['cliente_id', $cliente_id], ['vinculado', 1]])
                     ->get()->last();
 
@@ -136,9 +136,9 @@ class PropuestaController extends Controller
                         ->leftjoin('credito_subproductos as cre_sub', 'cre_pro.subproducto_id', 'cre_sub.id')
                         ->join('credito_tipos as cre_tip', 'cre_pro.tipo_id', 'cre_tip.id')
                         ->join('credito_garantias as cre_gar', 'cre_pro.garantia_id', 'cre_gar.id')
-                        ->join('credipyme_master.usuarios as us_1', 'cre_pro.promotor_id',  'us_1.dni')
+                        ->join('solucion_master.usuarios as us_1', 'cre_pro.promotor_id',  'us_1.dni')
                         ->join(
-                            'credipyme_master.usuarios as us_2',
+                            'solucion_master.usuarios as us_2',
                             DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"),
                             'us_2.dni'
                         )
@@ -231,9 +231,9 @@ class PropuestaController extends Controller
                                     'pro.provincia',
                                     'dis.distrito'
                                 )
-                                ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                                ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                                ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                                ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                                ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                                ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                                 ->where('cli_reg.id', $aval_id)
                                 ->get()->last()->toArray();
                         } else if (in_array($datos_propuesta->agencia_aval, [1, 4, 6])) {
@@ -330,7 +330,7 @@ class PropuestaController extends Controller
                         $model = Prenda::on($conexion)->from('cliente_prendas as cli_pre');
                         $model->getModel()->setTable('cli_pre');
 
-                        $datos_prendas = $model->join('credipyme_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
+                        $datos_prendas = $model->join('solucion_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
                             ->select(
                                 [
                                     'cli_pre.id',
@@ -445,9 +445,9 @@ class PropuestaController extends Controller
                                     'pro.provincia',
                                     'dis.distrito'
                                 )
-                                ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                                ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                                ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                                ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                                ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                                ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                                 ->where('cli_reg.id', $datos_aval->aval_id)
                                 ->get()->last()->toArray();
                         } else if (in_array($datos_aval->agencia_aval, [1, 4, 6])) {
@@ -566,7 +566,7 @@ class PropuestaController extends Controller
 
                     $model = Prenda::on($conexion)->from('cliente_prendas as cli_pre');
                     $model->getModel()->setTable('cli_pre');
-                    $datos_prendas = $model->join('credipyme_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
+                    $datos_prendas = $model->join('solucion_master.usuarios as us', DB::raw("SUBSTRING(cli_pre.datos_creacion,42,8)"), 'us.dni')
                         ->select(
                             [
                                 'cli_pre.id',
@@ -625,12 +625,12 @@ class PropuestaController extends Controller
                         'pro.provincia',
                         'dis.distrito'
                     )
-                    ->join('credipyme_master.agencias as ag', 'cli_reg.agencia_id', 'ag.id_agencia')
+                    ->join('solucion_master.agencias as ag', 'cli_reg.agencia_id', 'ag.id_agencia')
                     ->join('cliente_negocios as cli_neg', 'cli_reg.id', 'cli_neg.cliente_id')
-                    ->join('credipyme_master.usuarios as us', 'cli_reg.asesor_id', 'us.dni')
-                    ->join('credipyme_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
-                    ->join('credipyme_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
-                    ->join('credipyme_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
+                    ->join('solucion_master.usuarios as us', 'cli_reg.asesor_id', 'us.dni')
+                    ->join('solucion_master.departamentos as dep', 'cli_reg.departamento_id',  'dep.id')
+                    ->join('solucion_master.provincias as pro', 'cli_reg.provincia_id',  'pro.id')
+                    ->join('solucion_master.distritos as dis', 'cli_reg.distrito_id',  'dis.id')
                     ->where([
                         ['cli_reg.id', $cliente_id],
                         ['cli_neg.vinculado', 1]
@@ -697,7 +697,7 @@ class PropuestaController extends Controller
                                 ->join('caja_desembolsos as caj_des', 'cre_reg.id', 'caj_des.credito_id')
                                 ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
                                 ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
-                                ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                                ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                                 ->where([['cre_reg.cliente_id', $value->cliente_id], ['cre_reg.estado_id', $estado_id]])
                                 ->get();
                             foreach ($credito_de as $item) {
@@ -752,7 +752,7 @@ class PropuestaController extends Controller
                                 ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
                                 ->join('credito_tipos as cre_tip', 'cre_apr.tipo_id', 'cre_tip.id')
                                 ->join('credito_propuestas as cre_pro', 'cre_apr.propuesta_id', 'cre_pro.id')
-                                ->join('credipyme_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
+                                ->join('solucion_master.usuarios as usu', 'cli_reg.asesor_id', 'usu.dni')
                                 ->where([
                                     ["cre_pro.$columna_1", $agencia_id],
                                     ["cre_pro.$columna_2", $cliente_id],
@@ -1135,9 +1135,9 @@ class PropuestaController extends Controller
                 'us_2.usuario as usuario_registro',
 
             )->join('cliente_registros as cli_reg', 'cre_pro.cliente_id', 'cli_reg.id')
-            ->join('credipyme_master.agencias as age', 'cre_pro.agencia_id', 'age.id_agencia')
-            ->join('credipyme_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
-            ->join('credipyme_master.usuarios as us_2', DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"), 'us_2.dni')
+            ->join('solucion_master.agencias as age', 'cre_pro.agencia_id', 'age.id_agencia')
+            ->join('solucion_master.usuarios as us_1', 'cli_reg.asesor_id', 'us_1.dni')
+            ->join('solucion_master.usuarios as us_2', DB::raw("SUBSTRING(cre_pro.datos_creacion,42,8)"), 'us_2.dni')
             ->join('credito_estados as cre_est', 'cre_pro.estado_id', 'cre_est.id')
             ->where([
                 ['cre_pro.estado_id', $estado_id],
