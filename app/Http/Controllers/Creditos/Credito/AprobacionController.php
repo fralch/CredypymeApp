@@ -281,7 +281,7 @@ class AprobacionController extends Controller
                 if ($pariente_aval_id != null) {
 
                     $datos_pariente_aval = (object)[
-                        'agencia_pariente' => $datos_propuesta->agencia_pariente_aval,
+                        'agencia_pariente_aval' => $datos_propuesta->agencia_pariente_aval,
                         'pariente_aval_id' => $pariente_aval_id
                     ];
 
@@ -465,6 +465,8 @@ class AprobacionController extends Controller
                         'cliente_id' => $datos_pariente_aval->pariente_aval_id
                     ])
                 ];
+
+
 
                 $estado = Estado::on($conexion)->select('id')->where('estado', 'DESEMBOLSADO')->get()->last();
                 $estado_id = $estado->id;
