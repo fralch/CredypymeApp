@@ -17,6 +17,10 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Http;
+
+define('API_HIS_URL',  getenv('VITE_S_API_EXTERNA'));
+
 class ClienteHistorialCrediticioController extends Controller
 {
     public function historial_crediticio($cliente_id, $agencia_id)
@@ -116,7 +120,7 @@ class ClienteHistorialCrediticioController extends Controller
 
             if ($row['pariente_id'] != null && $row['agencia_pariente'] != null) {
 
-                if (in_array($row['agencia_pariente'], [2, 3])) {
+                if (in_array($row['agencia_pariente'], [2, 3, 5])) {
                     $conexion_pariente = 'master_' . $row['agencia_pariente'];
                     $datos_pariente = Cliente::on($conexion_pariente)
                         ->select(
@@ -126,23 +130,43 @@ class ClienteHistorialCrediticioController extends Controller
                             'dni',
                             'direccion'
                         )
-                        ->where('id',  $row['pariente_id'])->get()->last();
+                        ->where('id',  $row['pariente_id'])
+                        ->get()
+                        ->last();
+                } else if (in_array($row['agencia_pariente'], [1, 4, 6])) {
+
+                    $params =
+                        [
+                            'agencia_id' => $row['agencia_pariente'],
+                            'cliente_id' => $row['pariente_id']
+                        ];
+
+                    $response = Http::get(API_HIS_URL . "/api/cli/listado_externa/datos_cliente", $params);
 
 
-                    if ($datos_pariente != null) {
+                    if ($response->successful()) {
 
-                        $row['apellido_paterno_pariente'] = $datos_pariente->apellido_paterno;
-                        $row['apellido_materno_pariente'] = $datos_pariente->apellido_materno;
-                        $row['nombres_pariente'] = $datos_pariente->nombres;
-                        $row['dni_pariente'] = $datos_pariente->dni;
-                        $row['direccion_pariente'] = $datos_pariente->direccion;
+                        $response = $response->json();
+
+                        $datos_pariente = (new Cliente)->newInstance($response['datos_cliente'], true);
+                    } else {
+                        $datos_pariente = null;
                     }
+                }
+
+                if ($datos_pariente != null) {
+
+                    $row['apellido_paterno_pariente'] = $datos_pariente->apellido_paterno;
+                    $row['apellido_materno_pariente'] = $datos_pariente->apellido_materno;
+                    $row['nombres_pariente'] = $datos_pariente->nombres;
+                    $row['dni_pariente'] = $datos_pariente->dni;
+                    $row['direccion_pariente'] = $datos_pariente->direccion;
                 }
             }
 
             if ($row['aval_id'] != null && $row['agencia_aval'] != null) {
 
-                if (in_array($row['agencia_aval'], [2, 3])) {
+                if (in_array($row['agencia_aval'], [2, 3, 5])) {
                     $conexion_aval = 'master_' . $row['agencia_aval'];
                     $datos_aval = Cliente::on($conexion_aval)
                         ->select(
@@ -152,22 +176,43 @@ class ClienteHistorialCrediticioController extends Controller
                             'dni',
                             'direccion'
                         )
-                        ->where('id',  $row['aval_id'])->get()->last();
+                        ->where('id',  $row['aval_id'])
+                        ->get()
+                        ->last();
+                } else if (in_array($row['agencia_aval'], [1, 4, 6])) {
 
-                    if ($datos_aval != null) {
-                        $row['apellido_paterno_aval'] = $datos_aval->apellido_paterno;
-                        $row['apellido_materno_aval'] = $datos_aval->apellido_materno;
-                        $row['nombres_aval'] = $datos_aval->nombres;
-                        $row['dni_aval'] = $datos_aval->dni;
-                        $row['direccion_aval'] = $datos_aval->direccion;
+                    $params =
+                        [
+                            'agencia_id' => $row['agencia_aval'],
+                            'cliente_id' => $row['aval_id']
+                        ];
+
+                    $response = Http::get(API_HIS_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                    if ($response->successful()) {
+
+                        $response = $response->json();
+
+                        $datos_aval = (new Cliente)->newInstance($response['datos_cliente'], true);
+                    } else {
+                        $datos_aval = null;
                     }
+                }
+
+
+                if ($datos_aval != null) {
+                    $row['apellido_paterno_aval'] = $datos_aval->apellido_paterno;
+                    $row['apellido_materno_aval'] = $datos_aval->apellido_materno;
+                    $row['nombres_aval'] = $datos_aval->nombres;
+                    $row['dni_aval'] = $datos_aval->dni;
+                    $row['direccion_aval'] = $datos_aval->direccion;
                 }
             }
 
             if ($row['pariente_aval_id'] != null && $row['agencia_pariente_aval'] != null) {
 
-                if (in_array($row['agencia_pariente_aval'], [2, 3])) {
-
+                if (in_array($row['agencia_pariente_aval'], [2, 3, 5])) {
                     $conexion_pariente_aval = 'master_' . $row['agencia_pariente_aval'];
                     $datos_pariente_aval = Cliente::on($conexion_pariente_aval)
                         ->select(
@@ -177,18 +222,39 @@ class ClienteHistorialCrediticioController extends Controller
                             'dni',
                             'direccion'
                         )
-                        ->where('id',  $row['pariente_aval_id'])->get()->last();
+                        ->where('id',  $row['pariente_aval_id'])
+                        ->get()
+                        ->last();
+                } else if (in_array($row['agencia_pariente_aval'], [1, 4, 6])) {
 
-                    if ($datos_pariente_aval != null) {
-                        $row['apellido_paterno_pariente_aval'] = $datos_pariente_aval->apellido_paterno;
-                        $row['apellido_materno_pariente_aval'] = $datos_pariente_aval->apellido_materno;
-                        $row['nombres_pariente_aval'] = $datos_pariente_aval->nombres;
-                        $row['dni_pariente_aval'] = $datos_pariente_aval->dni;
-                        $row['direccion_pariente_aval'] = $datos_pariente_aval->direccion;
+                    $params =
+                        [
+                            'agencia_id' => $row['agencia_pariente_aval'],
+                            'cliente_id' => $row['pariente_aval_id']
+                        ];
+
+                    $response = Http::get(API_HIS_URL . "/api/cli/listado_externa/datos_cliente", $params);
+
+
+                    if ($response->successful()) {
+
+                        $response = $response->json();
+
+                        $datos_pariente_aval = (new Cliente)->newInstance($response['datos_cliente'], true);
+                    } else {
+                        $datos_pariente_aval = null;
                     }
                 }
-            }
 
+
+                if ($datos_pariente_aval != null) {
+                    $row['apellido_paterno_pariente_aval'] = $datos_pariente_aval->apellido_paterno;
+                    $row['apellido_materno_pariente_aval'] = $datos_pariente_aval->apellido_materno;
+                    $row['nombres_pariente_aval'] = $datos_pariente_aval->nombres;
+                    $row['dni_pariente_aval'] = $datos_pariente_aval->dni;
+                    $row['direccion_pariente_aval'] = $datos_pariente_aval->direccion;
+                }
+            }
 
             return $row;
         });

@@ -1692,7 +1692,6 @@ export default {
 
 			form_1.modo = "NO-EDITAR";
 
-			console.log(form_2.agencia_id);
 			// Esperar a que Vue reactive los datos antes de abrir modal/tab
 			this.$nextTick(() => {
 				$("#mdlDatosPersonales").css("display", "none");
