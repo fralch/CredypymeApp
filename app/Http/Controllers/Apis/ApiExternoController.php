@@ -1711,57 +1711,59 @@ class ApiExternoController extends Controller
 
         $lista_clientes = [];
         foreach ($agencias as $item) {
-            $conexion = 'master_' . $item->id_agencia;
+            if ($item->id_agencia != 5) {
+                $conexion = 'master_' . $item->id_agencia;
 
-            $lista_clientes = Cliente::on($conexion)->from('cliente_registros as cli')
-                ->select(
-                    'cli.id',
-                    'cli.dni',
+                $lista_clientes = Cliente::on($conexion)->from('cliente_registros as cli')
+                    ->select(
+                        'cli.id',
+                        'cli.dni',
 
-                    'cli.apellido_paterno',
-                    'cli.apellido_materno',
-                    'cli.nombres',
-                    'cli.fecha_nacimiento',
-                    'cli.estado_civil',
-                    'cli.sexo',
-                    'cli.hijos',
-                    'cli.agencia_id',
-                    'ag.nombre as agencia',
-                    'cli.correo_electronico',
+                        'cli.apellido_paterno',
+                        'cli.apellido_materno',
+                        'cli.nombres',
+                        'cli.fecha_nacimiento',
+                        'cli.estado_civil',
+                        'cli.sexo',
+                        'cli.hijos',
+                        'cli.agencia_id',
+                        'ag.nombre as agencia',
+                        'cli.correo_electronico',
 
-                    'cli.codigo_expediente',
-                    DB::raw("IFNULL(cli.asesor_id,0) as asesor_id"),
-                    'us.usuario as usuario_asesor',
-                    DB::raw("IFNULL(cli.promotor_id,0) as promotor_id"),
-                    'cli.central_riesgo',
-                    'cli.canal_referencia',
+                        'cli.codigo_expediente',
+                        DB::raw("IFNULL(cli.asesor_id,0) as asesor_id"),
+                        'us.usuario as usuario_asesor',
+                        DB::raw("IFNULL(cli.promotor_id,0) as promotor_id"),
+                        'cli.central_riesgo',
+                        'cli.canal_referencia',
 
-                    'cli.monto_maximo',
-                    'cli.notas',
-                    'cli.reportar_equifax',
+                        'cli.monto_maximo',
+                        'cli.notas',
+                        'cli.reportar_equifax',
 
-                    'cli.direccion',
-                    'cli.departamento_id',
-                    'dep.departamento',
-                    'cli.provincia_id',
-                    'pro.provincia',
-                    'cli.distrito_id',
-                    'dis.distrito',
-                    'cli.referencia_direccion',
-                    'cli.telefonos',
+                        'cli.direccion',
+                        'cli.departamento_id',
+                        'dep.departamento',
+                        'cli.provincia_id',
+                        'pro.provincia',
+                        'cli.distrito_id',
+                        'dis.distrito',
+                        'cli.referencia_direccion',
+                        'cli.telefonos',
 
-                    'cli.imagen_dni',
-                    'cli.observaciones',
-                )
-                ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli.agencia_id')
-                ->join('solucion_master.departamentos as dep', 'dep.id', 'cli.departamento_id')
-                ->join('solucion_master.provincias as pro', 'pro.id', 'cli.provincia_id')
-                ->join('solucion_master.distritos as dis', 'dis.id', 'cli.distrito_id')
-                ->leftjoin('solucion_master.usuarios as us', 'cli.asesor_id', 'us.dni')
-                ->where('cli.dni', $dni)
-                ->get();
-            if (count($lista_clientes) > 0) {
-                break;
+                        'cli.imagen_dni',
+                        'cli.observaciones',
+                    )
+                    ->join('solucion_master.agencias as ag', 'ag.id_agencia', 'cli.agencia_id')
+                    ->join('solucion_master.departamentos as dep', 'dep.id', 'cli.departamento_id')
+                    ->join('solucion_master.provincias as pro', 'pro.id', 'cli.provincia_id')
+                    ->join('solucion_master.distritos as dis', 'dis.id', 'cli.distrito_id')
+                    ->leftjoin('solucion_master.usuarios as us', 'cli.asesor_id', 'us.dni')
+                    ->where('cli.dni', $dni)
+                    ->get();
+                if (count($lista_clientes) > 0) {
+                    break;
+                }
             }
         }
         return response()->json([
