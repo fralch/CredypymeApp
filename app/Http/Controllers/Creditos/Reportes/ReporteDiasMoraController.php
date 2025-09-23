@@ -381,7 +381,7 @@ class ReporteDiasMoraController extends Controller
 
         if ($datos_credito->aval_id != null) {
 
-            if (in_array($datos_credito->agencia_pariente, [2, 3, 5])) {
+            if (in_array($datos_credito->agencia_aval, [2, 3, 5])) {
                 $conexion_aval = 'master_' .  $datos_credito->agencia_aval;
 
                 $aval = Cliente::on($conexion_aval)->from('cliente_registros as cli_reg')
