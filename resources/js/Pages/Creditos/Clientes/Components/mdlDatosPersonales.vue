@@ -1414,17 +1414,17 @@ export default {
 				return false;
 			}
 
-			// const response = await this.BusquedaExterna();
+			const response = await this.BusquedaExterna();
 
-			// if (response.resultado == "RESTRINGIDO") {
-			// 	const agencia = response.agencia;
-			// 	Swal.fire({
-			// 		icon: "error",
-			// 		title: "¡Error!",
-			// 		text: "El cliente está RESTRINGIDO por la agencia " + agencia,
-			// 	});
-			// 	return false;
-			// }
+			if (response.resultado == "RESTRINGIDO") {
+				const agencia = response.agencia;
+				Swal.fire({
+					icon: "error",
+					title: "¡Error!",
+					text: "El cliente está RESTRINGIDO por la agencia " + agencia,
+				});
+				return false;
+			}
 
 			Swal.fire({
 				title: "BUSCANDO",
@@ -1480,18 +1480,18 @@ export default {
 			});
 		},
 
-		// async BusquedaExterna() {
-		// 	const params = {
-		// 		dni: this.frmDatosCliente.dni,
-		// 	};
+		async BusquedaExterna() {
+			const params = {
+				dni: this.frmDatosCliente.dni,
+			};
 
-		// 	return axios
-		// 		.get(api_externa + "/api/cli/listado_externa/buscar", { params })
-		// 		.then((response) => {
-		// 			console.log(response.data);
-		// 			return response.data;
-		// 		});
-		// },
+			return axios
+				.get(api_externa + "/api/cli/listado_externa/buscar", { params })
+				.then((response) => {
+					console.log(response.data);
+					return response.data;
+				});
+		},
 
 		FiltrarProvincias() {
 			let departamento_id = this.frmDatosCliente.departamento_id;
