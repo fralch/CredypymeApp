@@ -2,7 +2,7 @@
 <html lang="es">
 
 <head>
-    <title>CrediApp</title>
+    <title>CredyApp</title>
     <meta charset="UTF-8">
 
     <meta http-equiv="Expires" content="0">
