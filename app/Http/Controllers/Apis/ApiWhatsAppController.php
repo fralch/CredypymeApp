@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 
 define('API_URL', 'https://apiwsp.factiliza.com/v1/message');
-define('API_INSTANCE', 'NTE5NTM2MDA5ODc=');
-define('API_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNzciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJjb25zdWx0b3IifQ.HD5PhP2aHPAa4dJ9YwqJt0SapK8fwwASH-zlGtp-i6w');
+define('API_INSTANCE', 'NTE5NDEzODA1MDc=');
+define('API_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzOTU0NSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImNvbnN1bHRvciJ9.SneWgmC2ux6Gm7-n-hFkc3obnKSoNYnzey3MJUe7aIE');
 
 class ApiWhatsAppController extends Controller
 {

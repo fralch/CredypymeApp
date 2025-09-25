@@ -702,7 +702,7 @@ class CarritoController extends Controller
         if ($enviroment == 'production') {
             $telefono_principal = $request->telefono_principal;
         } else if ($enviroment == 'development') {
-            $telefono_principal = 961990030;
+            $telefono_principal = 955547121;
         }
         // ---------------------------------------
 
@@ -953,7 +953,7 @@ class CarritoController extends Controller
         if ($enviroment == 'production') {
             $telefono_principal = $request->telefono_principal;
         } else if ($enviroment == 'development') {
-            $telefono_principal = 961990030;
+            $telefono_principal = 955547121;
         }
         // ---------------------------------------
 

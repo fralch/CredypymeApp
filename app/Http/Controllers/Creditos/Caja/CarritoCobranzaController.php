@@ -1036,26 +1036,25 @@ class CarritoCobranzaController extends Controller
 
         $credito = Credito::on($conexion)->find($credito_id);
 
-        if($credito && $credito->estado_id == 4){
+        if ($credito && $credito->estado_id == 4) {
 
             $prendas = Credito::on($conexion)->from('credito_registros as cre_reg')->select(
                 'prendas'
-                )
-                ->join('credito_aprobaciones as cre_apr','cre_apr.id','cre_reg.aprobacion_id')
-                ->join('credito_propuestas as cre_pro','cre_pro.id','cre_apr.propuesta_id')
+            )
+                ->join('credito_aprobaciones as cre_apr', 'cre_apr.id', 'cre_reg.aprobacion_id')
+                ->join('credito_propuestas as cre_pro', 'cre_pro.id', 'cre_apr.propuesta_id')
                 ->where('cre_reg.id', $credito_id)
                 ->first();
 
-                if ($prendas && $prendas->prendas) {
+            if ($prendas && $prendas->prendas) {
 
-                    $prendas = json_decode($prendas->prendas);
+                $prendas = json_decode($prendas->prendas);
 
-                    foreach ($prendas as $value) {
-                        Prenda::on($conexion)->where('id', $value)->update([
-                            'disponible' => 1,
-                            'datos_actualizacion' => $datos_registro
-                        ]);
-
+                foreach ($prendas as $value) {
+                    Prenda::on($conexion)->where('id', $value)->update([
+                        'disponible' => 1,
+                        'datos_actualizacion' => $datos_registro
+                    ]);
                 }
                 // dd($estado_id);
             }
@@ -1124,7 +1123,7 @@ class CarritoCobranzaController extends Controller
             if ($enviroment == 'production') {
                 $telefono_principal = $detalle_pago->telefono_envio;
             } else if ($enviroment == 'development') {
-                $telefono_principal = 961990030;
+                $telefono_principal = 955547121;
             }
             // ---------------------------------------
 
@@ -1228,7 +1227,7 @@ class CarritoCobranzaController extends Controller
         if ($enviroment == 'production') {
             $phone_number = $datos_voucher->telefono_principal;
         } else if ($enviroment == 'development') {
-            $phone_number = 961990030;
+            $phone_number = 955547121;
         }
         // ---------------------------------------
 

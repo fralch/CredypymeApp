@@ -139,7 +139,7 @@ class MensajeriaController extends Controller
 
                         // ENVIAR MENSAJE
 
-                        // $numero_principal = '961990030';
+                        // $numero_principal = '955547121';
                         $respuesta = (new ApiWhatsAppController)->text_send($numero_principal, $mensaje);
 
                         // dd($respuesta);
