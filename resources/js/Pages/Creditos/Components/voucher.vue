@@ -9,8 +9,8 @@
 		id="voucher"
 	>
 		<div class="text-center">
-			<p style="margin-bottom: 0px">CORPORACIÓN CREDIPYME</p>
-			<p style="margin-bottom: 0px">RUC: 20601618282</p>
+			<p style="margin-bottom: 0px">CREDIPYME HUANCA</p>
+			<p style="margin-bottom: 0px">RUC: -</p>
 			<p style="margin-bottom: 0px">
 				{{ concepto }}
 			</p>

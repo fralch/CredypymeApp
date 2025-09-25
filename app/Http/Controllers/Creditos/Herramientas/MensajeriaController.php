@@ -113,7 +113,7 @@ class MensajeriaController extends Controller
         $telefonos_enviar = [];
 
         $mensaje = '*Estimado cliente:*' . "\n" .
-            'Te saludamos 👋🏻 desde *CREDIPYME* para informarte que nuestras cuentas en *Interbank* ya se encuentran operativas ✅ para recibir tus pagos. ¡Agradecemos tu preferencia! 😃';
+            'Te saludamos 👋🏻 desde *CREDIPYME HUANCA* para informarte que nuestras cuentas en *Interbank* ya se encuentran operativas ✅ para recibir tus pagos. ¡Agradecemos tu preferencia! 😃';
 
         foreach ($datos_clientes as $item) {
             // Enviar mensaje a cliente aquí...

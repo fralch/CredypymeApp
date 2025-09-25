@@ -13,10 +13,10 @@
 		>
 			<div class="text-center">
 				<p style="font-weight: bold; margin-bottom: 0px; font-size: 14px">
-					CREDIPYMESOLUCIÓN
+					CREDIPYME HUANCA
 				</p>
 				<p style="font-weight: bold; margin-bottom: 0px; font-size: 14px">
-					RUC:20601618282
+					RUC:-
 				</p>
 				<p style="font-weight: bold; margin-bottom: 0px; font-size: 12px">
 					RECEP. DE DINERO DE AGENCIA

@@ -53,7 +53,7 @@
                     <span>SISTEMA</span> <i class="far fa-building fa-lg"></i>
                 </a>
 
-                <a class="button b3" href="https://credipyme.com.pe:2096" target="_blank">
+                <a class="button b3" href="https://credipymehuanca.com.pe:2096" target="_blank">
                     <span>CORREO</span> <i class="far fa-envelope"></i>
                 </a>
             </div>

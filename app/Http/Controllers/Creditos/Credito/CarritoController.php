@@ -836,7 +836,7 @@ class CarritoController extends Controller
 
         $mensaje = $mensaje . "\n" .
             "*Total Cobro: S/* " . "*" . $total_cobro . "*" . "
-        **Credipyme**";
+        **Credipyme Huanca**";
 
 
         if ($enviar_comprobante) {
@@ -974,7 +974,7 @@ class CarritoController extends Controller
         $carrito_detalle->save();
 
         $mensaje = "Su Ticket de Cobranza: " . "*" . $agencia_credito . "-" . $cliente_id . "-" . $credito_id . "-" . $carrito_detalle_id . " se ha ANULADO*";
-        $mensaje = $mensaje . "\n" . "**Credipyme**";
+        $mensaje = $mensaje . "\n" . "**Credipyme Huanca**";
 
         // Para verificar si el servicio está activo
 

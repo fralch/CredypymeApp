@@ -522,7 +522,7 @@ class CarritoSeguimientoController extends Controller
         if ($modo_envio == 'SMS') {
             $message = "EL TICKET: " . $ticket . " se ha pagado correctamente." . "\n" .
                 "¡Gracias por tu confianza!" . "\n" .
-                "---Credipyme---";
+                "---Credipyme Huanca---";
 
             $respuesta_envio = (new ApiSmsController)->single_send($telefono_envio, $message)->getContent();
         } else if ($modo_envio == 'WHATSAPP') {

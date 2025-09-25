@@ -1133,7 +1133,7 @@ class CarritoCobranzaController extends Controller
 
                 $message = "EL TICKET: " . $ticket . " se ha pagado correctamente." . "\n" .
                     "¡Gracias por tu confianza!" . "\n" .
-                    "---Credipyme---";
+                    "---Credipyme Huanca---";
 
                 $respuesta_envio = (new ApiSmsController)->single_send($telefono_principal, $message)->getContent();
             } else if ($detalle_pago->modo_envio == 'WHATSAPP') {
@@ -1220,7 +1220,7 @@ class CarritoCobranzaController extends Controller
         $agencia_credito = $datos_voucher->agencia_credito;
 
         $message = "EL TICKET: " . $ticket . " se ha pagado correctamente. ¡Gracias por tu preferencia!" . "
-            " . "***Credipyme***";
+            " . "***Credipyme Huanca***";
 
         // ---- Número celular según entorno -----
         $enviroment = getenv('APP_ENV');

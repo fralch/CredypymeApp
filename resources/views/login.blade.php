@@ -56,7 +56,7 @@
                             <button type="submit" class="btn btn-primary" id="btnEntrar">INGRESAR</button>
                         </div>
                         <div class="row form-group">
-                            <p class="copyright">&copy; 2025 Grupo Credipyme</p>
+                            <p class="copyright">&copy; 2025 Credipyme Huanca SAC</p>
                         </div>
                     </div>
                 </form>
