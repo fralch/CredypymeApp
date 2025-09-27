@@ -42,10 +42,10 @@ class CreditoDocumentoFinancieroController extends Controller
         $datos_documento = json_decode($request->datos_documento);
 
         $datos_empresa = (object)[
-            'razon' => 'CREDIPYME HUANCA SAC',
+            'razon' => 'CREDIPYME HUANCA S.A.C',
             'nombre' => 'CREDIPYME HUANCA',
-            'ruc' => '-',
-            'direccion' => 'Prolg. Huánuco 317 (2do piso)',
+            'ruc' => '20614827239',
+            'direccion' => 'Prolg. Huánuco N° 317 (2do piso)',
             'distrito' => 'Huancayo',
             'provincia' => 'Huancayo',
         ];

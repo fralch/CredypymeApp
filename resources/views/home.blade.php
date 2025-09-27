@@ -54,7 +54,7 @@
     <header id="header" class="header">
         <div class="top-left">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/home"><img class="logo-principal" src="/images/general/logo-blanco.svg" alt="Logo"></a>
+                <a class="navbar-brand" href="/home"><img class="logo-principal" src="/images/general/logo-blanco.svg" alt="Logo" style="width: 20% !important;"></a>
             </div>
         </div>
 

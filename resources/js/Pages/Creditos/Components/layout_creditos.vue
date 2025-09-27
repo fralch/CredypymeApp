@@ -43,7 +43,7 @@
 	>
 		<div class="container">
 			<inertia-link class="logo-system" :href="$route('cre.index')"
-				><img :src="'/images/general/logo-blanco.svg'" alt="Logo" width="150px"
+				><img :src="'/images/general/logo-blanco.svg'" alt="Logo" width="180px"
 			/></inertia-link>
 
 			<nav>
