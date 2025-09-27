@@ -38,7 +38,7 @@
 
         <div class="container-picture mr-auto p-2">
             <div class="container-logo">
-                <img class="pic-logo" src="{{ asset('images/general/logo-blanco.svg') }}" alt="logo-empresa">
+                <img class="pic-logo" src="{{ asset('images/general/logo-blanco.png') }}" alt="logo-empresa">
             </div>
 
             <img class="pic1" src="{{ asset('images/index/imagen-contenido.svg') }}" alt="imagen-contenido">

@@ -34,7 +34,7 @@ class AvalController extends Controller
 
         foreach ($lista as $key => $item) {
 
-            if (in_array($item->agencia_pariente, [2, 3, 5])) {
+            if (in_array($item->agencia_aval, [2, 3, 5])) {
                 $conexion = 'master_' .  $item->agencia_aval;
 
                 $datos_cliente = Cliente::on($conexion)->from('cliente_registros as cli_reg')

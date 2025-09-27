@@ -2,7 +2,7 @@
 	<div style="height: 100% !important">
 		<div class="container">
 			<inertia-link class="logo-system" :href="$route('gth.index')"
-				><img :src="'/images/general/logo-blanco.svg'" alt="Logo" width="180px"
+				><img :src="'/images/general/logo-blanco.png'" alt="Logo" width="180px"
 			/></inertia-link>
 
 			<nav>

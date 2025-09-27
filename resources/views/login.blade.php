@@ -23,7 +23,7 @@
 <body>
 
     <div class="navbar-header">
-        <a class="navbar-brand" href="./"><img src="{{asset('images/general/logo-blanco.svg')}}" alt="Logo" id="logoPrincipal"></a>
+        <a class="navbar-brand" href="./"><img src="{{asset('images/general/logo-blanco.png')}}" alt="Logo" id="logoPrincipal"></a>
     </div>
     <div class="container login-container" style="z-index:1;">
         <div class="row">
