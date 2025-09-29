@@ -250,11 +250,11 @@
 										<div class="text-center col-md-12 col-4">
 											<button
 												class="btn btn-cancel btn-icon-split mt-1"
-												title="Imprimir PAGARÉ FIANZA"
+												title="Imprimir PAGARÉ"
 												style="font-size: 9px; width: 100% !important"
 												@click="Imprimir('pagare_fianza')"
 											>
-												<span class="text">PAGARÉ / FIANZA</span>
+												<span class="text">PAGARÉ</span>
 											</button>
 										</div>
 									</div>

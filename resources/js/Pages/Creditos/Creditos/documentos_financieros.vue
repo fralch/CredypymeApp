@@ -113,11 +113,11 @@
 										<div class="form-group col-md-12 col-4">
 											<button
 												class="btn btn-action btn-icon-split mt-1"
-												title="Imprimir PAGARÉ FIANZA"
+												title="Imprimir PAGARÉ"
 												style="width: 100% !important"
 												@click="Imprimir('pagare_fianza')"
 											>
-												<span class="text">PAGARÉ / FIANZA</span>
+												<span class="text">PAGARÉ</span>
 											</button>
 										</div>
 										<div class="form-group col-md-12 col-4">
