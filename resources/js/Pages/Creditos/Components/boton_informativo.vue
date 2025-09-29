@@ -462,8 +462,8 @@ export default {
 	height: 53px;
 	border-radius: 50px;
 
-	background: #244b9a;
-	border-bottom: 5px solid #0045a6;
+	background: var(--colorAlto);
+	border-bottom: var(--colorAlto);
 	box-shadow: 6px 6px 6px #999;
 	color: #fff;
 
@@ -476,7 +476,7 @@ export default {
 }
 #button:hover {
 	/* background-color: #89bd29; */
-	background: #89bd29;
+	background: var(--colorMedio);
 }
 
 #button:active {

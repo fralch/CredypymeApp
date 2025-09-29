@@ -12,14 +12,14 @@ a:visited {
 }
 
 :root {
-    --colorCreditos1: #337ba3;
-    --colorCreditos2: #53c3ff;
+    --colorCreditos1: #71bc9c;
+    --colorCreditos2: #95ffd1;
     --colorOperaciones1: #70639e;
     --colorOperaciones2: #b6a2ff;
     --colorGth1: #d6975f;
     --colorGth2: #fab06f;
-    --colorLogistica1: #71bc9c;
-    --colorLogistica2: #95ffd1;
+    --colorLogistica1: #337ba3;
+    --colorLogistica2: #53c3ff;
     --colorContabilidad1: #d64355;
     --colorContabilidad2: #ff576b;
 }

@@ -811,9 +811,9 @@ export default {
 
 <style lang="css">
 :root {
-	--colorMedio: #71bc9c;
-	--colorAlto: #17a673;
-	--colorBajo: #e7fbf2;
+	--colorBajo: #f6feff;
+	--colorMedio: var(--verdeOscuroEmpresarial);
+	--colorAlto: var(--azulOscuroEmpresarial);
 }
 * {
 	margin: 0;
@@ -1024,7 +1024,7 @@ footer {
 
 .footer-text {
 	border-top-right-radius: 20px;
-	color: var(--colorAlto);
+	color: var(--verdeOscuroEmpresarial);
 	background: var(--plomoOscuroEmpresarial);
 	font-size: 0.7rem;
 	font-weight: bolder;

@@ -2623,13 +2623,9 @@ export default {
 
 <style lang="css">
 :root {
-	/* --colorBajo: #f6feff; */
-	--colorBajo: #f6feff;
-	/* --colorBajo: #def7ff; */
-	/* --colorMedio: #337ba3; */
-	--colorMedio: var(--verdeOscuroEmpresarial);
-	--colorAlto: var(--azulOscuroEmpresarial);
-	/* --colorAlto: var(--verdeOscuroEmpresarial); */
+	--colorMedio: #71bc9c;
+	--colorAlto: #17a673;
+	--colorBajo: #e7fbf2;
 }
 
 * {
@@ -2864,7 +2860,7 @@ footer {
 	border-top-right-radius: 20px;
 	background: var(--plomoOscuroEmpresarial);
 	font-size: 0.7rem;
-	color: var(--verdeOscuroEmpresarial);
+	color: var(--colorAlto);
 	font-weight: bolder;
 }
 
