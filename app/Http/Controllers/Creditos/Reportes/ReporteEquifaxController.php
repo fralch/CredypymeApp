@@ -30,6 +30,10 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use Illuminate\Support\Facades\Http;
+
+define('API_EQU_URL',  getenv('VITE_S_API_EXTERNA'));
+
 class ReporteEquifaxController extends Controller
 {
     public function informe_equifax($modo)
@@ -166,7 +170,11 @@ class ReporteEquifaxController extends Controller
             ->orderBy('cre_reg.fecha_desembolso', 'asc')
             ->get();
 
+        $provisional = [];
+
         foreach ($creditos as $item) {
+
+
 
             $datos_cliente = $this->informacion_cliente($agencia_id, $item->cliente_id);
 
@@ -183,7 +191,27 @@ class ReporteEquifaxController extends Controller
 
                 $cliente_id = $item->pariente_id;
                 $agencia_pariente = $item->agencia_pariente;
-                $datos_cliente = $this->informacion_cliente($agencia_pariente, $cliente_id);
+
+                if (in_array($agencia_pariente, [2, 3, 5])) {
+                    $datos_cliente = $this->informacion_cliente($agencia_pariente, $cliente_id);
+                } else if (in_array($agencia_pariente, [1, 4, 6])) {
+                    $datos_pariente =
+                        [
+                            'agencia_id' => $agencia_pariente,
+                            'cliente_id' => $cliente_id
+                        ];
+
+                    $response = Http::get(API_EQU_URL . "/api/cli/listado_externa/datos_cliente", $datos_pariente);
+
+                    if ($response->successful()) {
+
+                        $response = $response->json();
+
+                        $datos_cliente = (object) $response['datos_cliente'];
+                    } else {
+                        $datos_cliente = null;
+                    }
+                }
 
                 if ($datos_cliente != null) {
                     $item->cliente_pariente_id = $cliente_id;
@@ -208,7 +236,27 @@ class ReporteEquifaxController extends Controller
                 $cliente_id = $item->aval_id;
                 $agencia_aval = $item->agencia_aval;
 
-                $datos_cliente = $this->informacion_cliente($agencia_aval, $cliente_id);
+                if (in_array($agencia_aval, [2, 3, 5])) {
+                    $datos_cliente = $this->informacion_cliente($agencia_aval, $cliente_id);
+                } else if (in_array($agencia_aval, [1, 4, 6])) {
+                    $datos_aval =
+                        [
+                            'agencia_id' => $agencia_aval,
+                            'cliente_id' => $cliente_id
+                        ];
+
+                    $response = Http::get(API_EQU_URL . "/api/cli/listado_externa/datos_cliente", $datos_aval);
+
+                    if ($response->successful()) {
+
+                        $response = $response->json();
+
+                        $datos_cliente = (object) $response['datos_cliente'];
+                    } else {
+                        $datos_cliente = null;
+                    }
+                }
+
 
                 if ($datos_cliente != null) {
                     $item->cliente_aval_id = $cliente_id;
@@ -232,7 +280,28 @@ class ReporteEquifaxController extends Controller
                 $cliente_id = $item->pariente_aval_id;
                 $agencia_pariente_aval = $item->agencia_pariente_aval;
 
-                $datos_cliente = $this->informacion_cliente($agencia_pariente_aval, $cliente_id);
+                if (in_array($agencia_pariente_aval, [2, 3, 5])) {
+                    $datos_cliente = $this->informacion_cliente($agencia_pariente_aval, $cliente_id);
+                } else if (in_array($agencia_pariente_aval, [1, 4, 6])) {
+
+
+                    $datos_pariente_aval =
+                        [
+                            'agencia_id' => $agencia_pariente_aval,
+                            'cliente_id' => $cliente_id
+                        ];
+
+                    $response = Http::get(API_EQU_URL . "/api/cli/listado_externa/datos_cliente", $datos_pariente_aval);
+
+                    if ($response->successful()) {
+
+                        $response = $response->json();
+
+                        $datos_cliente = (object) $response['datos_cliente'];
+                    } else {
+                        $datos_cliente = null;
+                    }
+                }
 
                 if ($datos_cliente != null) {
                     $item->cliente_pariente_aval_id = $cliente_id;
