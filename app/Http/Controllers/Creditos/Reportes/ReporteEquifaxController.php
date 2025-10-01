@@ -170,10 +170,9 @@ class ReporteEquifaxController extends Controller
             ->orderBy('cre_reg.fecha_desembolso', 'asc')
             ->get();
 
-        $provisional = [];
+
 
         foreach ($creditos as $item) {
-
 
 
             $datos_cliente = $this->informacion_cliente($agencia_id, $item->cliente_id);
@@ -207,7 +206,11 @@ class ReporteEquifaxController extends Controller
 
                         $response = $response->json();
 
-                        $datos_cliente = (object) $response['datos_cliente'];
+                        if ($response['datos_cliente']) {
+                            $datos_cliente = (object) $response['datos_cliente'];
+                        } else {
+                            $datos_cliente = null;
+                        }
                     } else {
                         $datos_cliente = null;
                     }
@@ -247,18 +250,24 @@ class ReporteEquifaxController extends Controller
 
                     $response = Http::get(API_EQU_URL . "/api/cli/listado_externa/datos_cliente", $datos_aval);
 
+
+
                     if ($response->successful()) {
 
                         $response = $response->json();
 
-                        $datos_cliente = (object) $response['datos_cliente'];
+                        if ($response['datos_cliente']) {
+                            $datos_cliente = (object) $response['datos_cliente'];
+                        } else {
+                            $datos_cliente = null;
+                        }
                     } else {
                         $datos_cliente = null;
                     }
                 }
 
-
                 if ($datos_cliente != null) {
+
                     $item->cliente_aval_id = $cliente_id;
                     $item->dni_aval = $datos_cliente->dni;
                     $item->apellido_paterno_aval = $datos_cliente->apellido_paterno;
@@ -297,7 +306,11 @@ class ReporteEquifaxController extends Controller
 
                         $response = $response->json();
 
-                        $datos_cliente = (object) $response['datos_cliente'];
+                        if ($response['datos_cliente']) {
+                            $datos_cliente = (object) $response['datos_cliente'];
+                        } else {
+                            $datos_cliente = null;
+                        }
                     } else {
                         $datos_cliente = null;
                     }

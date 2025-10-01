@@ -236,49 +236,28 @@ class FacturacionController extends Controller
 
         switch ($agencia_id) {
 
-            case 1: //AGENCIA TAMBO:
-
-                $serie = $comprobante_id == 1 ? 'FFF1' : 'BBB1';
-                $token = "e77d106f3f144721bc6c0004714aca76314660cb61194d88b3cbc18b66e928e6";
-
-                break;
             case 2: //AGENCIA HUANCAYO:
 
                 $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
-                $token = "8015f6c9c0534f9f958d1dd685feb11962e57890aba44a38a7816cbdcb1b75ee";
+                $token = "";
 
                 break;
             case 3: //AGENCIA PAMPAS:
 
                 $serie =  $comprobante_id == 1 ? 'FFF3' : 'BBB3';
-                $token = "9b0f17f77fa945ddabd983987fe856169de9ccef9b91465898a68bdb494a21c6";
-
-                break;
-            case 4: //AGENCIA HUANCAVELICA:
-
-                $serie =  $comprobante_id == 1 ? 'FFF4' : 'BBB4';
-                $token = "b9a6193f2d9d4d5dbffdaaae5271a2706cc0639049af42849bbcd5c2cf524e1f";
-
-                break;
-            case 6: //AGENCIA CHILCA:
-
-                $serie =  $comprobante_id == 1 ? 'FFF6' : 'BBB6';
-                $token = "8b788dac183f4313941f348c0c4149a53bfd41bf89cd42a084ee4192cc2c74fc";
+                $token = "";
 
                 break;
         }
 
 
-        $ruta = "https://api.nubefact.com/api/v1/957365d8-fc55-46fd-afbb-310406460b2a";
+        $ruta = "https://api.nubefact.com/api/v1/";
 
 
         $numeracion = [
-            (object) ['agencia_id' => 1, 'ultimo' => 0],
             (object) ['agencia_id' => 2, 'ultimo' => 0],
             (object) ['agencia_id' => 3, 'ultimo' => 0],
-            (object) ['agencia_id' => 4, 'ultimo' => 0],
             (object) ['agencia_id' => 5, 'ultimo' => 0],
-            (object) ['agencia_id' => 6, 'ultimo' => 0],
         ];
 
 
@@ -476,49 +455,29 @@ class FacturacionController extends Controller
 
         switch ($agencia_id) {
 
-            case 1: //AGENCIA TAMBO:
-
-                $serie = $comprobante_id == 1 ? 'FFF1' : 'BBB1';
-                $token = "b83f416c92164eb290576217109e8d38ed781b8f754547e3aeac90c6cd372ddd";
-
-                break;
             case 2: //AGENCIA HUANCAYO:
 
                 $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
-                $token = "c479069d3e8845d99292037ccfd44010d555b75e8082429b81f9edf4ea14f304";
+                $token = "";
 
                 break;
 
             case 3: //AGENCIA PAMPAS:
 
                 $serie =  $comprobante_id == 1 ? 'FFF3' : 'BBB3';
-                $token = "8f92dbd9eb8e4dd9a98decfe782a68db95f8d7572f10472e87d4384b59a78b5f";
-
-                break;
-
-            case 4: //AGENCIA HUANCAVELICA:
-
-                $serie =  $comprobante_id == 1 ? 'FFF4' : 'BBB4';
-                $token = "bfc6853f36fa43e181d07fca68d0fe3482a93e04baca48169f3e6465d0d854f2";
+                $token = "";
 
                 break;
 
             case 5: //OF. ADMINISTRATIVA:
 
                 $serie =  $comprobante_id == 1 ? 'FFF5' : 'BBB5';
-                $token = "6309d2a198354c438971fd1bdd994494b75a0ed9c5174317829889dad912e201";
-
-                break;
-
-            case 6: //AGENCIA CHILCA:
-
-                $serie =  $comprobante_id == 1 ? 'FFF6' : 'BBB6';
-                $token = "50965ed974c54cba9e9066453bce8af94bdd6b25d26347a9a7f0ca2814983f0e";
+                $token = "";
 
                 break;
         }
 
-        $ruta = "https://api.nubefact.com/api/v1/0c3eb210-300d-4991-a1c9-deb8eb5cf45f";
+        $ruta = "https://api.nubefact.com/api/v1/";
 
         $numeracion = [
             (object) ['agencia_id' => 1, 'ultimo' => 0],
@@ -675,34 +634,7 @@ class FacturacionController extends Controller
     public function facturar_todos() //Para facturar mediante arrays
     {
         $lista = [];
-        $lista[] = (object) ['nombres' => 'ESPINOZA CRISPIN DORIS LUZ', 'dni' => '41386245', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'VILLAVERDE CASTAÑEDA WILINTON', 'dni' => '45424552', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'GOMEZ CONDOR ADELA', 'dni' => '41264295', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'ESPINOZA CRISPIN DORIS LUZ', 'dni' => '41386245', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'CAPCHA ROMERO LIZ JANET', 'dni' => '48637766', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'PAUCARCHUCO SOTO ANTONIO FREDY', 'dni' => '42493456', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'FELIX CANCHARI RODRIGO', 'dni' => '45309266', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'GUERRERO MARTINEZ CHARLY SEBASTIAN', 'dni' => '44338739', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'GUTIERREZ ROJAS LURDES', 'dni' => '77053042', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'FLORES PECEROS MIGUEL', 'dni' => '47953548', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'ROJAS SHUAN YENNY YUDITH', 'dni' => '70149065', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'QUISPE PORRAS JAQUELINE ANA', 'dni' => '45928316', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'BUSTAMANTE ESPINOZA ANGGUE ZAID', 'dni' => '70667403', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'CAPCHA ROMERO LUIS MIGUEL', 'dni' => '45499242', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'CORDOVA BALBIN BERTHA', 'dni' => '20043858', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'HUARINGA MEZA CLARA LUZ', 'dni' => '62211325', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'JAIME ARAUCO ROSARIO ISABEL', 'dni' => '19852964', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'MENDOZA RODRIGUEZ FILOMENA', 'dni' => '23709498', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'OROZCO FABIAN ENA LUISA', 'dni' => '40462623', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'GAMBOA GALINDO MARIA JUANA', 'dni' => '07018316', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'QUISPE LEON JUSTINA VICTORIA', 'dni' => '23238346', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'CASQUI VILLALVA CINTYA', 'dni' => '46030516', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'QUINTO SANCHEZ INDIRA', 'dni' => '42749352', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'LAURA CCENTE JOSE CARLOS', 'dni' => '71808607', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'LUNA PRIVAT JOSE JUAN', 'dni' => '19810672', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'DE LA BREÑA REYMUNDO ROSI', 'dni' => '44478805', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'REYNOSO CAPCHA ELOY', 'dni' => '19882539', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
-        $lista[] = (object) ['nombres' => 'GOMEZ LIMAS JHESIKA', 'dni' => '43724402', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
+        $lista[] = (object) ['nombres' => '', 'dni' => '', 'direccion' => null, 'importe_total' => 333, 'importe_igv' => 50.7965, 'importe_gravado' => 282.2035, 'porcentaje_igv' => 18];
 
         //    -----------FACTURACION ------------
         $hoy = date("Y-m-d H:i:s");
@@ -718,9 +650,9 @@ class FacturacionController extends Controller
             $comprobante_id = $comprobante->id;
 
             $serie =  $comprobante_id == 1 ? 'FFF6' : 'BBB6';
-            $token = "50965ed974c54cba9e9066453bce8af94bdd6b25d26347a9a7f0ca2814983f0e";
+            $token = "";
 
-            $ruta = "https://api.nubefact.com/api/v1/0c3eb210-300d-4991-a1c9-deb8eb5cf45f";
+            $ruta = "https://api.nubefact.com/api/v1/";
 
             $numero += 1;
 

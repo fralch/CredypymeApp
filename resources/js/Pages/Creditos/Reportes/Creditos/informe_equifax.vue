@@ -880,14 +880,14 @@ export default {
 				data.append("hasta_dias", this.hasta_dias);
 			}
 
+			// this.$inertia.post(route("rep.cre.informe_equifax.buscar"), data);
+			// return false;
+
 			Swal.fire({
 				title: "BUSCANDO",
 				text: "Espere porfavor...",
 				allowOutsideClick: false,
 				didOpen: () => {
-					// this.$inertia.post(route("rep.cre.informe_equifax.buscar"), data);
-					// return false;
-
 					Swal.showLoading();
 					axios
 						.post(route("rep.cre.informe_equifax.buscar"), data)
