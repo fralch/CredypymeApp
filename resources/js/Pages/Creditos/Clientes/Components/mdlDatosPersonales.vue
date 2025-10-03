@@ -1480,18 +1480,21 @@ export default {
 			});
 		},
 
+		// NO BORRAR --------------------------------------------------------
 		async BusquedaExterna() {
 			const params = {
 				dni: this.frmDatosCliente.dni,
+				agencia_id: this.agencia_seleccionada,
+				acceso: JSON.stringify(this.datos_sesion),
 			};
 
 			return axios
 				.get(api_externa + "/api/cli/listado_externa/buscar", { params })
 				.then((response) => {
-					console.log(response.data);
 					return response.data;
 				});
 		},
+		// ------------------------------------------------------------------
 
 		FiltrarProvincias() {
 			let departamento_id = this.frmDatosCliente.departamento_id;

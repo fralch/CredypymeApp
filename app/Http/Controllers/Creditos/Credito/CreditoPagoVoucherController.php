@@ -271,8 +271,13 @@ class CreditoPagoVoucherController extends Controller
                 ->get()
                 ->last();
 
-            $item->agencia_caja = $datos_caja->agencia;
-            $item->usuario_caja = $datos_caja->usuario;
+            if ($datos_caja) {
+                $item->agencia_caja = $datos_caja->agencia;
+                $item->usuario_caja = $datos_caja->usuario;
+            } else {
+                $item->agencia_caja = null;
+                $item->usuario_caja = null;
+            }
         }
 
         // dd($vouchers);
