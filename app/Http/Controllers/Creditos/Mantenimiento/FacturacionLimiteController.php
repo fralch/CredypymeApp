@@ -198,39 +198,10 @@ class FacturacionLimiteController extends Controller
 
         // Calcular el restante del limite del dia anterior
         $restante = 0;
-        // $limite_dia_anterior = LimiteDetalle::where('fecha', $fecha_actual_corta)->get()->last();
-
-        // if ($limite_dia_anterior != null) {
-        //     $limite_dia_anterior = json_decode($limite_dia_anterior->detalle);
-
-        //     $limite_anterior = [];
-        //     foreach ($limite_dia_anterior as $item) {
-        //         if ($item->agencia_id == session('id_agencia')) {
-        //             $limite_anterior[] = $item;
-        //         }
-        //     }
-
-        //     if (count($limite_anterior) > 0) {
-        //         $monto_limite_anterior = $limite_anterior[0]->monto_limite;
-        //         $facturado_dia_anterior = Facturado::from('credito_facturados as cre_fac')
-        //             ->join('caja_desembolsos as caj_des', 'cre_fac.desembolso_id', 'caj_des.id')
-        //             ->join('credito_registros as cre_reg', 'caj_des.credito_id', 'cre_reg.id')
-        //             ->where([
-        //                 [DB::raw("STR_TO_DATE(SUBSTRING(cre_fac.datos_creacion ,11,10), '%Y-%m-%d')"), $fecha_actual_corta],
-        //                 ['cre_reg.agencia_id', session('id_agencia')]
-        //             ])
-        //             ->sum('caj_des.interes_total');
-
-        //         $restante = round(floatval($monto_limite_anterior) - floatval($facturado_dia_anterior), 2);
-        //     }
-        // }
-
-        // ---------------------------
 
         // Verificar si existe limites del día nuevo
         $limite_diario_actual = LimiteDetalle::where('fecha', $fecha_nueva_corta)->get()->last();
         // -----------------------------------
-
 
         if ($limite_diario_actual == null) {
 
@@ -252,22 +223,12 @@ class FacturacionLimiteController extends Controller
             $lista_detalles = [];
 
             if ($agencia_id != 5) {
-
-                if (in_array($agencia_id, [2, 3])) {
-                    $lista_detalles[] = [
-                        'agencia_id' => $agencia_id,
-                        'cantidad_creditos' => count($creditos_activos),
-                        'porcentaje_limite' => round($porcentaje_limite / 7.8, 2),
-                        'monto_limite' => round($monto_limite_dia / 7.8, 2)
-                    ];
-                } else {
-                    $lista_detalles[] = [
-                        'agencia_id' => $agencia_id,
-                        'cantidad_creditos' => count($creditos_activos),
-                        'porcentaje_limite' => round($porcentaje_limite / 3.9, 2),
-                        'monto_limite' => round($monto_limite_dia / 3.9, 2)
-                    ];
-                }
+                $lista_detalles[] = [
+                    'agencia_id' => $agencia_id,
+                    'cantidad_creditos' => count($creditos_activos),
+                    'porcentaje_limite' => round($porcentaje_limite / 1, 2),
+                    'monto_limite' => round($monto_limite_dia / 1, 2)
+                ];
             } else {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,
@@ -316,21 +277,12 @@ class FacturacionLimiteController extends Controller
                 }
                 // ---------------------------
 
-                if (in_array($item->agencia_id, [2, 3])) {
-                    $lista_detalles[] = [
-                        'agencia_id' => $item->agencia_id,
-                        'cantidad_creditos' => $item->cantidad_creditos,
-                        'porcentaje_limite' => round($nuevo_porcentaje / 7.8, 2),
-                        'monto_limite' => round($nuevo_monto_limite /  7.8, 2)
-                    ];
-                } else {
-                    $lista_detalles[] = [
-                        'agencia_id' => $item->agencia_id,
-                        'cantidad_creditos' => $item->cantidad_creditos,
-                        'porcentaje_limite' => round($nuevo_porcentaje / 3.9, 2),
-                        'monto_limite' => round($nuevo_monto_limite /  3.9, 2)
-                    ];
-                }
+                $lista_detalles[] = [
+                    'agencia_id' => $item->agencia_id,
+                    'cantidad_creditos' => $item->cantidad_creditos,
+                    'porcentaje_limite' => round($nuevo_porcentaje / 1, 2),
+                    'monto_limite' => round($nuevo_monto_limite /  1, 2)
+                ];
             }
             // ---------------------------
 
@@ -352,21 +304,12 @@ class FacturacionLimiteController extends Controller
             if (
                 $agencia_id != 5
             ) {
-                if (in_array($agencia_id, [2, 3])) {
-                    $lista_detalles[] = [
-                        'agencia_id' => $agencia_id,
-                        'cantidad_creditos' => count($creditos_activos),
-                        'porcentaje_limite' => round($porcentaje_limite / 7.8, 2),
-                        'monto_limite' => round($monto_limite_dia / 7.8, 2)
-                    ];
-                } else {
-                    $lista_detalles[] = [
-                        'agencia_id' => $agencia_id,
-                        'cantidad_creditos' => count($creditos_activos),
-                        'porcentaje_limite' => round($porcentaje_limite / 3.9, 2),
-                        'monto_limite' => round($monto_limite_dia / 3.9, 2)
-                    ];
-                }
+                $lista_detalles[] = [
+                    'agencia_id' => $agencia_id,
+                    'cantidad_creditos' => count($creditos_activos),
+                    'porcentaje_limite' => round($porcentaje_limite / 1, 2),
+                    'monto_limite' => round($monto_limite_dia / 1, 2)
+                ];
             } else {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,

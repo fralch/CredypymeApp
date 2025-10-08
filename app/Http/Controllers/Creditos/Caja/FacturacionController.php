@@ -236,22 +236,29 @@ class FacturacionController extends Controller
 
         switch ($agencia_id) {
 
+
             case 2: //AGENCIA HUANCAYO:
 
-                $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
-                $token = "";
+                $serie =  $comprobante_id == 1 ? 'FFF1' : 'BBB1';
+                $token = "29cc1c43b27b4f52802eda001360df0c45f1516e701b4dd69eb8f4a4b476499d";
 
                 break;
             case 3: //AGENCIA PAMPAS:
 
+                $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
+                $token = "052cc210529a4f6f88ac34a50c51242377e1e813df944191bfcd99f4617f36c8";
+
+                break;
+            case 5: //OFICINA ADMINISTRATIVA:
+
                 $serie =  $comprobante_id == 1 ? 'FFF3' : 'BBB3';
-                $token = "";
+                $token = "67b096b58fa54d719f14986ed09619e3564e49853ae1446c8304ce7040d1c66a";
 
                 break;
         }
 
 
-        $ruta = "https://api.nubefact.com/api/v1/";
+        $ruta = "https://api.nubefact.com/api/v1/d3a35edb-68c5-45da-ba4b-0feeb07d89c1";
 
 
         $numeracion = [
