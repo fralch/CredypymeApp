@@ -305,7 +305,7 @@ class AprobacionController extends Controller
 
                         $params =
                             [
-                                'agencia_id' => $datos_propuesta->agencia_aval,
+                                'agencia_id' => $datos_propuesta->agencia_pariente_aval,
                                 'cliente_id' => $pariente_aval_id
                             ];
 
