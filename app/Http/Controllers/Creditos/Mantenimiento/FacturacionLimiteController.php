@@ -222,7 +222,7 @@ class FacturacionLimiteController extends Controller
 
             $lista_detalles = [];
 
-            if ($agencia_id != 5) {
+            if ($agencia_id != 5 && $agencia_id != 3 && $agencia_id != 2) {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,
                     'cantidad_creditos' => count($creditos_activos),
@@ -302,7 +302,7 @@ class FacturacionLimiteController extends Controller
             }
 
             if (
-                $agencia_id != 5
+                $agencia_id != 5 && $agencia_id != 3 && $agencia_id != 2
             ) {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,

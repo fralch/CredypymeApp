@@ -1333,6 +1333,9 @@ export default {
 				).length > 0
 			);
 		},
+		datos_sesion(){
+			return this.$inertia.page.props.user_session;
+		}
 	},
 	methods: {
 		Redondear(e) {
