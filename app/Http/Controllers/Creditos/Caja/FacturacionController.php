@@ -233,38 +233,30 @@ class FacturacionController extends Controller
         $comprobante = Comprobante::select('id')->where('comprobante', 'BOLETA')->get()->last();
         $comprobante_id = $comprobante->id;
 
-
         switch ($agencia_id) {
 
 
             case 2: //AGENCIA HUANCAYO:
 
-                $serie =  $comprobante_id == 1 ? 'FFF1' : 'BBB1';
-                $token = "29cc1c43b27b4f52802eda001360df0c45f1516e701b4dd69eb8f4a4b476499d";
+                $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
+                $token = "8015f6c9c0534f9f958d1dd685feb11962e57890aba44a38a7816cbdcb1b75ee";
 
                 break;
             case 3: //AGENCIA PAMPAS:
 
-                $serie =  $comprobante_id == 1 ? 'FFF2' : 'BBB2';
-                $token = "052cc210529a4f6f88ac34a50c51242377e1e813df944191bfcd99f4617f36c8";
-
-                break;
-            case 5: //OFICINA ADMINISTRATIVA:
-
                 $serie =  $comprobante_id == 1 ? 'FFF3' : 'BBB3';
-                $token = "67b096b58fa54d719f14986ed09619e3564e49853ae1446c8304ce7040d1c66a";
+                $token = "9b0f17f77fa945ddabd983987fe856169de9ccef9b91465898a68bdb494a21c6";
 
                 break;
         }
 
 
-        $ruta = "https://api.nubefact.com/api/v1/d3a35edb-68c5-45da-ba4b-0feeb07d89c1";
+        $ruta = "https://api.nubefact.com/api/v1/957365d8-fc55-46fd-afbb-310406460b2a";
 
 
         $numeracion = [
             (object) ['agencia_id' => 2, 'ultimo' => 0],
-            (object) ['agencia_id' => 3, 'ultimo' => 0],
-            (object) ['agencia_id' => 5, 'ultimo' => 0],
+            (object) ['agencia_id' => 3, 'ultimo' => 0]
         ];
 
 
@@ -318,10 +310,10 @@ class FacturacionController extends Controller
             "descuento_global"                  => "",
             "total_descuento"                   => "",
             "total_anticipo"                    => "",
-            "total_gravada"                     => strval($importe_gravado),
-            "total_inafecta"                    => "",
+            "total_gravada"                     => "",
+            "total_inafecta"                    => $importe_total,
             "total_exonerada"                   => "",
-            "total_igv"                         => $importe_igv,
+            "total_igv"                         => "",
             "total_gratuita"                    => "",
             "total_otros_cargos"                => "",
             "total"                             => $importe_total,
@@ -351,12 +343,12 @@ class FacturacionController extends Controller
                     "codigo"                    => "001",
                     "descripcion"               => "INTERES COMPENSATORIO",
                     "cantidad"                  => "1",
-                    "valor_unitario"            => strval($importe_gravado),
+                    "valor_unitario"            => $importe_total,
                     "precio_unitario"           => $importe_total,
                     "descuento"                 => "",
-                    "subtotal"                  => strval($importe_gravado),
-                    "tipo_de_igv"               => "1",
-                    "igv"                       => $importe_igv,
+                    "subtotal"                  => $importe_total,
+                    "tipo_de_igv"               => 9,
+                    "igv"                       => "0",
                     "total"                     => $importe_total,
                     "anticipo_regularizacion"   => "false",
                     "anticipo_documento_serie"  => "",
@@ -389,7 +381,7 @@ class FacturacionController extends Controller
         $respuesta_nubefact = json_decode($respuesta, true);
 
         if (isset($respuesta_nubefact['errors'])) {
-            return $respuesta_nubefact['errors'];
+            dd($respuesta_nubefact['errors']);
         } else {
             Facturado::on($conexion)->create([
                 'desembolso_id' => $desembolso_id,
@@ -544,10 +536,10 @@ class FacturacionController extends Controller
             "descuento_global"                  => "",
             "total_descuento"                   => "",
             "total_anticipo"                    => "",
-            "total_gravada"                     => strval($importe_gravado),
-            "total_inafecta"                    => "",
+            "total_gravada"                     => "",
+            "total_inafecta"                    => $importe_total,
             "total_exonerada"                   => "",
-            "total_igv"                         => $importe_igv,
+            "total_igv"                         => "",
             "total_gratuita"                    => "",
             "total_otros_cargos"                => "",
             "total"                             => $importe_total,
@@ -577,12 +569,12 @@ class FacturacionController extends Controller
                     "codigo"                    => "001",
                     "descripcion"               => "INTERES COMPENSATORIO",
                     "cantidad"                  => "1",
-                    "valor_unitario"            => strval($importe_gravado),
+                    "valor_unitario"            => $importe_total,
                     "precio_unitario"           => $importe_total,
                     "descuento"                 => "",
-                    "subtotal"                  => strval($importe_gravado),
-                    "tipo_de_igv"               => "1",
-                    "igv"                       => $importe_igv,
+                    "subtotal"                  => $importe_total,
+                    "tipo_de_igv"               => 9,
+                    "igv"                       => "0",
                     "total"                     => $importe_total,
                     "anticipo_regularizacion"   => "false",
                     "anticipo_documento_serie"  => "",

@@ -164,6 +164,8 @@ class FacturacionLimiteController extends Controller
         $estado = Estado::on($conexion)->where('estado', 'DESEMBOLSADO')->get()->last();
         $estado_id = $estado->id;
 
+        // // Se comenta porque la asignacion de porcentajes es fija--------------------------------
+
         $creditos_activos = Credito::on($conexion)->from('credito_registros as cre_reg')
             ->select('cre_reg.id')
             ->join('credito_aprobaciones as cre_apr', 'cre_reg.aprobacion_id', 'cre_apr.id')
@@ -171,6 +173,7 @@ class FacturacionLimiteController extends Controller
                 ['cre_reg.estado_id', $estado_id],
                 ['cre_apr.tipo_id', '<>', $tipo_id]
             ])->get();
+
         // -----------------------------------
 
         // Porcentajes de desembolsos según día
@@ -209,7 +212,9 @@ class FacturacionLimiteController extends Controller
                 $porcentaje_limite = 0;
                 $monto_limite_dia =  0;
             } else {
+
                 $porcentaje_limite = 1;
+
                 $monto_limite = $limite_mensual_actual->limite_real;
                 $monto_limite_corresponde = round(floatval($porcentaje_limite) * floatval($monto_limite), 2);
 
@@ -222,7 +227,7 @@ class FacturacionLimiteController extends Controller
 
             $lista_detalles = [];
 
-            if ($agencia_id != 5 && $agencia_id != 3 && $agencia_id != 2) {
+            if ($agencia_id != 5) {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,
                     'cantidad_creditos' => count($creditos_activos),
@@ -237,7 +242,6 @@ class FacturacionLimiteController extends Controller
                     'monto_limite' => 0
                 ];
             }
-
 
             LimiteDetalle::create([
                 'limite_id' => $limite_mensual_actual->id,
@@ -259,6 +263,7 @@ class FacturacionLimiteController extends Controller
 
             $lista_detalles = [];
 
+
             // Actualizando porcentajes y montos limites de cada agencia
             foreach ($limite_actual_detalle as $item) {
 
@@ -266,7 +271,17 @@ class FacturacionLimiteController extends Controller
                     $nuevo_porcentaje = 0;
                     $nuevo_monto_limite =  0;
                 } else {
-                    $nuevo_porcentaje = round(intval($item->cantidad_creditos) / intval($total_creditos), 2);
+
+                    // $nuevo_porcentaje = round(intval($item->cantidad_creditos) / intval($total_creditos), 2);
+
+                    if ($item->agencia_id == 2) {
+                        $nuevo_porcentaje = 0.4; // HUANCAYO
+                    } else if ($item->agencia_id == 3) {
+                        $nuevo_porcentaje = 0.6; // PAMPAS
+                    } else {
+                        $nuevo_porcentaje = 0;
+                    }
+
                     $monto_limite = $limite_mensual_actual->limite_real;
                     $monto_limite_corresponde = round(floatval($nuevo_porcentaje) * floatval($monto_limite), 2);
 
@@ -291,7 +306,16 @@ class FacturacionLimiteController extends Controller
                 $porcentaje_limite = 0;
                 $monto_limite_dia =  0;
             } else {
-                $porcentaje_limite = round(count($creditos_activos) / $total_creditos, 2);
+                // $porcentaje_limite = round(count($creditos_activos) / $total_creditos, 2);
+
+                if ($agencia_id == 2) {
+                    $porcentaje_limite = 0.4; // HUANCAYO
+                } else if ($agencia_id == 3) {
+                    $porcentaje_limite = 0.6; // PAMPAS
+                } else {
+                    $porcentaje_limite = 0;
+                }
+
                 $monto_limite = $limite_mensual_actual->limite_real;
                 $monto_limite_corresponde = round(floatval($porcentaje_limite) * floatval($monto_limite), 2);
                 // Calcular monto límite del día de la agencia
@@ -302,7 +326,7 @@ class FacturacionLimiteController extends Controller
             }
 
             if (
-                $agencia_id != 5 && $agencia_id != 3 && $agencia_id != 2
+                $agencia_id != 5
             ) {
                 $lista_detalles[] = [
                     'agencia_id' => $agencia_id,

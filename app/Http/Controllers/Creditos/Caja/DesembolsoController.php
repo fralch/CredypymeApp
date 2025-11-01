@@ -471,6 +471,7 @@ class DesembolsoController extends Controller
 
             $enviroment = getenv('APP_ENV');
 
+
             if ($enviroment == 'development') {
                 $facturado = (new FacturacionController)->facturar_local($datos_desembolso);
             } else if ($enviroment == 'production') {
