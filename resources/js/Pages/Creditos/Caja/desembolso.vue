@@ -1440,11 +1440,11 @@ export default {
                                 );
                             }
 
-                            this.$inertia.post(
-                                route("caj.desembolso.guardar"),
-                                data
-                            );
-                            return false;
+                            //   this.$inertia.post(
+                            //     route("caj.desembolso.guardar"),
+                            //     data
+                            // );
+                            // return false;
 
                             Swal.showLoading();
                             await axios
