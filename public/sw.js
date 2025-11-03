@@ -1,5 +1,5 @@
 //asignar un nombre y versión al cache
-const CACHE_NAME = "v1_cache_credisys",
+const CACHE_NAME = "v2_cache_credisys",
     urlsToCache = [
         "./",
         "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css",
