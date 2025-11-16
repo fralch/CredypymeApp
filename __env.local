@@ -8,7 +8,7 @@ APP_URL=http://credypymeapp.test
 LOG_CHANNEL=stack
 
 LIBREOFFICE="soffice"
-VITE_FACTILIZA_TOKEN= ''
+VITE_FACTILIZA_TOKEN= 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzOTU0NSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImNvbnN1bHRvciJ9.ha1U3ur2lhubqKlHiwxaZuJFdqnfAIBa1AZJERreMhI'
 VITE_S_API_EXTERNA="http://credipymeapp.test"
 
 # CONEXION LOCAL ----------------------------
