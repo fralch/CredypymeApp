@@ -275,9 +275,9 @@ class FacturacionLimiteController extends Controller
                     // $nuevo_porcentaje = round(intval($item->cantidad_creditos) / intval($total_creditos), 2);
 
                     if ($item->agencia_id == 2) {
-                        $nuevo_porcentaje = 0.4; // HUANCAYO
+                        $nuevo_porcentaje = 0.45; // HUANCAYO
                     } else if ($item->agencia_id == 3) {
-                        $nuevo_porcentaje = 0.6; // PAMPAS
+                        $nuevo_porcentaje = 0.55; // PAMPAS
                     } else {
                         $nuevo_porcentaje = 0;
                     }
@@ -309,9 +309,9 @@ class FacturacionLimiteController extends Controller
                 // $porcentaje_limite = round(count($creditos_activos) / $total_creditos, 2);
 
                 if ($agencia_id == 2) {
-                    $porcentaje_limite = 0.4; // HUANCAYO
+                    $porcentaje_limite = 0.45; // HUANCAYO
                 } else if ($agencia_id == 3) {
-                    $porcentaje_limite = 0.6; // PAMPAS
+                    $porcentaje_limite = 0.55; // PAMPAS
                 } else {
                     $porcentaje_limite = 0;
                 }
