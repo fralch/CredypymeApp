@@ -839,18 +839,18 @@ class CarritoController extends Controller
         **Credipyme Huanca**";
 
 
-        if ($enviar_comprobante) {
-            if ($modo_envio == 'SMS') {
+        // if ($enviar_comprobante) {
+        //     if ($modo_envio == 'SMS') {
 
-                $mensaje = str_replace('_', '', $mensaje);
-                $mensaje = str_replace('**', '--', $mensaje);
-                $mensaje = str_replace('*', '', $mensaje);
+        //         $mensaje = str_replace('_', '', $mensaje);
+        //         $mensaje = str_replace('**', '--', $mensaje);
+        //         $mensaje = str_replace('*', '', $mensaje);
 
-                $respuesta_envio = (new ApiSmsController)->single_send($telefono_principal, $mensaje);
-            } else if ($modo_envio == 'WHATSAPP') {
-                $respuesta_envio = (new ApiWhatsAppController)->text_send($telefono_principal, $mensaje);
-            }
-        }
+        //         $respuesta_envio = (new ApiSmsController)->single_send($telefono_principal, $mensaje);
+        //     } else if ($modo_envio == 'WHATSAPP') {
+        //         $respuesta_envio = (new ApiWhatsAppController)->text_send($telefono_principal, $mensaje);
+        //     }
+        // }
 
         return "ENVIADO";
     }
@@ -987,18 +987,18 @@ class CarritoController extends Controller
         $enviar_comprobante = $verificar_servicio['resultado'];
         // -----------------------------------------------
 
-        if ($enviar_comprobante) {
-            if ($modo_envio == 'SMS') {
+        // if ($enviar_comprobante) {
+        //     if ($modo_envio == 'SMS') {
 
-                $mensaje = str_replace('_', '', $mensaje);
-                $mensaje = str_replace('**', '--', $mensaje);
-                $mensaje = str_replace('*', '', $mensaje);
+        //         $mensaje = str_replace('_', '', $mensaje);
+        //         $mensaje = str_replace('**', '--', $mensaje);
+        //         $mensaje = str_replace('*', '', $mensaje);
 
-                $respuesta_envio = (new ApiSmsController)->single_send($telefono_envio, $mensaje);
-            } else if ($modo_envio == 'WHATSAPP') {
-                $respuesta_envio = (new ApiWhatsAppController)->text_send($telefono_envio, $mensaje);
-            }
-        }
+        //         $respuesta_envio = (new ApiSmsController)->single_send($telefono_envio, $mensaje);
+        //     } else if ($modo_envio == 'WHATSAPP') {
+        //         $respuesta_envio = (new ApiWhatsAppController)->text_send($telefono_envio, $mensaje);
+        //     }
+        // }
 
         return "EXITO";
     }
