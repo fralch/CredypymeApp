@@ -357,13 +357,15 @@ class CajaCierreDiaController extends Controller
                         $monto_mora = 3;
                         break;
                     case 'QUINCENAL':
-                        $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
+                        // $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
+                        $monto_mora = 5;
                         break;
                     case 'PAGO_UNICO':
                         $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
+                        $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
                         break;
                     case 'MENSUAL':
-                        $monto_mora = 3;
+                        $monto_mora = 5;
                         break;
                 }
             } else if ($item->es_especial) {
@@ -393,13 +395,14 @@ class CajaCierreDiaController extends Controller
 
                     switch ($item->periodo_pago) {
                         case 'QUINCENAL':
-                            $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
+                            // $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
+                            $monto_mora = 5;
                             break;
                         case 'PAGO_UNICO':
                             $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
                             break;
                         case 'MENSUAL':
-                            $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 30), 1);
+                            $monto_mora = 5;
                             break;
                     }
                 }
