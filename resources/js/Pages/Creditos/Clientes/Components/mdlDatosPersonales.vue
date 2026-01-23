@@ -110,7 +110,20 @@
                                                             step="1"
                                                             lang="en"
                                                             maxlength="8"
-                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                            oninput="
+                                                                javascript: if (
+                                                                    this.value
+                                                                        .length >
+                                                                    this
+                                                                        .maxLength
+                                                                )
+                                                                    this.value =
+                                                                        this.value.slice(
+                                                                            0,
+                                                                            this
+                                                                                .maxLength,
+                                                                        );
+                                                            "
                                                             v-model="
                                                                 frmDatosCliente.dni
                                                             "
@@ -422,7 +435,13 @@
                                                     v-model.number="
                                                         frmDatosCliente.hijos
                                                     "
-                                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                                    onkeypress="
+                                                        return (
+                                                            event.charCode >=
+                                                                48 &&
+                                                            event.charCode <= 57
+                                                        );
+                                                    "
                                                     :disabled="
                                                         frmDatosCliente.modo ==
                                                             'NO-EDITAR' ||
@@ -1012,7 +1031,20 @@
                                                                     : '',
                                                             ]"
                                                             maxlength="9"
-                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                            oninput="
+                                                                javascript: if (
+                                                                    this.value
+                                                                        .length >
+                                                                    this
+                                                                        .maxLength
+                                                                )
+                                                                    this.value =
+                                                                        this.value.slice(
+                                                                            0,
+                                                                            this
+                                                                                .maxLength,
+                                                                        );
+                                                            "
                                                             v-model="
                                                                 frmDatosCliente
                                                                     .telefonos
@@ -1191,7 +1223,20 @@
                                                                 max-width: 400px;
                                                             "
                                                             maxlength="9"
-                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                            oninput="
+                                                                javascript: if (
+                                                                    this.value
+                                                                        .length >
+                                                                    this
+                                                                        .maxLength
+                                                                )
+                                                                    this.value =
+                                                                        this.value.slice(
+                                                                            0,
+                                                                            this
+                                                                                .maxLength,
+                                                                        );
+                                                            "
                                                             v-model="
                                                                 frmDatosCliente
                                                                     .telefonos
@@ -1337,7 +1382,20 @@
                                                                 max-width: 400px;
                                                             "
                                                             maxlength="9"
-                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                            oninput="
+                                                                javascript: if (
+                                                                    this.value
+                                                                        .length >
+                                                                    this
+                                                                        .maxLength
+                                                                )
+                                                                    this.value =
+                                                                        this.value.slice(
+                                                                            0,
+                                                                            this
+                                                                                .maxLength,
+                                                                        );
+                                                            "
                                                             v-model="
                                                                 frmDatosCliente
                                                                     .telefonos
@@ -1474,7 +1532,20 @@
                                                                 max-width: 400px;
                                                             "
                                                             maxlength="9"
-                                                            oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                            oninput="
+                                                                javascript: if (
+                                                                    this.value
+                                                                        .length >
+                                                                    this
+                                                                        .maxLength
+                                                                )
+                                                                    this.value =
+                                                                        this.value.slice(
+                                                                            0,
+                                                                            this
+                                                                                .maxLength,
+                                                                        );
+                                                            "
                                                             v-model="
                                                                 frmDatosCliente
                                                                     .telefonos
@@ -1881,7 +1952,7 @@ export default {
             let resultado = false;
             let permiso_detalle =
                 this.$inertia.page.props.user_permissions.permisos_detalle.filter(
-                    (item) => item.permiso == "CREDITOS_CLIENTES/EDITAR_MONTO"
+                    (item) => item.permiso == "CREDITOS_CLIENTES/EDITAR_MONTO",
                 );
 
             if (permiso_detalle.length != 0) {
@@ -1892,7 +1963,7 @@ export default {
 
                     let agencia_autorizada = acceso_agencias.filter(
                         (item) =>
-                            item.agencia_id == this.frmDatosCliente.agencia_id
+                            item.agencia_id == this.frmDatosCliente.agencia_id,
                     );
 
                     if (agencia_autorizada.length != 0) {
@@ -1905,7 +1976,7 @@ export default {
         permiso_editar_asesor() {
             return (
                 this.$inertia.page.props.user_permissions.permisos.filter(
-                    (item) => item.includes("CREDITOS_CLIENTES/EDITAR_ASESOR")
+                    (item) => item.includes("CREDITOS_CLIENTES/EDITAR_ASESOR"),
                 ).length > 0
             );
         },
@@ -1924,7 +1995,7 @@ export default {
 
             this.frmDatosCliente.monto_maximo = this.$parent.round(
                 valor,
-                numero_decimales
+                numero_decimales,
             );
         },
 
@@ -1941,10 +2012,10 @@ export default {
             this.frmDatosCliente.hijos = 0;
 
             this.frmDatosCliente.agencia = this.agencias.filter(
-                (item) => item.id == this.agencia_seleccionada
+                (item) => item.id == this.agencia_seleccionada,
             )[0].agencia;
             this.frmDatosCliente.agencia_id = this.agencias.filter(
-                (item) => item.id == this.agencia_seleccionada
+                (item) => item.id == this.agencia_seleccionada,
             )[0].id;
             this.frmDatosCliente.correo_electronico = null;
 
@@ -1993,19 +2064,6 @@ export default {
                 return false;
             }
 
-            const response = await this.BusquedaExterna();
-
-            if (response.resultado == "RESTRINGIDO") {
-                const agencia = response.agencia;
-                Swal.fire({
-                    icon: "error",
-                    title: "¡Error!",
-                    text:
-                        "El cliente está RESTRINGIDO por la agencia " + agencia,
-                });
-                return false;
-            }
-
             Swal.fire({
                 title: "BUSCANDO",
                 showConfirmButton: false,
@@ -2021,7 +2079,7 @@ export default {
                                 headers: {
                                     Authorization: `Bearer ${api_factiliza_token}`,
                                 },
-                            }
+                            },
                         )
                         .then(async (response) => {
                             let inf_reniec = response.data.data;
@@ -2039,14 +2097,14 @@ export default {
                                 this.provincias_filtradas.filter(
                                     (item) =>
                                         item.ubigeo_provincia ==
-                                        inf_reniec.ubigeo[1]
+                                        inf_reniec.ubigeo[1],
                                 )[0].id;
                             this.FiltrarDistritos();
                             this.frmDatosCliente.distrito_id =
                                 this.distritos_filtrados.filter(
                                     (item) =>
                                         item.ubigeo_distrito ==
-                                        inf_reniec.ubigeo[2]
+                                        inf_reniec.ubigeo[2],
                                 )[0].id;
 
                             return Swal.fire({
@@ -2069,30 +2127,12 @@ export default {
             });
         },
 
-        // NO BORRAR --------------------------------------------------------
-        async BusquedaExterna() {
-            const params = {
-                dni: this.frmDatosCliente.dni,
-                agencia_id: this.agencia_seleccionada,
-                acceso: JSON.stringify(this.datos_sesion),
-            };
-
-            return axios
-                .get(api_externa + "/api/cli/listado_externa/buscar", {
-                    params,
-                })
-                .then((response) => {
-                    return response.data;
-                });
-        },
-        // ------------------------------------------------------------------
-
         FiltrarProvincias() {
             let departamento_id = this.frmDatosCliente.departamento_id;
 
             if (!departamento_id == 0) {
                 this.provincias_filtradas = this.provincias.filter(
-                    (item) => item.departamento_id == departamento_id
+                    (item) => item.departamento_id == departamento_id,
                 );
             } else {
                 this.provincias_filtradas = this.provincias;
@@ -2106,7 +2146,7 @@ export default {
 
             if (!provincia_id == 0) {
                 this.distritos_filtrados = this.distritos.filter(
-                    (item) => item.provincia_id == provincia_id
+                    (item) => item.provincia_id == provincia_id,
                 );
             } else {
                 this.distritos_filtrados = this.distritos;
@@ -2154,7 +2194,7 @@ export default {
                 self.frmDatosCliente.modo == "EDITAR"
             ) {
                 let fecha_actual = await self.$parent.fecha_hora_actual(
-                    self.frmDatosCliente.agencia_id
+                    self.frmDatosCliente.agencia_id,
                 );
 
                 self.frmDatosCliente.telefonos["actualizado"] = fecha_actual;
@@ -2203,12 +2243,12 @@ export default {
 
                                 data.append(
                                     "frmDatosCliente",
-                                    JSON.stringify(self.frmDatosCliente)
+                                    JSON.stringify(self.frmDatosCliente),
                                 );
 
                                 data.append(
                                     "imagen_dni",
-                                    self.frmDatosCliente.imagen_dni
+                                    self.frmDatosCliente.imagen_dni,
                                 );
 
                                 self.$inertia.post(
@@ -2233,7 +2273,7 @@ export default {
                                                             if (content) {
                                                                 const b =
                                                                     content.querySelector(
-                                                                        "b"
+                                                                        "b",
                                                                     );
                                                                 if (b) {
                                                                     b.textContent =
@@ -2241,12 +2281,12 @@ export default {
                                                                 }
                                                             }
                                                         },
-                                                        100
+                                                        100,
                                                     );
                                                 },
                                                 willClose: () => {
                                                     clearInterval(
-                                                        timerInterval
+                                                        timerInterval,
                                                     );
                                                 },
                                             });
@@ -2258,16 +2298,16 @@ export default {
                                                 allowOutsideClick: false,
                                                 preConfirm: (result) => {
                                                     $("#datosCliente1-tab").tab(
-                                                        "show"
+                                                        "show",
                                                     );
                                                     $(
-                                                        "#mdlDatosPersonales"
+                                                        "#mdlDatosPersonales",
                                                     ).css("display", "none");
                                                     self.$parent.$parent.BuscarClientes();
                                                 },
                                             });
                                         },
-                                    }
+                                    },
                                 );
                             },
                         });
