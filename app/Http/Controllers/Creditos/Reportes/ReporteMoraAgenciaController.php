@@ -358,7 +358,7 @@ class ReporteMoraAgenciaController extends Controller
         }
 
         foreach ($rango_fechas as $item) {
-            $item =  date("Y-m-t", strtotime($item));
+            $item =  date("Y-m-01", strtotime($item));
             $rango_fecha_mes[] = $item;
         }
 
