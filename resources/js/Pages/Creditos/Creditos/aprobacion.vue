@@ -2813,7 +2813,8 @@ export default {
         es_especial(value) {
             if (value) {
                 if (this.aprobacion_id == 0) {
-                    this.frmAprobacion.mora_adicional = this.roundTo(0.5, 2);
+                    this.frmAprobacion.mora_adicional =
+                        this.datos_propuesta.mora_adicional;
                 }
             } else {
                 this.frmAprobacion.mora_adicional = this.roundTo(0, 2);
