@@ -395,7 +395,13 @@ class DesembolsoController extends Controller
         $importe_gravado = round(($interes_total) / (1 + ($porcentaje_igv / 100)), 2);
         $importe_igv = round($interes_total - $importe_gravado, 2);
 
-        $emite_comprobante = (new FacturacionController)->verificar_facturacion($credito_id, $agencia_id);
+        $enviroment = getenv('APP_ENV');
+
+        if ($enviroment == 'development') {
+            $emite_comprobante = 0;
+        } else if ($enviroment == 'production') {
+            $emite_comprobante = (new FacturacionController)->verificar_facturacion($credito_id, $agencia_id);
+        }
 
         $desembolso = Desembolso::on($conexion)->create([
             'credito_id' => $credito_id,
@@ -469,11 +475,8 @@ class DesembolsoController extends Controller
                 'desembolso_id' => $desembolso_id
             ];
 
-            $enviroment = getenv('APP_ENV');
-
-
             if ($enviroment == 'development') {
-                $facturado = (new FacturacionController)->facturar_local($datos_desembolso);
+                //  $facturado = (new FacturacionController)->facturar_local($datos_desembolso);
             } else if ($enviroment == 'production') {
                 $facturado = (new FacturacionController)->facturar_production($datos_desembolso);
             }

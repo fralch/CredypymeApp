@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Creditos\CreditosController;
 // ----------------CLIENTES--------------------------------------------
 use App\Http\Controllers\Creditos\Clientes\ClientesController;
+use App\Http\Controllers\Creditos\Clientes\GrupoController;
 use App\Http\Controllers\Creditos\Clientes\ParienteController;
 use App\Http\Controllers\Creditos\Clientes\AvalController;
 use App\Http\Controllers\Creditos\Clientes\NegocioController;
@@ -146,6 +147,19 @@ Route::POST('/cli/listado_registro/eliminar', [ClientesController::class, 'elimi
     ->name('cli.listado_registro.eliminar');
 Route::GET('/cli/listado_registro/cantidad_creditos/{agencia_id},{cliente_id}', [ClientesController::class, 'cantidad_creditos'])
     ->name('cli.listado_registro.cantidad_creditos');
+
+Route::GET('cli/gru/listar_datos', [GrupoController::class, 'listar_datos'])
+    ->name('cli.gru.listar_datos');
+Route::GET('cli/gru/listar_grupos', [GrupoController::class, 'listar_grupos'])
+    ->name('cli.gru.listar_grupos');
+Route::GET('cli/gru/buscar_clientes', [GrupoController::class, 'buscar_clientes'])
+    ->name('cli.gru.buscar_clientes');
+Route::GET('cli/gru/listar_grupo_clientes', [GrupoController::class, 'listar_grupo_clientes'])
+    ->name('cli.gru.listar_grupo_clientes');
+Route::GET('cli/gru/verificar', [GrupoController::class, 'verificar'])
+    ->name('cli.gru.verificar');
+Route::POST('cli/gru/guardar', [GrupoController::class, 'guardar'])
+    ->name('cli.gru.guardar');
 
 Route::GET('/cli/album_fotos/{cliente_id}/{agencia_id}', [AlbumFotosController::class, 'album_fotos'])
     ->name('cli.album_fotos');

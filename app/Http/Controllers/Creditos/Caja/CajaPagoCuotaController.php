@@ -55,7 +55,12 @@ class CajaPagoCuotaController extends Controller
                 ->where('caj_reg.id', $item->caja_id)
                 ->get()
                 ->last();
-            $item->usuario_caja = $datos_caja->usuario;
+
+            if ($datos_caja) {
+                $item->usuario_caja = $datos_caja->usuario;
+            } else {
+                $item->usuario_caja = '-';
+            }
         }
 
         return $pagos;
