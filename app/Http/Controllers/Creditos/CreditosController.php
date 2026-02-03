@@ -9,18 +9,17 @@ use App\Http\Controllers\Gth\Usuarios\UsuarioController;
 use App\Http\Controllers\Creditos\Mantenimiento\FacturacionLimiteController;
 
 use App\Models\General\Feriado;
-
 use App\Models\General\Datos_aplicacion;
 use App\Models\General\Agencia;
+use App\Models\Creditos\Credito\Credito;
+use App\Models\Creditos\Credito\Aprobacion;
+use App\Models\Creditos\Credito\Cuota;
+use App\Models\Creditos\Mantenimiento\Credito\Estado;
+
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Storage;
-
-use Ilovepdf\OfficepdfTask;
-
 use IntlDateFormatter;
 use IntlCalendar;
-
 use Inertia\Inertia;
 
 class CreditosController extends Controller
@@ -885,5 +884,60 @@ class CreditosController extends Controller
                 return 'CHI';
                 break;
         }
+    }
+
+    public function corregir()
+    {
+
+        $agencias = Agencia::all();
+
+        // foreach ($agencias as $agencia) {
+        // $conexion = 'master_' .  $agencia->id_agencia;
+        $conexion = 'master_1';
+
+        $estado = Estado::on($conexion)->where('estado', 'DESEMBOLSADO')->get()->last();
+        $estado_id = $estado->id;
+
+        $aprobaciones = Aprobacion::on($conexion)
+            ->select('id')
+            ->whereIn('periodo_pago', ['MENSUAL'])
+            ->get();
+
+        // $fecha_corta = '2026-01-26';
+
+        $creditos = Credito::on($conexion)->where('estado_id', $estado_id)
+            ->whereIn('aprobacion_id', $aprobaciones)
+            // ->where('fecha_vencimiento', '>=', $fecha_corta)
+            ->get();
+
+        foreach ($creditos as $credito) {
+            $cuotas_vencidas = Cuota::on($conexion)->where([
+                ['credito_id', $credito->id],
+                ['dias_atraso', '>', '0']
+            ])->get();
+
+            $total_mora = 5 * count($cuotas_vencidas);
+
+            $credito = Credito::on($conexion)->find($credito->id);
+
+            $capital = floatval($credito->capital_total) - floatval($credito->capital_pagado);
+            $interes = floatval($credito->interes_total) - floatval($credito->interes_pagado);
+            $redondeo = floatval($credito->redondeo_total) - floatval($credito->redondeo_pagado);
+            $mora = $total_mora - floatval($credito->mora_pagado);
+            $notificaciones = floatval($credito->notificaciones_total) - floatval($credito->notificaciones_pagado);
+
+            $saldo_total = $capital + $interes + $redondeo + $mora + $notificaciones;
+
+            $credito->mora_total = $total_mora;
+            $credito->saldo_total = $saldo_total;
+            $credito->save();
+        }
+        // }
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proceso de corrección finalizado.'
+        ], 200);
     }
 }
