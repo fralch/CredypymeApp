@@ -394,16 +394,19 @@ class CajaCierreDiaController extends Controller
                     switch ($item->periodo_pago) {
                         case 'PAGO_UNICO':
                             $medicion_dias =  1;
+                            $cantidad_cuotas = 1;
                             break;
                         case 'QUINCENAL':
                             $medicion_dias =  15;
+                            $cantidad_cuotas  = $item->plazo;
                             break;
                         case 'MENSUAL':
                             $medicion_dias =  30;
+                            $cantidad_cuotas  = $item->plazo;
                             break;
                     }
                     // La mora diaria es el interés DIARIO
-                    $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * $medicion_dias), 1);
+                    $monto_mora = round((($item->cuota * $cantidad_cuotas) - $item->monto) / ($item->plazo * $medicion_dias), 1);
                 }
             }
 

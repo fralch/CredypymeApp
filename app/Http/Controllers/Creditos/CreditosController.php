@@ -893,14 +893,14 @@ class CreditosController extends Controller
 
         // foreach ($agencias as $agencia) {
         // $conexion = 'master_' .  $agencia->id_agencia;
-        $conexion = 'master_1';
+        $conexion = 'master_2';
 
         $estado = Estado::on($conexion)->where('estado', 'DESEMBOLSADO')->get()->last();
         $estado_id = $estado->id;
 
         $aprobaciones = Aprobacion::on($conexion)
             ->select('id')
-            ->whereIn('periodo_pago', ['MENSUAL'])
+            ->whereIn('periodo_pago', ['QUINCENAL'])
             ->get();
 
         // $fecha_corta = '2026-01-26';
@@ -916,7 +916,29 @@ class CreditosController extends Controller
                 ['dias_atraso', '>', '0']
             ])->get();
 
-            $total_mora = 5 * count($cuotas_vencidas);
+
+            if ($cuotas_vencidas->count() > 0) {
+
+                $aprobacion = Aprobacion::on($conexion)->find($credito->aprobacion_id);
+                $mora_diaria = round((($aprobacion->cuota * $aprobacion->plazo) - $aprobacion->monto) / ($aprobacion->plazo * 15), 1);
+
+                $total_mora = 0;
+                foreach ($cuotas_vencidas as $cuota) {
+                    $dias_atraso = intval($cuota->dias_atraso);
+
+                    $total_mora += 5;
+
+                    if ($dias_atraso > 15 && intval($cuota->numero_cuota) != intval($aprobacion->plazo)) {
+                        $dias_atraso -= 15;
+                    }
+
+                    $total_mora_dias = round($mora_diaria * ($dias_atraso - 1), 1);
+
+                    $total_mora += $total_mora_dias;
+                }
+            } else {
+                $total_mora = 0;
+            }
 
             $credito = Credito::on($conexion)->find($credito->id);
 
