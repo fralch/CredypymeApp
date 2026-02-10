@@ -900,7 +900,7 @@ class CreditosController extends Controller
 
         $aprobaciones = Aprobacion::on($conexion)
             ->select('id')
-            ->whereIn('periodo_pago', ['QUINCENAL'])
+            ->whereIn('periodo_pago', ['PAGO UNICO'])
             ->get();
 
         // $fecha_corta = '2026-01-26';
@@ -913,32 +913,37 @@ class CreditosController extends Controller
         foreach ($creditos as $credito) {
             $cuotas_vencidas = Cuota::on($conexion)->where([
                 ['credito_id', $credito->id],
-                ['dias_atraso', '>', '0']
-            ])->get();
+                ['dias_atraso', '>', 0]
+            ])->get()->count();
 
 
-            if ($cuotas_vencidas->count() > 0) {
-
-                $aprobacion = Aprobacion::on($conexion)->find($credito->aprobacion_id);
-                $mora_diaria = round((($aprobacion->cuota * $aprobacion->plazo) - $aprobacion->monto) / ($aprobacion->plazo * 15), 1);
-
-                $total_mora = 0;
-                foreach ($cuotas_vencidas as $cuota) {
-                    $dias_atraso = intval($cuota->dias_atraso);
-
-                    $total_mora += 5;
-
-                    if ($dias_atraso > 15 && intval($cuota->numero_cuota) != intval($aprobacion->plazo)) {
-                        $dias_atraso -= 15;
-                    }
-
-                    $total_mora_dias = round($mora_diaria * ($dias_atraso - 1), 1);
-
-                    $total_mora += $total_mora_dias;
-                }
-            } else {
+            if ($cuotas_vencidas == 0) {
                 $total_mora = 0;
             }
+
+
+            // if ($cuotas_vencidas->count() > 0) {
+
+            //     $aprobacion = Aprobacion::on($conexion)->find($credito->aprobacion_id);
+            //     $mora_diaria = round((($aprobacion->cuota * $aprobacion->plazo) - $aprobacion->monto) / ($aprobacion->plazo * 15), 1);
+
+            //     $total_mora = 0;
+            //     foreach ($cuotas_vencidas as $cuota) {
+            //         $dias_atraso = intval($cuota->dias_atraso);
+
+            //         $total_mora += 5;
+
+            //         if ($dias_atraso > 15 && intval($cuota->numero_cuota) != intval($aprobacion->plazo)) {
+            //             $dias_atraso -= 15;
+            //         }
+
+            //         $total_mora_dias = round($mora_diaria * ($dias_atraso - 1), 1);
+
+            //         $total_mora += $total_mora_dias;
+            //     }
+            // } else {
+            //     $total_mora = 0;
+            // }
 
             $credito = Credito::on($conexion)->find($credito->id);
 
