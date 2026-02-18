@@ -63,7 +63,7 @@ class GrupoController extends Controller
             )
             ->join($this->main_db . '.usuarios as usu', 'gru.asesor_id', 'usu.dni')
             ->groupBy('gru.id')
-            ->orderBy('gru.id', 'desc')
+            ->orderBy('nombre', 'asc')
             ->get();
 
         return response()->json([
@@ -120,6 +120,7 @@ class GrupoController extends Controller
             ->select(
                 'gru_cli.grupo_id',
                 'gru_cli.cliente_id',
+                'gru_cli.responsable',
                 DB::raw("CONCAT(cli_reg.apellido_paterno,' ',cli_reg.apellido_materno,' ',cli_reg.nombres) as cliente"),
             )
             ->where('gru_cli.grupo_id', $grupo_id)
@@ -169,6 +170,7 @@ class GrupoController extends Controller
             'existe' => $resultado
         ], 200);
     }
+
     public function guardar(Request $request)
     {
 
@@ -200,6 +202,7 @@ class GrupoController extends Controller
                 GrupoCliente::on($conexion)->create(array(
                     'grupo_id' => $id,
                     'cliente_id' => $item->cliente_id,
+                    'responsable' => $item->responsable ?? null,
                     'datos_creacion' => $datos_registro,
 
                 ));
@@ -229,6 +232,7 @@ class GrupoController extends Controller
                 GrupoCliente::on($conexion)->create([
                     'grupo_id' => $grupo_id,
                     'cliente_id' => $item->cliente_id,
+                    'responsable' => $item->responsable ?? null,
                     'datos_creacion' => $datos_registro,
                 ]);
             }
