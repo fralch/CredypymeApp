@@ -407,7 +407,13 @@
                                 ).length > 0
                             "
                         > -->
-                        <li>
+                        <li
+                            v-if="
+                                $page.props.user_permissions.permisos.filter(
+                                    (item) => item.includes('CREDITOS_GRUPAL'),
+                                ).length > 0
+                            "
+                        >
                             <a href="javascript:void(0)"
                                 >Grupal<span class="arrow-down"></span
                             ></a>
@@ -418,14 +424,14 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBusquedaGrupos',
-                                                'propuesta',
-                                                'CREDITOS_GRUPAL/PROPUESTA',
+                                                'mdlBuscarGrupos',
+                                                'solicitud',
+                                                'CREDITOS_GRUPAL/SOLICITUD',
                                             )
                                         "
                                         v-if="
                                             $page.props.user_permissions.permisos.includes(
-                                                'CREDITOS_GRUPAL/PROPUESTA',
+                                                'CREDITOS_GRUPAL/SOLICITUD',
                                             )
                                         "
                                         :style="
@@ -433,7 +439,7 @@
                                                 ? ''
                                                 : 'background-color: var(--plomoOscuroEmpresarial) !important; color: white !important'
                                         "
-                                        >Propuesta
+                                        >Solicitud
                                     </a>
                                 </li>
                                 <li>
@@ -442,17 +448,17 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBusquedaCreditosGrupo',
-                                                'copia_propuesta',
-                                                'CREDITOS_GRUPAL/COPIA_PROPUESTA',
+                                                'mdlBuscarCreditos',
+                                                'copia_solicitud',
+                                                'CREDITOS_GRUPAL/COPIA_SOLICITUD',
                                             )
                                         "
                                         v-if="
                                             $page.props.user_permissions.permisos.includes(
-                                                'CREDITOS_GRUPAL/COPIA_PROPUESTA',
+                                                'CREDITOS_GRUPAL/COPIA_SOLICITUD',
                                             )
                                         "
-                                        >Copia de propuesta</a
+                                        >Copia de solicitud</a
                                     >
                                 </li>
                                 <li>
@@ -461,7 +467,7 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBusquedaCreditosGrupo',
+                                                'mdlBuscarCreditos',
                                                 'aprobacion',
                                                 'CREDITOS_GRUPAL/APROBACION',
                                             )
@@ -485,7 +491,7 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBusquedaCreditosGrupo',
+                                                'mdlBuscarCreditos',
                                                 'copia_aprobacion',
                                                 'CREDITOS_GRUPAL/COPIA_APROBACION',
                                             )
@@ -2774,6 +2780,9 @@
         <mdlDesembolsosPorAsesor
             ref="mdlDesembolsosPorAsesor"
         ></mdlDesembolsosPorAsesor>
+
+        <mdlBuscarGrupos ref="mdlBuscarGrupos"></mdlBuscarGrupos>
+        <mdlBuscarCreditos ref="mdlBuscarCreditos"></mdlBuscarCreditos>
     </div>
 </template>
 
@@ -2792,8 +2801,9 @@ import mdlSimuladorBilleteo from "@/Pages/Creditos/Herramientas/Components/mdlSi
 import mdlClaveTransaccion from "@/Pages/Creditos/Herramientas/Components/mdlClaveTransaccion.vue";
 import mdlControlMoraAgencia from "@/Pages/Creditos/Reportes/Components/mdlControlMoraAgencia.vue";
 import mdlControlMoraAgenciaMensual from "@/Pages/Creditos/Reportes/Components/mdlControlMoraAgenciaMensual.vue";
-
 import mdlDesembolsosPorAsesor from "@/Pages/Creditos/Reportes/Components/mdlDesembolsosPorAsesor.vue";
+import mdlBuscarGrupos from "@/Pages/Creditos/Grupal/Components/mdlBuscarGrupos.vue";
+import mdlBuscarCreditos from "@/Pages/Creditos/Grupal/Components/mdlBuscarCreditos.vue";
 
 import botonInformativo from "@/Pages/Creditos/Components/boton_informativo.vue";
 
@@ -2817,6 +2827,8 @@ export default {
         mdlControlMoraAgenciaMensual,
         mdlDesembolsosPorAsesor,
         botonInformativo,
+        mdlBuscarGrupos,
+        mdlBuscarCreditos,
     },
     props: { agencias: Array },
     data() {
@@ -3151,6 +3163,11 @@ export default {
                 modulo.nombre_modulo = nombre_modulo;
                 modulo.texto_buscar = null;
                 this.$nextTick(() => modulo.$refs.buscar_inversion.focus());
+            } else if (nombre_modal == "mdlBuscarGrupos") {
+                modulo = this.$refs.mdlBuscarGrupos;
+                modulo.nombre_modulo = nombre_modulo;
+                modulo.agencias_permiso = this.filtrar_agencias(permiso);
+                modulo.nombre_grupo = null;
             }
 
             $("#" + nombre_modal).css("display", "block");

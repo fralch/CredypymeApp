@@ -243,4 +243,32 @@ class GrupoController extends Controller
             ], 200);
         }
     }
+
+    public function buscar_grupos(Request $request)
+    {
+
+        $nombre = $request->nombre;
+        $agencia_id = $request->agencia_id;
+        $conexion = 'master_' . $agencia_id;
+
+        $lista_grupos = Grupo::on($conexion)->from('grupos as gru')
+            ->select(
+                'gru.id',
+                'gru.nombre',
+                'gru.asesor_id',
+                'gru.agencia_id',
+
+                'age.nombre as agencia',
+                'usu.usuario as asesor'
+            )
+            ->join("$this->main_db.agencias as age",  'gru.agencia_id', 'age.id_agencia')
+            ->join("$this->main_db.usuarios as usu", 'gru.asesor_id', 'usu.dni')
+            ->where('gru.nombre', 'like', "%$nombre%")
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'lista_grupos' => $lista_grupos
+        ], 200);
+    }
 }

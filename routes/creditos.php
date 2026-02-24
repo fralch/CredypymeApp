@@ -24,6 +24,8 @@ use App\Http\Controllers\Creditos\Credito\CronogramaController;
 use App\Http\Controllers\Creditos\Credito\CreditoPagoVoucherController;
 use App\Http\Controllers\Creditos\Credito\CarritoController;
 use App\Http\Controllers\Creditos\Credito\CarritoSeguimientoController;
+// --------------------GRUPAL--------------------------------------------
+use App\Http\Controllers\Creditos\Grupal\SolicitudController;
 
 //-----------------------------INVERSIONES-------------------------------
 use App\Http\Controllers\Creditos\Inversion\InversionController;
@@ -321,6 +323,16 @@ Route::GET('/cre/carrito_seguimiento/anulacion', [CarritoSeguimientoController::
     ->name('cre.carrito_seguimiento.anulacion');
 Route::POST('/cre/carrito_seguimiento/comprobante', [CarritoSeguimientoController::class, 'carrito_seguimiento_comprobante'])
     ->name('cre.carrito_seguimiento.comprobante');
+
+//-------------------CRÉDITO---------------------------------------------------------
+Route::GET('/gru/buscar_grupos', [GrupoController::class, 'buscar_grupos'])
+    ->name('gru.buscar_grupos');
+
+Route::GET('/gru/solicitud', [SolicitudController::class, 'index'])
+    ->name('gru.solicitud');
+
+
+
 
 //------------------------------INVERSION----------------------------
 
