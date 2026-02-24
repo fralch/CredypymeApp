@@ -330,6 +330,8 @@ Route::GET('/gru/buscar_grupos', [GrupoController::class, 'buscar_grupos'])
 
 Route::GET('/gru/solicitud', [SolicitudController::class, 'index'])
     ->name('gru.solicitud');
+Route::GET('/gru/solicitud/listar_datos', [SolicitudController::class, 'listar_datos'])
+    ->name('gru.solicitud.listar_datos');
 
 
 

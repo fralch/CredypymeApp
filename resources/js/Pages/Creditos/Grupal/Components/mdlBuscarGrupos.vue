@@ -126,7 +126,7 @@ export default {
     watch: {
         nombre_modulo(value) {
             if (value == "solicitud") {
-                this.ruta_modulo = "cre.gru.solicitud";
+                this.ruta_modulo = "gru.solicitud";
             }
         },
 
@@ -172,7 +172,7 @@ export default {
             if (this.nombre_modulo == "solicitud") {
                 object = {
                     agencia_id: this.agencia_buscar,
-                    grupo_id: event.data.grupo_id,
+                    grupo_id: event.data.id,
                     grupo_solicitud_id: 0,
                 };
             }
