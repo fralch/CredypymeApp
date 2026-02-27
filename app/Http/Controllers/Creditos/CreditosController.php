@@ -703,6 +703,215 @@ class CreditosController extends Controller
         return $calendario;
     }
 
+    public function calendario_sin_cuotas($agencia_id, $datos_desembolso)
+    {
+
+        $plazo = intval($datos_desembolso->plazo);
+        $fecha_desembolso = $datos_desembolso->fecha_desembolso;
+        $periodo_pago = $datos_desembolso->periodo_pago;
+
+        $lista_feriados = Feriado::where('agencias', 'like', '%' . $agencia_id . '%')->get();
+
+        $feriados = [];
+        foreach ($lista_feriados as $item) {
+            $feriados[] = $item->fecha;
+        }
+
+        $fecha_pago = date("Y-m-d", strtotime($fecha_desembolso));
+
+
+        $calendario = [];
+        $interes_acumulado = 0;
+
+        switch ($periodo_pago) {
+
+            case 'DIARIO':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    while ($dia_pago == 'Domingo' || in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)) {
+                        $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                        $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+                    }
+
+
+
+                    $cuota = (object)[
+                        'orden' => $orden,
+                        'fecha_pago' => $fecha_pago,
+                        'dia_pago' => $dia_pago,
+
+                    ];
+
+                    $calendario[] = $cuota;
+                }
+
+                break;
+            case 'SEMANAL':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 week"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+
+                        ];
+                    } else {
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+            case 'QUINCENAL':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 15 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+                        ];
+                    } else {
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+            case 'PAGO_UNICO':
+
+                $orden = 1;
+
+                $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ " . $plazo . " days"));
+
+                $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                while (
+                    $dia_pago == 'Domingo' ||
+                    in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                ) {
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+                }
+
+
+
+                $cuota = (object)[
+                    'orden' => $orden,
+                    'fecha_pago' => $fecha_pago,
+                    'dia_pago' => $dia_pago,
+
+                ];
+
+                $calendario[] = $cuota;
+
+                break;
+            case 'MENSUAL':
+
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 30 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+
+                        ];
+                    } else {
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+        }
+
+        return $calendario;
+    }
+
     public function compressImage($archivo, $ruta, $calidad)
     {
 

@@ -332,6 +332,8 @@ Route::GET('/gru/solicitud', [SolicitudController::class, 'index'])
     ->name('gru.solicitud');
 Route::GET('/gru/solicitud/listar_datos', [SolicitudController::class, 'listar_datos'])
     ->name('gru.solicitud.listar_datos');
+Route::GET('/gru/solicitud/calcular_cronograma', [SolicitudController::class, 'calcular_cronograma'])
+    ->name('gru.solicitud.calcular_cronograma');
 
 
 

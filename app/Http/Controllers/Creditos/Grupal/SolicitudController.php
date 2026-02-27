@@ -70,7 +70,7 @@ class SolicitudController extends Controller
                 'gru_cli.responsable',
 
                 DB::raw("CONCAT(cli_reg.apellido_paterno, ' ', cli_reg.apellido_materno, ' ', cli_reg.nombres) AS cliente"),
-                DB::raw("200 as monto"),
+                DB::raw("ROUND(200,2) as monto"),
                 DB::raw("0 as tasa_interes"),
                 DB::raw("0 as cuota"),
                 DB::raw("0 as monto_retencion")
@@ -108,27 +108,34 @@ class SolicitudController extends Controller
 
     public function calcular_cronograma(Request $request)
     {
-        $agencia_id = $request->agencia_id;
-        $plazo = $request->plazo;
-        $periodo_pago = $request->periodo_pago;
-        $fecha_desembolso = $request->fecha_desembolso;
 
-        $integrantes = json_decode($request->integrantes);
+        $agencia_id = $request->input('agencia_id');
+        $frmSolicitud = json_decode($request->input('frmSolicitud'));
+
+        $plazo = $frmSolicitud->plazo;
+        $periodo_pago = $frmSolicitud->periodo_pago;
+        $tasa_interes = $frmSolicitud->tasa_interes;
+        $fecha_solicitud = $frmSolicitud->fecha_solicitud;
+
+        $grupo_clientes = $frmSolicitud->grupo_clientes;
 
         $datos_credito = (object)[
             'plazo' => $plazo,
             'periodo_pago' => $periodo_pago
         ];
 
-        foreach ($integrantes as  $item) {
+        foreach ($grupo_clientes as  $item) {
             $datos_credito->monto = $item->monto;
-            $datos_credito->tasa_interes = $item->tasa_interes;
+            $datos_credito->tasa_interes = $tasa_interes;
+
+            $datos_credito->con_dias_gracia = 0;
+            $datos_credito->es_especial = false;
 
             $item->cuota = (new CreditosController)->calcular_cuota($datos_credito)->monto_cuota;
         }
 
         $datos_desembolso = (object)[
-            'fecha_desembolso' => $fecha_desembolso,
+            'fecha_desembolso' => $fecha_solicitud,
             'periodo_pago' => $periodo_pago,
             'plazo' => $plazo,
 
@@ -136,10 +143,11 @@ class SolicitudController extends Controller
 
         $datos_calendario = (new CreditosController)->calendario_sin_cuotas($agencia_id, $datos_desembolso);
 
-        return [
-            'cuotas_integrantes' => $integrantes,
+        return response()->json([
+            'success' => true,
+            'cuotas_clientes' => $grupo_clientes,
             'datos_calendario' => $datos_calendario,
-        ];
+        ], 200);
     }
     public function verificar(Request $request)
     {

@@ -9,11 +9,15 @@
 
                     <div class="card-body card-block">
                         <div class="form-row">
-                            <div class="form-group col-md-7 col-12">
+                            <div class="form-group col-md-6 col-12">
                                 <div class="input-group">
-                                    <label class="input-group-text label-title"
-                                        >NOMBRE</label
-                                    >
+                                    <div class="input-group-prepend">
+                                        <label
+                                            class="input-group-text label-title"
+                                            >NOMBRE</label
+                                        >
+                                    </div>
+
                                     <input
                                         type="text"
                                         class="form-control bolder"
@@ -23,11 +27,14 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5 col-12">
+                            <div class="form-group col-md-3 col-12">
                                 <div class="input-group">
-                                    <label class="input-group-text label-title"
-                                        >ASESOR</label
-                                    >
+                                    <div class="input-group-prepend">
+                                        <label
+                                            class="input-group-text label-title"
+                                            >ASESOR</label
+                                        >
+                                    </div>
                                     <input
                                         type="text"
                                         class="form-control center bolder"
@@ -37,11 +44,14 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-6 col-12">
+                            <div class="form-group col-md-3 col-12">
                                 <div class="input-group">
-                                    <label class="input-group-text label-title"
-                                        >FECHA SOLICITUD</label
-                                    >
+                                    <div class="input-group-prepend">
+                                        <label
+                                            class="input-group-text label-title"
+                                            >F. SOLICITUD</label
+                                        >
+                                    </div>
                                     <input
                                         type="text"
                                         class="form-control center bolder"
@@ -104,9 +114,10 @@
                                                     type="number"
                                                     class="form-control center bolder"
                                                     style="font-size: 15px"
-                                                    step="50"
+                                                    step="10"
                                                     lang="en"
                                                     :min="200"
+                                                    :id="'inp_' + item.id"
                                                     v-model.number="item.monto"
                                                     name="monto"
                                                     @change="RedondearValor"
@@ -128,7 +139,9 @@
                                                 <input
                                                     type="text"
                                                     class="form-control center bolder"
-                                                    :value="item.cuota"
+                                                    :value="
+                                                        roundTo(item.cuota, 2)
+                                                    "
                                                     name="cuota"
                                                     readonly
                                                 />
@@ -150,7 +163,14 @@
                                                     type="text"
                                                     class="form-control center bolder"
                                                     :value="
-                                                        item.monto_retencion
+                                                        roundTo(
+                                                            (frmSolicitud.tasa_retencion /
+                                                                100) *
+                                                                parseFloat(
+                                                                    item.monto,
+                                                                ),
+                                                            2,
+                                                        )
                                                     "
                                                     readonly
                                                 />
@@ -168,7 +188,6 @@
                                         class="form-control center bolder"
                                         style="font-size: 13px"
                                         v-model="frmSolicitud.periodo_pago"
-                                        @change="RevisarPeriodo()"
                                         :disabled="
                                             modo_modulo == 'VER_SOLICITUD'
                                         "
@@ -285,39 +304,48 @@
                                             "
                                         >
                                             <span class="icon text-white">
-                                                <i class="pi pi-calendar"></i
+                                                <i class="pi pi-sync"></i
                                             ></span>
                                             <span class="text"
-                                                >GENERAR CALENDARIO</span
+                                                >CALCULAR CUOTAS</span
                                             >
                                         </button>
                                     </div>
                                 </div>
+
                                 <DataTable
                                     :value="datos_calendario"
                                     :scrollable="true"
-                                    scrollHeight="240px"
                                     scrollDirection="both"
+                                    :scrollHeight="'300px'"
+                                    showGridlines
+                                    :rows="100"
                                 >
                                     <Column
-                                        class="align-center"
                                         field="orden"
                                         header="N°"
-                                        style="width: 50px !important"
+                                        :styles="{
+                                            width: '50px',
+                                            justifyContent: 'center',
+                                        }"
                                     >
                                     </Column>
                                     <Column
-                                        class="align-center"
                                         field="fecha_pago"
-                                        header="FECHA_PAGO"
-                                        style="width: 80px !important"
+                                        header="FECHA PAGO"
+                                        :styles="{
+                                            width: '80px',
+                                            justifyContent: 'center',
+                                        }"
                                     >
                                     </Column>
                                     <Column
-                                        class="align-center"
                                         field="dia_pago"
-                                        header="DIA_PAGO"
-                                        style="width: 80px !important"
+                                        header="DÍA PAGO"
+                                        :styles="{
+                                            width: '80px',
+                                            justifyContent: 'center',
+                                        }"
                                     >
                                     </Column>
                                     <template #empty>
@@ -370,6 +398,8 @@ import TabView from "primevue/tabview/tabview.common";
 import TabPanel from "primevue/tabpanel/tabpanel.common";
 
 import { required } from "vuelidate/lib/validators";
+import { round } from "lodash";
+import { forEach } from "lodash";
 const noZero = (value) => value != 0;
 
 export default {
@@ -401,10 +431,10 @@ export default {
 
             frmSolicitud: {
                 grupo_clientes: [],
-                periodo_pago: "SEMANAL",
-                plazo: 0,
-                tasa_interes: 9,
-                tasa_retencion: 8,
+                periodo_pago: "MENSUAL",
+                plazo: 6,
+                tasa_interes: this.roundTo(9, 2),
+                tasa_retencion: this.roundTo(8, 2),
                 fecha_solicitud: null,
             },
         };
@@ -459,10 +489,12 @@ export default {
                 .then((response) => {
                     this.datos_grupo = response.data.datos_grupo;
 
-                    this.frmSolicitud.grupo_clientes = this.CalcularInformacion(
-                        response.data.grupo_clientes,
-                        true,
-                    );
+                    this.frmSolicitud.grupo_clientes =
+                        response.data.grupo_clientes;
+
+                    forEach(this.frmSolicitud.grupo_clientes, (item) => {
+                        item.monto = this.roundTo(item.monto, 2);
+                    });
 
                     if (this.grupo_solicitud_id) {
                         const grupo_clientess = response.data.grupo_clientess;
@@ -502,26 +534,45 @@ export default {
             }
 
             if (e.target.name == "monto") {
-                const tasa_ahorro = 0.1;
-
-                const cliente_id = e.target.id.split("_")[1];
+                const grupo_cliente_id = e.target.id.split("_")[1];
                 const integrante = this.frmSolicitud.grupo_clientes.find(
-                    (item) => item.id == cliente_id,
+                    (item) => item.id == grupo_cliente_id,
                 );
-                integrante.monto = this.roundTo(valor, numero_decimales);
 
-                integrante.monto_retencion = this.roundTo(
-                    valor * tasa_ahorro,
-                    numero_decimales,
-                );
-            } else if (e.target.name == "plazo") {
-                this.frmSolicitud.plazo = this.roundTo(valor, 0);
-            } else if (e.target.name == "tasa_interes") {
-                if (valor < 1) {
-                    valor = 1;
+                const min = parseFloat(e.target.min);
+
+                if (parseFloat(valor) < min) {
+                    valor = min;
                 }
 
-                this.frmSolicitud.tasa_interes = this.roundTo(valor, 1);
+                integrante.monto = this.roundTo(valor, numero_decimales);
+            } else if (e.target.name == "plazo") {
+                const min = 1;
+
+                if (parseFloat(valor) < min) {
+                    valor = min;
+                }
+
+                this.frmSolicitud.plazo = this.roundTo(valor, 0);
+            } else if (e.target.name == "tasa_interes") {
+                const min = parseFloat(e.target.min);
+
+                if (parseFloat(valor) < min) {
+                    valor = min;
+                }
+
+                this.frmSolicitud.tasa_interes = this.roundTo(valor, 2);
+            } else if (e.target.name == "tasa_retencion") {
+                const min = parseFloat(e.target.min);
+                const max = parseFloat(e.target.max);
+
+                if (parseFloat(valor) < min) {
+                    valor = min;
+                } else if (parseFloat(valor) > max) {
+                    valor = max;
+                }
+
+                this.frmSolicitud.tasa_retencion = this.roundTo(valor, 2);
             }
         },
         periodo_medicion(value) {
@@ -533,50 +584,25 @@ export default {
                 return "(MESES)";
             }
         },
-        RevisarPeriodo() {
-            this.CalcularInformacion(this.frmSolicitud.grupo_clientes);
-            this.frmSolicitud.fecha_calculo = this.frmSolicitud.fecha_solicitud;
-            this.datos_calendario = [];
-        },
-
-        CalcularInformacion(lista) {
-            const tasa_ahorro = 0.1;
-
-            lista.forEach((element) => {
-                element.monto = this.roundTo(element.monto, 2);
-                element.cuota = this.roundTo(element.cuota, 2);
-                element.monto_retencion = this.roundTo(
-                    element.monto * tasa_ahorro,
-                    2,
-                );
-            });
-
-            return lista;
-        },
 
         async CalcularCronograma() {
-            const data = new FormData();
+            const params = {
+                agencia_id: this.agencia_id,
+                frmSolicitud: JSON.stringify(this.frmSolicitud),
+            };
 
-            data.append(
-                "grupo_clientes",
-                JSON.stringify(this.frmSolicitud.grupo_clientes),
-            );
-            data.append("plazo", this.frmSolicitud.plazo);
-            data.append("periodo_pago", this.frmSolicitud.periodo_pago);
-            data.append("fecha_desembolso", this.frmSolicitud.fecha_calculo);
-
-            // this.$inertia.post(
-            // 	route("cre.solicitud_grupo.calcular_cronograma"),
-            // 	data
+            // this.$inertia.get(
+            //     route("gru.solicitud.calcular_cronograma"),
+            //     params,
             // );
             // return false;
 
             await axios
-                .post(route("cre.solicitud_grupo.calcular_cronograma"), data)
+                .get(route("gru.solicitud.calcular_cronograma"), { params })
                 .then((response) => {
-                    this.frmSolicitud.grupo_clientes = this.CalcularInformacion(
-                        response.data.cuotas_grupo_clientes,
-                    );
+                    this.frmSolicitud.grupo_clientes =
+                        response.data.cuotas_clientes;
+
                     this.datos_calendario = response.data.datos_calendario;
                 });
         },
