@@ -26,6 +26,7 @@ use App\Http\Controllers\Creditos\Credito\CarritoController;
 use App\Http\Controllers\Creditos\Credito\CarritoSeguimientoController;
 // --------------------GRUPAL--------------------------------------------
 use App\Http\Controllers\Creditos\Grupal\SolicitudController;
+use App\Http\Controllers\Creditos\Grupal\AprobacionController as GrupoAprobacionController;
 
 //-----------------------------INVERSIONES-------------------------------
 use App\Http\Controllers\Creditos\Inversion\InversionController;
@@ -324,16 +325,35 @@ Route::GET('/cre/carrito_seguimiento/anulacion', [CarritoSeguimientoController::
 Route::POST('/cre/carrito_seguimiento/comprobante', [CarritoSeguimientoController::class, 'carrito_seguimiento_comprobante'])
     ->name('cre.carrito_seguimiento.comprobante');
 
-//-------------------CRÉDITO---------------------------------------------------------
+//-------------------CRÉDITO GRUPAL---------------------------------------------------------
 Route::GET('/gru/buscar_grupos', [GrupoController::class, 'buscar_grupos'])
     ->name('gru.buscar_grupos');
 
+//-------------------SOLICITUD---------------------------------------------------------
 Route::GET('/gru/solicitud', [SolicitudController::class, 'index'])
     ->name('gru.solicitud');
 Route::GET('/gru/solicitud/listar_datos', [SolicitudController::class, 'listar_datos'])
     ->name('gru.solicitud.listar_datos');
 Route::GET('/gru/solicitud/calcular_cronograma', [SolicitudController::class, 'calcular_cronograma'])
     ->name('gru.solicitud.calcular_cronograma');
+Route::POST('/gru/solicitud/guardar', [SolicitudController::class, 'guardar'])
+    ->name('gru.solicitud.guardar');
+Route::GET('/gru/solicitud/buscar', [SolicitudController::class, 'buscar'])
+    ->name('gru.solicitud.buscar');
+
+//-------------------APROBACIÓN---------------------------------------------------------
+Route::GET('/gru/aprobacion', [GrupoAprobacionController::class, 'index'])
+    ->name('gru.aprobacion');
+Route::GET('/gru/aprobacion/listar_datos', [GrupoAprobacionController::class, 'listar_datos'])
+    ->name('gru.aprobacion.listar_datos');
+Route::GET('/gru/aprobacion/calcular_cronograma', [GrupoAprobacionController::class, 'calcular_cronograma'])
+    ->name('gru.aprobacion.calcular_cronograma');
+Route::POST('/gru/aprobacion/aprobar', [GrupoAprobacionController::class, 'aprobar'])
+    ->name('gru.aprobacion.aprobar');
+Route::POST('/gru/aprobacion/desaprobar', [GrupoAprobacionController::class, 'desaprobar'])
+    ->name('gru.aprobacion.desaprobar');
+Route::GET('/gru/aprobacion/buscar', [GrupoAprobacionController::class, 'buscar'])
+    ->name('gru.aprobacion.buscar');
 
 
 

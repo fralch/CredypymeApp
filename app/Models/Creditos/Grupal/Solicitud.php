@@ -15,33 +15,35 @@ class Solicitud extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'agencia_id',
         'grupo_id',
         'asesor_id',
+        'plazo',
+        'periodo_pago',
+        'tasa_interes',
+        'tasa_retencion',
+
         'estado_id',
 
-        'datos_creacion',
-        'datos_actualizacion',
+        'fecha_solicitud',
+        'usuario_solicitud',
+        'fecha_aprobacion',
+        'usuario_aprobacion',
+        'fecha_desaprobacion',
+        'usuario_desaprobacion',
+        'agencia_caja',
+        'caja_id',
+
+        'data_created',
+        'data_updated',
 
         'created_at',
         'updated_at'
     ];
 
-    protected $casts = [
-        'datos_creacion' => 'array',
-        'datos_actualizacion' => 'array',
-    ];
-
-
     // Relación con el modelo Usuario
     public function grupo()
     {
         return $this->belongsTo(Grupo::class, 'grupo_id');
-    }
-    // Relación con el modelo Sede
-    public function agencia()
-    {
-        return $this->belongsTo(Agencia::class, 'agencia_id');
     }
     // Relación con el modelo Estado
     public function estado()

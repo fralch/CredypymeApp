@@ -18,7 +18,7 @@ use App\Models\Creditos\Mantenimiento\Credito\Estado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class SolicitudController extends Controller
+class AprobacionController extends Controller
 {
     protected $master_db;
 
@@ -31,18 +31,20 @@ class SolicitudController extends Controller
         $grupo_id = $request->input('grupo_id');
         $agencia_id = $request->input('agencia_id');
         $grupo_solicitud_id = $request->input('grupo_solicitud_id');
+        $grupo_aprobacion_id = $request->input('grupo_aprobacion_id');
 
-        return Inertia('Creditos/Grupal/solicitud', [
+        return Inertia('Creditos/Grupal/aprobacion', [
             'grupo_id' => intval($grupo_id),
             'agencia_id' => intval($agencia_id),
-            'grupo_solicitud_id' => $grupo_solicitud_id ? intval($grupo_solicitud_id) : null,
+            'grupo_solicitud_id' => intval($grupo_solicitud_id),
+            'grupo_aprobacion_id' => $grupo_aprobacion_id ? intval($grupo_aprobacion_id) : null,
         ]);
     }
     public function listar_datos(Request $request)
     {
         $agencia_id = $request->input('agencia_id');
         $grupo_id = $request->input('grupo_id');
-        $grupo_solicitud_id = $request->input('grupo_solicitud_id');
+        $grupo_solicitud_id = $request->input('grupo_solicitud_id');;
 
         $conexion = 'master_' . $agencia_id;
 
@@ -59,54 +61,28 @@ class SolicitudController extends Controller
             ->where('gru.id', $grupo_id)
             ->get()->last();
 
-        $grupo_clientes = GrupoCliente::on($conexion)
-            ->from('grupo_clientes as gru_cli')
+        $grupo_clientes = SolicitudCredito::on($conexion)
+            ->from('grupo_solicitud_creditos as gru_cre_sol')
             ->select(
-                'gru_cli.id',
-                'gru_cli.cliente_id',
-                'gru_cli.responsable',
-                'cli_reg.agencia_id',
+                'gru_cre_sol.*',
 
+                'cli_reg.agencia_id',
                 DB::raw("CONCAT(cli_reg.apellido_paterno, ' ', cli_reg.apellido_materno, ' ', cli_reg.nombres) AS cliente"),
-                DB::raw("ROUND(200,2) as monto"),
-                DB::raw("0 as tasa_interes"),
-                DB::raw("0 as cuota"),
-                DB::raw("0 as monto_retencion")
+
             )
-            ->join("cliente_registros as cli_reg", 'gru_cli.cliente_id', 'cli_reg.id')
-            ->where('gru_cli.grupo_id', $grupo_id)
-            ->orderByRaw('gru_cli.responsable IS NULL, gru_cli.responsable ASC')
+            ->join('cliente_registros as cli_reg', 'gru_cre_sol.cliente_id', 'cli_reg.id')
+            ->where('grupo_solicitud_id', $grupo_solicitud_id)
+            ->orderBy('gru_cre_sol.id', 'asc')
             ->get();
 
+        $grupo_solicitud = Solicitud::on($conexion)->find($grupo_solicitud_id);
 
-        $fecha_actual = (new CreditosController)->fecha_corta_aplicacion($agencia_id);
-
-
-        if ($grupo_solicitud_id) {
-
-            $grupo_clientes = SolicitudCredito::on($conexion)
-                ->from('grupo_solicitud_creditos as gru_cre_sol')
-                ->select(
-                    'gru_cre_sol.*',
-
-                    'cli_reg.agencia_id',
-                    DB::raw("CONCAT(cli_reg.apellido_paterno, ' ', cli_reg.apellido_materno, ' ', cli_reg.nombres) AS cliente"),
-
-                )
-                ->join('cliente_registros as cli_reg', 'gru_cre_sol.cliente_id', 'cli_reg.id')
-                ->where('grupo_solicitud_id', $grupo_solicitud_id)
-                ->orderBy('gru_cre_sol.id', 'asc')
-                ->get();
-
-            $grupo_solicitud = Solicitud::on($conexion)->find($grupo_solicitud_id);
-        }
 
         return response()->json([
             'success' => true,
             'datos_grupo' => $datos_grupo,
             'grupo_clientes' => $grupo_clientes,
-            'grupo_solicitud' => $grupo_solicitud ?? null,
-            'fecha_actual' => $fecha_actual
+            'grupo_solicitud' => $grupo_solicitud
         ], 200);
     }
 
@@ -154,15 +130,12 @@ class SolicitudController extends Controller
         ], 200);
     }
 
-    public function guardar(Request $request)
+    public function aprobar(Request $request)
     {
-
         $agencia_id = $request->agencia_id;
         $conexion = 'master_' . $agencia_id;
 
-        $datos_grupo = json_decode($request->datos_grupo);
-        $grupo_id = $datos_grupo->id;
-        $asesor_id = $datos_grupo->asesor_id;
+        $grupo_solicitud_id = $request->grupo_solicitud_id;
         $frmSolicitud = json_decode($request->frmSolicitud);
 
         $periodo_pago = $frmSolicitud->periodo_pago;
@@ -174,51 +147,46 @@ class SolicitudController extends Controller
 
         $estado_id = Estado::on($conexion)
             ->select('id')
-            ->where('estado', 'PROPUESTO')
+            ->where('estado', 'APROBADO')
             ->value('id');
 
         $controller = (new CreditosController);
-        $fecha_solicitud = $controller->fecha_larga_aplicacion($agencia_id);
+        $fecha_aprobacion = $controller->fecha_larga_aplicacion($agencia_id);
         $datos_registro = $controller->datos_registro($agencia_id);
 
         $datos_grupo_solicitud = [
-            'grupo_id' => $grupo_id,
-            'asesor_id' => $asesor_id,
             'plazo' => $plazo,
             'periodo_pago' => $periodo_pago,
             'tasa_interes' => $tasa_interes,
             'tasa_retencion' => $tasa_retencion,
             'estado_id' => $estado_id,
-            'fecha_solicitud' => $fecha_solicitud,
-            'usuario_solicitud' => session('usuario_dni'),
-            'data_created' => $datos_registro
+            'fecha_aprobacion' => $fecha_aprobacion,
+            'usuario_aprobacion' => session('usuario_dni'),
+            'data_updated' => $datos_registro
         ];
 
-        $grupo_solicitud = Solicitud::on($conexion)->create($datos_grupo_solicitud);
-        $grupo_solicitud_id = $grupo_solicitud->id;
+        Solicitud::on($conexion)->where('id', $grupo_solicitud_id)->update($datos_grupo_solicitud);
 
         foreach ($grupo_clientes as $item) {
 
             $monto_retencion = ($tasa_retencion / 100) * floatval($item->monto);
             $datos = [
-                'grupo_solicitud_id' => $grupo_solicitud_id,
-                'agencia_cliente' => $item->agencia_id,
-                'cliente_id' => $item->cliente_id,
                 'monto' => floatval($item->monto),
                 'monto_retencion' => floatval($monto_retencion),
                 'cuota' => floatval($item->cuota),
                 'estado_id' => $estado_id,
-                'data_created' => $datos_registro
+                'data_updated' => $datos_registro
             ];
-            SolicitudCredito::on($conexion)->create($datos);
+            SolicitudCredito::on($conexion)->where('id', $item->id)->update($datos);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Solicitud registrada',
-            'grupo_solicitud_id' => $grupo_solicitud_id
+            'message' => 'Aprobación registrada'
         ], 200);
     }
+
+    public function desaprobar(Request $request) {}
 
     public function buscar(Request $request)
     {
@@ -227,7 +195,7 @@ class SolicitudController extends Controller
 
         $fecha_actual = (new CreditosController)->fecha_corta_aplicacion($agencia_id);
 
-        $estado_id = Estado::on($conexion)->where('estado', 'PROPUESTO')->value('id');
+        $estado_id = Estado::on($conexion)->where('estado', 'APROBADO')->value('id');
 
         $solicitudes = Solicitud::on($conexion)
             ->from('grupo_solicitudes as gru_sol')
@@ -237,7 +205,7 @@ class SolicitudController extends Controller
                 'gru_sol.plazo',
                 'gru_sol.periodo_pago',
                 'gru_sol.tasa_interes',
-                'gru_sol.fecha_solicitud',
+                'gru_sol.fecha_aprobacion',
 
                 'gru.nombre as nombre_grupo',
                 'usu_1.usuario as asesor',
@@ -249,8 +217,8 @@ class SolicitudController extends Controller
             ->join('grupos as gru', 'gru_sol.grupo_id', 'gru.id')
             ->join('grupo_solicitud_creditos as gru_sol_cre', 'gru_sol.id', 'gru_sol_cre.grupo_solicitud_id')
             ->join("$this->master_db.usuarios as usu_1", 'gru.asesor_id', 'usu_1.dni')
-            ->join("$this->master_db.usuarios as usu_2", 'gru_sol.usuario_solicitud', 'usu_2.dni')
-            ->whereDate('gru_sol.fecha_solicitud', $fecha_actual)
+            ->join("$this->master_db.usuarios as usu_2", 'gru_sol.usuario_aprobacion', 'usu_2.dni')
+            ->whereDate('gru_sol.fecha_aprobacion', $fecha_actual)
             ->where('gru_sol.estado_id', $estado_id)
             ->groupBy(
                 'gru_sol.id',
@@ -258,7 +226,7 @@ class SolicitudController extends Controller
                 'gru_sol.plazo',
                 'gru_sol.periodo_pago',
                 'gru_sol.tasa_interes',
-                'gru_sol.fecha_solicitud',
+                'gru_sol.fecha_aprobacion',
                 'gru.nombre',
                 'usu_1.usuario',
                 'usu_2.usuario'

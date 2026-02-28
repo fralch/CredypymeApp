@@ -12,6 +12,7 @@ class Credito extends Model
 
     protected $fillable = [
         'aprobacion_id',
+        'grupo_credito_id',
         'fecha_desembolso',
         'agencia_id',
         'cliente_id',

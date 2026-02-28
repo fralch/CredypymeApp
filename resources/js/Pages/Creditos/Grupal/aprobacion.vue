@@ -4,12 +4,12 @@
             <div class="content" style="display: block">
                 <div class="card">
                     <headerClose
-                        :title="'SOLICITUD - CRÉDITO GRUPAL'"
+                        :title="'APROBACIÓN - CRÉDITO GRUPAL'"
                     ></headerClose>
 
                     <div class="card-body card-block">
                         <div class="form-row">
-                            <div class="form-group col-md-6 col-12">
+                            <div class="form-group col-md-5 col-12">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <label
@@ -44,7 +44,10 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-3 col-12">
+                            <div
+                                class="form-group col-md-3 col-12"
+                                v-if="grupo_aprobacion_id == null"
+                            >
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <label
@@ -56,6 +59,25 @@
                                         type="text"
                                         class="form-control center bolder"
                                         :value="frmSolicitud.fecha_solicitud"
+                                        disabled
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                class="form-group col-md-4 col-12"
+                                v-if="grupo_aprobacion_id != null"
+                            >
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <label
+                                            class="input-group-text label-title"
+                                            >F. APROBACIÓN</label
+                                        >
+                                    </div>
+                                    <input
+                                        type="text"
+                                        class="form-control center bolder"
+                                        :value="frmSolicitud.fecha_aprobacion"
                                         disabled
                                     />
                                 </div>
@@ -329,18 +351,28 @@
                             <div class="btn-group" role="group">
                                 <button
                                     class="btn btn-action btn-icon-split"
-                                    @click="Solicitar"
-                                    v-if="grupo_solicitud_id == null"
+                                    @click="Aprobar"
+                                    v-if="grupo_aprobacion_id == null"
                                 >
                                     <span class="icon text-white">
                                         <i class="pi pi-check"></i
                                     ></span>
-                                    <span class="text">REGISTRAR</span>
+                                    <span class="text">APROBAR</span>
+                                </button>
+                                <button
+                                    class="btn btn-danger btn-icon-split"
+                                    @click="Desaprobar"
+                                    v-if="grupo_aprobacion_id == null"
+                                >
+                                    <span class="icon text-white">
+                                        <i class="pi pi-times"></i
+                                    ></span>
+                                    <span class="text">DESAPROBAR</span>
                                 </button>
                                 <button
                                     class="btn btn-action btn-icon-split"
                                     @click="Imprimir"
-                                    v-if="grupo_solicitud_id != null"
+                                    v-if="grupo_aprobacion_id != null"
                                 >
                                     <span class="icon text-white">
                                         <i class="pi pi-print"></i
@@ -366,13 +398,12 @@ import Column from "primevue/column/column.common";
 import TabView from "primevue/tabview/tabview.common";
 import TabPanel from "primevue/tabpanel/tabpanel.common";
 
-const noZero = (value) => value != 0;
-
 export default {
     props: {
         agencia_id: Number,
         grupo_id: Number,
         grupo_solicitud_id: Number,
+        grupo_aprobacion_id: Number,
     },
 
     components: {
@@ -395,11 +426,12 @@ export default {
 
             frmSolicitud: {
                 grupo_clientes: [],
-                periodo_pago: "MENSUAL",
-                plazo: 6,
-                tasa_interes: this.roundTo(9, 2),
-                tasa_retencion: this.roundTo(8, 2),
+                periodo_pago: null,
+                plazo: 0,
+                tasa_interes: 0,
+                tasa_retencion: 0,
                 fecha_solicitud: null,
+                fecha_aprobacion: null,
             },
         };
     },
@@ -409,7 +441,7 @@ export default {
             return this.$page.props.sesion_usuario;
         },
         bloqueado() {
-            if (this.grupo_solicitud_id != null) {
+            if (this.grupo_aprobacion_id != null) {
                 return true;
             }
             return false;
@@ -428,38 +460,28 @@ export default {
             };
 
             return await axios
-                .get(route("gru.solicitud.listar_datos"), { params })
+                .get(route("gru.aprobacion.listar_datos"), { params })
                 .then((response) => {
                     this.datos_grupo = response.data.datos_grupo;
 
-                    this.frmSolicitud.grupo_clientes =
-                        response.data.grupo_clientes;
+                    const grupo_solicitud = response.data.grupo_solicitud;
+                    const grupo_clientes = response.data.grupo_clientes;
 
-                    this.frmSolicitud.grupo_clientes.forEach((item) => {
-                        item.monto = this.roundTo(item.monto, 2);
-                    });
+                    this.frmSolicitud.grupo_clientes = grupo_clientes;
 
-                    if (this.grupo_solicitud_id) {
-                        const grupo_solicitud = response.data.grupo_solicitud;
-                        const grupo_clientes = response.data.grupo_clientes;
+                    this.frmSolicitud.periodo_pago =
+                        grupo_solicitud.periodo_pago;
+                    this.frmSolicitud.plazo = grupo_solicitud.plazo;
+                    this.frmSolicitud.tasa_interes =
+                        grupo_solicitud.tasa_interes;
+                    this.frmSolicitud.tasa_retencion =
+                        grupo_solicitud.tasa_retencion;
+                    this.frmSolicitud.fecha_solicitud =
+                        grupo_solicitud.fecha_solicitud;
+                    this.frmSolicitud.fecha_aprobacion =
+                        grupo_solicitud.fecha_aprobacion;
 
-                        this.frmSolicitud.grupo_clientes = grupo_clientes;
-
-                        this.frmSolicitud.periodo_pago =
-                            grupo_solicitud.periodo_pago;
-                        this.frmSolicitud.plazo = grupo_solicitud.plazo;
-                        this.frmSolicitud.tasa_interes =
-                            grupo_solicitud.tasa_interes;
-                        this.frmSolicitud.tasa_retencion =
-                            grupo_solicitud.tasa_retencion;
-                        this.frmSolicitud.fecha_solicitud =
-                            grupo_solicitud.fecha_solicitud;
-
-                        this.CalcularCronograma();
-                    } else {
-                        this.frmSolicitud.fecha_solicitud =
-                            response.data.fecha_actual;
-                    }
+                    this.CalcularCronograma();
                 });
         },
         roundTo(value, decimal_places) {
@@ -539,13 +561,13 @@ export default {
             };
 
             // this.$inertia.get(
-            //     route("gru.solicitud.calcular_cronograma"),
+            //     route("gru.aprobacion.calcular_cronograma"),
             //     params,
             // );
             // return false;
 
             await axios
-                .get(route("gru.solicitud.calcular_cronograma"), { params })
+                .get(route("gru.aprobacion.calcular_cronograma"), { params })
                 .then((response) => {
                     this.frmSolicitud.grupo_clientes =
                         response.data.cuotas_clientes;
@@ -554,13 +576,13 @@ export default {
                 });
         },
 
-        async Solicitar() {
+        async Aprobar() {
             await this.CalcularCronograma();
             this.submited = true;
 
             Swal.fire({
                 icon: "question",
-                title: "¿DESEA REGISTRAR ESTA SOLICITUD?",
+                title: "¿DESEA APROBAR ESTA SOLICITUD?",
                 confirmButtonText: "Si",
                 showCancelButton: true,
                 cancelButtonText: "No",
@@ -570,21 +592,17 @@ export default {
                     let data = new FormData();
 
                     data.append("agencia_id", this.agencia_id);
-                    data.append(
-                        "datos_grupo",
-                        JSON.stringify(this.datos_grupo),
-                    );
                     data.append("grupo_solicitud_id", this.grupo_solicitud_id);
                     data.append(
                         "frmSolicitud",
                         JSON.stringify(this.frmSolicitud),
                     );
 
-                    // this.$inertia.post(route("gru.solicitud.guardar"), data);
+                    // this.$inertia.post(route("gru.aprobacion.aprobar"), data);
                     // return false;
 
                     Swal.fire({
-                        title: "REGISTRANDO",
+                        title: "APROBANDO",
                         showConfirmButton: false,
                         allowOutsideClick: false,
 
@@ -592,17 +610,19 @@ export default {
                             Swal.showLoading();
 
                             return await axios
-                                .post(route("gru.solicitud.guardar"), data)
+                                .post(route("gru.aprobacion.aprobar"), data)
                                 .then(async (response) => {
                                     const params = {
                                         agencia_id: this.agencia_id,
 
                                         grupo_id: this.grupo_id,
                                         grupo_solicitud_id:
-                                            response.data.grupo_solicitud_id,
+                                            this.grupo_solicitud_id,
+                                        grupo_aprobacion_id:
+                                            this.grupo_solicitud_id,
                                     };
                                     this.$inertia.get(
-                                        route("gru.solicitud", params),
+                                        route("gru.aprobacion", params),
                                     );
 
                                     await Swal.close();
@@ -624,13 +644,74 @@ export default {
             });
         },
 
+        async Desaprobar() {
+            Swal.fire({
+                icon: "question",
+                title: "¿DESEA DESAPROBAR ESTA SOLICITUD?",
+                confirmButtonText: "Si",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const params = {
+                        agencia_id: this.agencia_id,
+                        grupo_solicitud_id: this.grupo_solicitud_id,
+                    };
+
+                    // this.$inertia.post(route("gru.aprobacion.desaprobar"), params);
+                    // return false;
+
+                    Swal.fire({
+                        title: "DESAPROBANDO",
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+
+                        willOpen: async () => {
+                            Swal.showLoading();
+
+                            return await axios
+                                .post(
+                                    route("gru.aprobacion.desaprobar"),
+                                    params,
+                                )
+                                .then(async (response) => {
+                                    const params = {
+                                        agencia_id: this.agencia_id,
+
+                                        grupo_id: this.grupo_id,
+                                        grupo_solicitud_id:
+                                            response.data.grupo_solicitud_id,
+                                    };
+                                    this.$inertia.get(
+                                        route("gru.aprobacion", params),
+                                    );
+
+                                    await Swal.close();
+                                    return Swal.fire({
+                                        icon: "success",
+                                        title: response.data.message,
+                                        timer: 1200,
+                                        showConfirmButton: false,
+                                    });
+                                })
+                                .catch((error) => {
+                                    Swal.showValidationMessage(
+                                        `Ha ocurrido un error, comunicar a TI: ${error}`,
+                                    );
+                                });
+                        },
+                    });
+                }
+            });
+        },
         async Imprimir(solicitud_id) {
             let data = new FormData();
             data.append("agencia_id", this.agencia_id);
             data.append("grupo_solicitud_id", this.grupo_solicitud_id);
             data.append("grupo_id", this.grupo_id);
 
-            // this.$inertia.post(route("gru.solicitud.exportar"), data);
+            // this.$inertia.post(route("gru.aprobacion.exportar"), data);
             // return false;
 
             Swal.fire({
@@ -640,7 +721,7 @@ export default {
                 didOpen: async () => {
                     Swal.showLoading();
                     await axios
-                        .post(route("gru.solicitud.exportar"), data)
+                        .post(route("gru.aprobacion.exportar"), data)
                         .then(async (response) => {
                             const origin = window.location.origin;
                             const path_pdf = response.data.path_pdf;

@@ -448,7 +448,7 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBuscarCreditos',
+                                                'mdlBuscarGrupoCreditos',
                                                 'copia_solicitud',
                                                 'CREDITOS_GRUPAL/COPIA_SOLICITUD',
                                             )
@@ -467,7 +467,7 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBuscarCreditos',
+                                                'mdlBuscarGrupoCreditos',
                                                 'aprobacion',
                                                 'CREDITOS_GRUPAL/APROBACION',
                                             )
@@ -491,7 +491,7 @@
                                         href="javascript:void(0)"
                                         @click="
                                             AbrirModal(
-                                                'mdlBuscarCreditos',
+                                                'mdlBuscarGrupoCreditos',
                                                 'copia_aprobacion',
                                                 'CREDITOS_GRUPAL/COPIA_APROBACION',
                                             )
@@ -2782,7 +2782,9 @@
         ></mdlDesembolsosPorAsesor>
 
         <mdlBuscarGrupos ref="mdlBuscarGrupos"></mdlBuscarGrupos>
-        <mdlBuscarCreditos ref="mdlBuscarCreditos"></mdlBuscarCreditos>
+        <mdlBuscarGrupoCreditos
+            ref="mdlBuscarGrupoCreditos"
+        ></mdlBuscarGrupoCreditos>
     </div>
 </template>
 
@@ -2803,7 +2805,7 @@ import mdlControlMoraAgencia from "@/Pages/Creditos/Reportes/Components/mdlContr
 import mdlControlMoraAgenciaMensual from "@/Pages/Creditos/Reportes/Components/mdlControlMoraAgenciaMensual.vue";
 import mdlDesembolsosPorAsesor from "@/Pages/Creditos/Reportes/Components/mdlDesembolsosPorAsesor.vue";
 import mdlBuscarGrupos from "@/Pages/Creditos/Grupal/Components/mdlBuscarGrupos.vue";
-import mdlBuscarCreditos from "@/Pages/Creditos/Grupal/Components/mdlBuscarCreditos.vue";
+import mdlBuscarGrupoCreditos from "@/Pages/Creditos/Grupal/Components/mdlBuscarGrupoCreditos.vue";
 
 import botonInformativo from "@/Pages/Creditos/Components/boton_informativo.vue";
 
@@ -2828,7 +2830,7 @@ export default {
         mdlDesembolsosPorAsesor,
         botonInformativo,
         mdlBuscarGrupos,
-        mdlBuscarCreditos,
+        mdlBuscarGrupoCreditos,
     },
     props: { agencias: Array },
     data() {
@@ -3168,6 +3170,10 @@ export default {
                 modulo.nombre_modulo = nombre_modulo;
                 modulo.agencias_permiso = this.filtrar_agencias(permiso);
                 modulo.nombre_grupo = null;
+            } else if (nombre_modal == "mdlBuscarGrupoCreditos") {
+                modulo = this.$refs.mdlBuscarGrupoCreditos;
+                modulo.nombre_modulo = nombre_modulo;
+                modulo.agencias_permiso = this.filtrar_agencias(permiso);
             }
 
             $("#" + nombre_modal).css("display", "block");
