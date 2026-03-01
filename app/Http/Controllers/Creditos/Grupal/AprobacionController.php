@@ -18,6 +18,8 @@ use App\Models\Creditos\Mantenimiento\Credito\Estado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use PhpOffice\PhpWord\TemplateProcessor;
+
 class AprobacionController extends Controller
 {
     protected $master_db;
@@ -239,41 +241,115 @@ class AprobacionController extends Controller
         ], 200);
     }
 
-    public function exportar(Request $request)
+    public function generar_ficha(Request $request)
     {
 
         // Ordenando array de datos-------------------------------
         $agencia_id = $request->agencia_id;
-        $solicitud_id = $request->solicitud_id;
-        $grupo_id = $request->grupo_id;
         $conexion = 'master_' . $agencia_id;
 
-        // Leer Plantilla-------------------------
-        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
-        $reader->setLoadSheetsOnly('rptFichaCreditoGrupal');
-        $spreadsheet = $reader->load("./report_templates/reportes/creditos/rptFichaCredito.xlsx");
-        $sheet = $spreadsheet->getActiveSheet();
+        $datos_grupo = json_decode($request->datos_grupo);
+        $frmSolicitud = json_decode($request->frmSolicitud);
 
-        // Insertando valores
+        $monto_total = 0;
 
-        $controller = new CreditosController();
+        foreach ($frmSolicitud->grupo_clientes as $item) {
+            $monto_total += floatval($item->monto);
+        }
 
-        $solicitud = Solicitud::on($conexion)->find($solicitud_id);
-        $cliente = Cliente::on($conexion)->find($solicitud->cliente_id);
-        $negocio_cliente = Negocio::on($conexion)->where('cliente_id', $solicitud->cliente_id)->get()->last();
-        $grupo = Grupo::on($conexion)->find($grupo_id);
-        $asesor_grupo = $grupo->asesor;
+        $template = new TemplateProcessor(public_path('report_templates/creditos/grupales/rptFichaCredito.docx'));
 
-        // Rellenando ENCABEZADO
+        $grupo_clientes = $frmSolicitud->grupo_clientes;
 
-        // Exportar para descarga-------------------------
+        $data = [
+            'tipo_documento' => 'APROBACIÓN',
+            'nombre_grupo' => $datos_grupo->nombre,
+            'fecha' => $frmSolicitud->fecha_solicitud,
+            'asesor' => $datos_grupo->asesor,
+            'monto_total' => number_format((float) $monto_total, 2, '.', ','),
 
-        $nombre_archivo =  $controller->concatenar_aleatorio('rptFichaCreditoGrupal', 5);
+        ];
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf($spreadsheet);
-        $writer->save($_SERVER['DOCUMENT_ROOT'] . '/temp_files/' . $nombre_archivo . '.pdf');
-        $path_pdf =  '/temp_files/' . $nombre_archivo . '.pdf';
+        $dni_presidente = Cliente::on($conexion)->where('id', $grupo_clientes[0]->cliente_id)->value('dni');
+        $plazo_periodo = $frmSolicitud->plazo . ' ' . (new CreditosController)->periodo_medicion($frmSolicitud->periodo_pago);
 
-        return ['path_pdf' => $path_pdf];
+        $template->cloneBlock('block_clientes', count($grupo_clientes), true, true);
+
+        foreach ($data as $mark => $value) {
+            $template->setValue($mark, $value);
+        }
+
+        foreach ($grupo_clientes as  $index => $item) {
+            $cliente = Cliente::on($conexion)
+                ->from('cliente_registros as cli_reg')
+                ->select(
+                    'cli_reg.apellido_paterno',
+                    'cli_reg.apellido_materno',
+                    'cli_reg.nombres',
+                    'cli_reg.dni',
+                    'cli_reg.direccion',
+                    'cli_reg.referencia_direccion',
+                    'cli_reg.telefonos',
+
+                    'dep.departamento',
+                    'prov.provincia',
+                    'dis.distrito'
+                )
+                ->join("$this->master_db.departamentos as dep", 'cli_reg.departamento_id', 'dep.id')
+                ->join("$this->master_db.provincias as prov", 'cli_reg.provincia_id', 'prov.id')
+                ->join("$this->master_db.distritos as dis", 'cli_reg.distrito_id', 'dis.id')
+                ->where('cli_reg.id', $item->cliente_id)
+                ->first();
+
+            $telefonos = json_decode($cliente->telefonos);
+
+            $negocio = Negocio::on($conexion)->where([
+                ['cliente_id', $item->cliente_id],
+                ['vinculado', 1]
+            ])->first();
+
+            $i = $index + 1;
+            $template->setValue("cliente_cargo#{$i}", ($i == 1) ? 'PRESIDENTE' : ($i == 2 ? 'TESORERO' : 'MIEMBRO DEL GRUPO'));
+            $template->setValue("apellido_paterno#{$i}", $cliente->apellido_paterno);
+            $template->setValue("apellido_materno#{$i}", $cliente->apellido_materno);
+            $template->setValue("nombres#{$i}", $cliente->nombres);
+            $template->setValue("dni#{$i}", $cliente->dni);
+            $template->setValue("cargo#{$i}", ($i == 1) ? 'PRESIDENTE' : ($i == 2 ? 'TESORERO' : '-'));
+            $template->setValue("monto#{$i}", number_format((float) $item->monto, 2, '.', ','));
+            $template->setValue("localidad#{$i}", $cliente->departamento . ' - ' . $cliente->provincia . ' - ' . $cliente->distrito);
+            $template->setValue("direccion#{$i}", $cliente->direccion);
+            $template->setValue("referencia_direccion#{$i}", $cliente->referencia_direccion);
+            $template->setValue("telefonos#{$i}", $telefonos->t1 . ' / ' . ($telefonos->t2 ?? '-') . ' / ' . ($telefonos->t3 ?? '-'));
+            $template->setValue("direccion_negocio#{$i}", $negocio ? $negocio->direccion : '-');
+
+            $template->setValue("tipo_documento#{$i}", 'APROBACIÓN');
+            $template->setValue("asesor#{$i}", $datos_grupo->asesor);
+            $template->setValue("monto#{$i}", number_format((float) $item->monto, 2, '.', ','));
+            $template->setValue("plazo_periodo#{$i}", $plazo_periodo);
+            $template->setValue("cuota#{$i}", number_format((float) $item->cuota, 2, '.', ','));
+            $template->setValue("tasa#{$i}", number_format((float) $frmSolicitud->tasa_interes, 2, '.', ','));
+
+            $template->setValue("dni_r1#{$i}", $dni_presidente);
+        }
+
+        $documento = (new CreditosController)->concatenar_aleatorio('rptFichaAprobacion', 5);
+
+        $template->saveAs(public_path('temp_files/' . $documento . '.docx'));
+
+        $docxFile = public_path('temp_files/' . $documento . '.docx');
+        $pdfFile = public_path('temp_files/' . $documento . '.pdf');
+
+        // Use OpenOffice to convert DOCX to PDF
+        $command = env('LIBREOFFICE') . " --headless --convert-to pdf $docxFile --outdir " . dirname($pdfFile);
+        shell_exec($command);
+
+        $path_pdf = '/temp_files/' . $documento . '.pdf';
+        // Return the path PDF file to the user
+
+        return response()->json([
+            'success' => true,
+            'path_pdf' => $path_pdf,
+            'message' => 'Ficha de APROBACIÓN generada'
+        ], 200);
     }
 }

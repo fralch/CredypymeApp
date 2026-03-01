@@ -345,7 +345,7 @@
                                     <span class="icon text-white">
                                         <i class="pi pi-print"></i
                                     ></span>
-                                    <span class="text">IMPRIMIR</span>
+                                    <span class="text">IMPRIMIR FICHA</span>
                                 </button>
                             </div>
                         </div>
@@ -624,23 +624,22 @@ export default {
             });
         },
 
-        async Imprimir(solicitud_id) {
+        async Imprimir() {
             let data = new FormData();
             data.append("agencia_id", this.agencia_id);
-            data.append("grupo_solicitud_id", this.grupo_solicitud_id);
-            data.append("grupo_id", this.grupo_id);
+            data.append("datos_grupo", JSON.stringify(this.datos_grupo));
+            data.append("frmSolicitud", JSON.stringify(this.frmSolicitud));
 
-            // this.$inertia.post(route("gru.solicitud.exportar"), data);
+            // this.$inertia.post(route("gru.solicitud.generar_ficha"), data);
             // return false;
 
             Swal.fire({
-                title: "GENERANDO",
-                text: "Espere porfavor...",
+                title: "CREANDO FICHA...",
                 allowOutsideClick: false,
                 didOpen: async () => {
                     Swal.showLoading();
                     await axios
-                        .post(route("gru.solicitud.exportar"), data)
+                        .post(route("gru.solicitud.generar_ficha"), data)
                         .then(async (response) => {
                             const origin = window.location.origin;
                             const path_pdf = response.data.path_pdf;

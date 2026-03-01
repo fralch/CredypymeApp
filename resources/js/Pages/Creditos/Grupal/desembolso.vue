@@ -1,10 +1,10 @@
 <template>
     <layout ref="layout">
-        <div class="slot_body slot-aprobacion-grupo" slot="component-view">
+        <div class="slot_body slot-desembolso-grupo" slot="component-view">
             <div class="content" style="display: block">
                 <div class="card">
                     <headerClose
-                        :title="'APROBACIÓN - CRÉDITO GRUPAL'"
+                        :title="'DESEMBOLSO - CRÉDITO GRUPAL'"
                     ></headerClose>
 
                     <div class="card-body card-block">
@@ -44,29 +44,7 @@
                                 </div>
                             </div>
 
-                            <div
-                                class="form-group col-md-3 col-12"
-                                v-if="grupo_aprobacion_id == null"
-                            >
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <label
-                                            class="input-group-text label-title"
-                                            >F. SOLICITUD</label
-                                        >
-                                    </div>
-                                    <input
-                                        type="text"
-                                        class="form-control center bolder"
-                                        :value="frmSolicitud.fecha_solicitud"
-                                        disabled
-                                    />
-                                </div>
-                            </div>
-                            <div
-                                class="form-group col-md-4 col-12"
-                                v-if="grupo_aprobacion_id != null"
-                            >
+                            <div class="form-group col-md-4 col-12">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <label
@@ -89,7 +67,7 @@
                         <div class="form-row">
                             <div class="col-md-8">
                                 <div
-                                    style="max-height: 400px; overflow-y: auto"
+                                    style="max-height: 435px; overflow-y: auto"
                                 >
                                     <fieldset
                                         v-for="(
@@ -133,16 +111,12 @@
                                                 </div>
 
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     class="form-control center bolder"
                                                     style="font-size: 15px"
                                                     step="10"
                                                     lang="en"
-                                                    :min="200"
-                                                    :id="'inp_' + item.id"
-                                                    v-model.number="item.monto"
-                                                    name="monto"
-                                                    @change="RedondearValor"
+                                                    :value="item.monto"
                                                     :readOnly="bloqueado"
                                                 />
                                             </div>
@@ -187,11 +161,7 @@
                                                     class="form-control center bolder"
                                                     :value="
                                                         roundTo(
-                                                            (frmSolicitud.tasa_retencion /
-                                                                100) *
-                                                                parseFloat(
-                                                                    item.monto,
-                                                                ),
+                                                            item.monto_retencion,
                                                             2,
                                                         )
                                                     "
@@ -237,9 +207,7 @@
                                         style="font-size: 15px"
                                         step="1"
                                         lang="en"
-                                        v-model.number="frmSolicitud.plazo"
-                                        name="plazo"
-                                        @change="RedondearValor"
+                                        :value="frmSolicitud.plazo"
                                         :disabled="bloqueado"
                                     />
                                 </div>
@@ -255,11 +223,7 @@
                                         step="1"
                                         :min="1"
                                         lang="en"
-                                        v-model.number="
-                                            frmSolicitud.tasa_interes
-                                        "
-                                        name="tasa_interes"
-                                        @change="RedondearValor"
+                                        :value="frmSolicitud.tasa_interes"
                                         :disabled="bloqueado"
                                     />
                                 </div>
@@ -276,11 +240,7 @@
                                         :min="8"
                                         :max="15"
                                         lang="en"
-                                        v-model.number="
-                                            frmSolicitud.tasa_retencion
-                                        "
-                                        name="tasa_retencion"
-                                        @change="RedondearValor"
+                                        :value="frmSolicitud.tasa_retencion"
                                         :disabled="bloqueado"
                                     />
                                 </div>
@@ -347,38 +307,88 @@
                         </div>
 
                         <hr />
-                        <div class="text-right">
-                            <div class="btn-group" role="group">
-                                <button
-                                    class="btn btn-action btn-icon-split"
-                                    @click="Aprobar"
-                                    v-if="grupo_aprobacion_id == null"
-                                >
-                                    <span class="icon text-white">
-                                        <i class="pi pi-check"></i
-                                    ></span>
-                                    <span class="text">APROBAR</span>
-                                </button>
-                                <button
-                                    class="btn btn-danger btn-icon-split"
-                                    @click="Desaprobar"
-                                    v-if="grupo_aprobacion_id == null"
-                                >
-                                    <span class="icon text-white">
-                                        <i class="pi pi-times"></i
-                                    ></span>
-                                    <span class="text">DESAPROBAR</span>
-                                </button>
-                                <button
-                                    class="btn btn-action btn-icon-split"
-                                    @click="Imprimir"
-                                    v-if="grupo_aprobacion_id != null"
-                                >
-                                    <span class="icon text-white">
-                                        <i class="pi pi-print"></i
-                                    ></span>
-                                    <span class="text">IMPRIMIR FICHA</span>
-                                </button>
+                        <div class="form-row">
+                            <div class="col-md-8">
+                                <div class="form-row text-left">
+                                    <div class="input-group col-md-6 col-6">
+                                        <div class="input-group-prepend">
+                                            <span
+                                                class="input-group-text label-title"
+                                                style="font-size: 15px"
+                                                >TOTAL MONTO
+                                            </span>
+                                        </div>
+
+                                        <input
+                                            type="text"
+                                            class="form-control center bolder"
+                                            :value="
+                                                'S/ ' + roundTo(total_monto, 2)
+                                            "
+                                            style="font-size: 18px"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div class="input-group col-md-6 col-6">
+                                        <div class="input-group-prepend">
+                                            <span
+                                                class="input-group-text label-title"
+                                                style="font-size: 15px"
+                                                >TOTAL RETENCIÓN
+                                            </span>
+                                        </div>
+
+                                        <input
+                                            type="text"
+                                            class="form-control center bolder"
+                                            :value="
+                                                'S/ ' +
+                                                roundTo(total_retencion, 2)
+                                            "
+                                            style="font-size: 18px"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-right">
+                                    <div class="btn-group" role="group">
+                                        <button
+                                            class="btn btn-action btn-icon-split"
+                                            @click="Desembolsar"
+                                            v-if="grupo_desembolso_id == null"
+                                        >
+                                            <span class="icon text-white">
+                                                <i class="pi pi-dollar"></i
+                                            ></span>
+                                            <span class="text"
+                                                >DESEMBOLSAR</span
+                                            >
+                                        </button>
+
+                                        <button
+                                            class="btn btn-action btn-icon-split"
+                                            @click="Imprimir('cronograma')"
+                                            v-if="grupo_desembolso_id != null"
+                                        >
+                                            <span class="icon text-white">
+                                                <i class="pi pi-print"></i
+                                            ></span>
+                                            <span class="text">CRONOGRAMA</span>
+                                        </button>
+                                        <button
+                                            class="btn btn-action btn-icon-split"
+                                            @click="Imprimir('voucher')"
+                                            v-if="grupo_desembolso_id != null"
+                                        >
+                                            <span class="icon text-white">
+                                                <i class="pi pi-print"></i
+                                            ></span>
+                                            <span class="text">VOUCHER</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -403,7 +413,7 @@ export default {
         agencia_id: Number,
         grupo_id: Number,
         grupo_solicitud_id: Number,
-        grupo_aprobacion_id: Number,
+        grupo_desembolso_id: Number,
     },
 
     components: {
@@ -437,14 +447,26 @@ export default {
     },
 
     computed: {
-        datos_sesion() {
-            return this.$page.props.sesion_usuario;
+        datos_caja() {
+            return this.$page.props.creditos_datos.datos_caja;
         },
         bloqueado() {
-            if (this.grupo_aprobacion_id != null) {
-                return true;
-            }
-            return false;
+            return true;
+        },
+        total_monto() {
+            return this.frmSolicitud.grupo_clientes.reduce(
+                (total, item) => total + parseFloat(item.monto || 0),
+                0,
+            );
+        },
+        total_retencion() {
+            return this.frmSolicitud.grupo_clientes.reduce(
+                (total, item) =>
+                    total +
+                    (parseFloat(this.frmSolicitud.tasa_retencion || 0) / 100) *
+                        parseFloat(item.monto || 0),
+                0,
+            );
         },
     },
 
@@ -460,7 +482,7 @@ export default {
             };
 
             return await axios
-                .get(route("gru.aprobacion.listar_datos"), { params })
+                .get(route("gru.desembolso.listar_datos"), { params })
                 .then((response) => {
                     this.datos_grupo = response.data.datos_grupo;
 
@@ -494,56 +516,7 @@ export default {
 
             return parseFloat(valor).toFixed(numero_decimales);
         },
-        RedondearValor(e) {
-            let valor = 0;
-            let numero_decimales = 2;
 
-            if (e.target.value && e.target.value >= 0) {
-                valor = e.target.value;
-            }
-
-            if (e.target.name == "monto") {
-                const grupo_cliente_id = e.target.id.split("_")[1];
-                const integrante = this.frmSolicitud.grupo_clientes.find(
-                    (item) => item.id == grupo_cliente_id,
-                );
-
-                const min = parseFloat(e.target.min);
-
-                if (parseFloat(valor) < min) {
-                    valor = min;
-                }
-
-                integrante.monto = this.roundTo(valor, numero_decimales);
-            } else if (e.target.name == "plazo") {
-                const min = 1;
-
-                if (parseFloat(valor) < min) {
-                    valor = min;
-                }
-
-                this.frmSolicitud.plazo = this.roundTo(valor, 0);
-            } else if (e.target.name == "tasa_interes") {
-                const min = parseFloat(e.target.min);
-
-                if (parseFloat(valor) < min) {
-                    valor = min;
-                }
-
-                this.frmSolicitud.tasa_interes = this.roundTo(valor, 2);
-            } else if (e.target.name == "tasa_retencion") {
-                const min = parseFloat(e.target.min);
-                const max = parseFloat(e.target.max);
-
-                if (parseFloat(valor) < min) {
-                    valor = min;
-                } else if (parseFloat(valor) > max) {
-                    valor = max;
-                }
-
-                this.frmSolicitud.tasa_retencion = this.roundTo(valor, 2);
-            }
-        },
         periodo_medicion(value) {
             if (value == "SEMANAL") {
                 return "(SEMANAS)";
@@ -576,13 +549,12 @@ export default {
                 });
         },
 
-        async Aprobar() {
-            await this.CalcularCronograma();
+        async Desembolsar() {
             this.submited = true;
 
             Swal.fire({
                 icon: "question",
-                title: "¿DESEA APROBAR ESTA SOLICITUD?",
+                title: "¿DESEA DESEMBOLSAR ESTE CRÉDITO?",
                 confirmButtonText: "Si",
                 showCancelButton: true,
                 cancelButtonText: "No",
@@ -593,16 +565,14 @@ export default {
 
                     data.append("agencia_id", this.agencia_id);
                     data.append("grupo_solicitud_id", this.grupo_solicitud_id);
-                    data.append(
-                        "frmSolicitud",
-                        JSON.stringify(this.frmSolicitud),
-                    );
+                    data.append("agencia_caja", this.datos_caja.agencia_id);
+                    data.append("caja_id", this.datos_caja.id);
 
-                    // this.$inertia.post(route("gru.aprobacion.aprobar"), data);
-                    // return false;
+                    this.$inertia.post(route("gru.desembolso.guardar"), data);
+                    return false;
 
                     Swal.fire({
-                        title: "APROBANDO",
+                        title: "DESEMBOLSANDO",
                         showConfirmButton: false,
                         allowOutsideClick: false,
 
@@ -610,7 +580,7 @@ export default {
                             Swal.showLoading();
 
                             return await axios
-                                .post(route("gru.aprobacion.aprobar"), data)
+                                .post(route("gru.desembolso.guardar"), data)
                                 .then(async (response) => {
                                     const params = {
                                         agencia_id: this.agencia_id,
@@ -618,7 +588,7 @@ export default {
                                         grupo_id: this.grupo_id,
                                         grupo_solicitud_id:
                                             this.grupo_solicitud_id,
-                                        grupo_aprobacion_id:
+                                        grupo_desembolso_id:
                                             this.grupo_solicitud_id,
                                     };
                                     this.$inertia.get(
@@ -705,22 +675,23 @@ export default {
                 }
             });
         },
-        async Imprimir() {
+        async Imprimir(solicitud_id) {
             let data = new FormData();
             data.append("agencia_id", this.agencia_id);
-            data.append("datos_grupo", JSON.stringify(this.datos_grupo));
-            data.append("frmSolicitud", JSON.stringify(this.frmSolicitud));
+            data.append("grupo_solicitud_id", this.grupo_solicitud_id);
+            data.append("grupo_id", this.grupo_id);
 
-            // this.$inertia.post(route("gru.aprobacion.generar_ficha"), data);
+            // this.$inertia.post(route("gru.aprobacion.exportar"), data);
             // return false;
 
             Swal.fire({
-                title: "CREANDO FICHA...",
+                title: "GENERANDO",
+                text: "Espere porfavor...",
                 allowOutsideClick: false,
                 didOpen: async () => {
                     Swal.showLoading();
                     await axios
-                        .post(route("gru.aprobacion.generar_ficha"), data)
+                        .post(route("gru.aprobacion.exportar"), data)
                         .then(async (response) => {
                             const origin = window.location.origin;
                             const path_pdf = response.data.path_pdf;
@@ -749,14 +720,14 @@ export default {
 </script>
 
 <style lang="scss">
-.slot-aprobacion-grupo {
+.slot-desembolso-grupo {
     width: 70% !important;
     margin-left: 15% !important;
 }
 
 @media (max-width: 900px) {
     //MOBILE SCREEN
-    .slot-aprobacion-grupo {
+    .slot-desembolso-grupo {
         width: 98% !important;
         margin-left: 1% !important;
     }

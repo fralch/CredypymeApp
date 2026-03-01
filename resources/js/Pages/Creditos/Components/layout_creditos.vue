@@ -517,6 +517,25 @@
                                         >Documentos financieros</inertia-link
                                     >
                                 </li>
+                                <li>
+                                    <a
+                                        class="collapse-item"
+                                        href="javascript:void(0)"
+                                        @click="
+                                            AbrirModal(
+                                                'mdlBuscarGrupoCreditos',
+                                                'desembolso',
+                                                'CREDITOS_GRUPAL/DESEMBOLSO',
+                                            )
+                                        "
+                                        v-if="
+                                            $page.props.user_permissions.permisos.includes(
+                                                'CREDITOS_GRUPAL/DESEMBOLSO',
+                                            )
+                                        "
+                                        >Desembolso</a
+                                    >
+                                </li>
                             </ul>
                         </li>
                         <!-- ------------ -->

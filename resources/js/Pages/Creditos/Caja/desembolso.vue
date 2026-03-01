@@ -99,7 +99,7 @@
                                                     'S/ ' +
                                                     roundTo(
                                                         datos_aprobacion.monto,
-                                                        2
+                                                        2,
                                                     )
                                                 "
                                                 readonly
@@ -138,11 +138,11 @@
                                                 :value="
                                                     roundTo(
                                                         datos_aprobacion.plazo,
-                                                        0
+                                                        0,
                                                     ) +
                                                     ' ' +
                                                     this.periodo_medicion(
-                                                        datos_aprobacion.periodo_pago
+                                                        datos_aprobacion.periodo_pago,
                                                     )
                                                 "
                                                 type="text"
@@ -168,7 +168,7 @@
                                                 :value="
                                                     roundTo(
                                                         datos_aprobacion.tasa_interes,
-                                                        2
+                                                        2,
                                                     ) + ' %'
                                                 "
                                                 type="text"
@@ -195,7 +195,7 @@
                                                     'S/ ' +
                                                     roundTo(
                                                         datos_aprobacion.cuota,
-                                                        2
+                                                        2,
                                                     )
                                                 "
                                                 type="text"
@@ -250,7 +250,7 @@
                                                 class="form-control center"
                                                 :value="
                                                     JSON.parse(
-                                                        datos_aprobacion.datos_creacion
+                                                        datos_aprobacion.datos_creacion,
                                                     ).fecha
                                                 "
                                                 type="text"
@@ -352,7 +352,7 @@
                                                             @click="
                                                                 ImprimirVoucher(
                                                                     'COMISION',
-                                                                    data.comision_id
+                                                                    data.comision_id,
                                                                 )
                                                             "
                                                         >
@@ -381,7 +381,7 @@
                                                             comisiones.filter(
                                                                 (item_1) =>
                                                                     item_1.id ==
-                                                                    data.comision_id
+                                                                    data.comision_id,
                                                             )[0].comision
                                                         }}
                                                     </template>
@@ -409,7 +409,7 @@
                                                             {{
                                                                 roundTo(
                                                                     data.monto_cobrar,
-                                                                    2
+                                                                    2,
                                                                 )
                                                             }}
                                                         </div>
@@ -433,13 +433,13 @@
                                                                 comisiones.filter(
                                                                     (item_1) =>
                                                                         item_1.id ==
-                                                                        data.comision_id
+                                                                        data.comision_id,
                                                                 )[0].comision ==
                                                                 'DESEMBOLSO'
                                                             "
                                                             @click="
                                                                 EditarComision(
-                                                                    data
+                                                                    data,
                                                                 )
                                                             "
                                                         >
@@ -665,7 +665,7 @@
                                                     '/' +
                                                     datos_aprobacion.imagen_dni.substring(
                                                         0,
-                                                        4
+                                                        4,
                                                     ) +
                                                     '/' +
                                                     datos_aprobacion.imagen_dni
@@ -802,7 +802,7 @@
                                                 {{
                                                     roundTo(
                                                         data.monto_capital,
-                                                        2
+                                                        2,
                                                     )
                                                 }}
                                             </template>
@@ -819,7 +819,7 @@
                                                 {{
                                                     roundTo(
                                                         data.monto_interes,
-                                                        2
+                                                        2,
                                                     )
                                                 }}
                                             </template>
@@ -879,7 +879,7 @@
                                             :value="
                                                 roundTo(
                                                     datos_aprobacion.valor_garantia,
-                                                    2
+                                                    2,
                                                 )
                                             "
                                             readonly
@@ -1043,7 +1043,7 @@ export default {
         },
         nueva_empresa() {
             let agencia = this.$inertia.page.props.application.agencias.filter(
-                (item) => item.id == this.agencia_id
+                (item) => item.id == this.agencia_id,
             );
 
             return agencia[0].nueva_empresa;
@@ -1127,13 +1127,13 @@ export default {
                 plazo: plazo_con_periodo,
                 tasa_interes: this.roundTo(
                     this.datos_desembolso.tasa_interes,
-                    2
+                    2,
                 ),
                 tipo: this.datos_desembolso.tipo,
                 cuota: this.roundTo(this.datos_desembolso.cuota, 2),
                 codigo_seguimiento: this.datos_desembolso.codigo_seguimiento,
                 fecha_desembolso: JSON.parse(
-                    this.datos_desembolso.datos_creacion
+                    this.datos_desembolso.datos_creacion,
                 ).fecha,
             };
 
@@ -1203,7 +1203,7 @@ export default {
 
         if (this.credito_id == 0) {
             this.lista_comisiones = JSON.parse(
-                this.datos_aprobacion.comisiones
+                this.datos_aprobacion.comisiones,
             ).filter((item) => item.cobrar_comision == 1);
         } else {
             let lista = [];
@@ -1261,7 +1261,7 @@ export default {
 
                 this.comision_seleccionada.monto_cobrar = this.roundTo(
                     valor,
-                    numero_decimales
+                    numero_decimales,
                 );
             }
         },
@@ -1287,24 +1287,24 @@ export default {
             data.append("periodo_pago", this.datos_aprobacion.periodo_pago);
             data.append(
                 "con_dias_gracia",
-                this.datos_aprobacion.con_dias_gracia
+                this.datos_aprobacion.con_dias_gracia,
             );
             data.append("es_especial", this.datos_aprobacion.es_especial);
 
             if (this.datos_aprobacion.con_dias_gracia) {
                 data.append(
                     "dias_gracia_ci",
-                    this.datos_aprobacion.dias_gracia_ci
+                    this.datos_aprobacion.dias_gracia_ci,
                 );
                 data.append(
                     "dias_gracia_si",
-                    this.datos_aprobacion.dias_gracia_si
+                    this.datos_aprobacion.dias_gracia_si,
                 );
             }
 
             data.append(
                 "fecha_desembolso",
-                this.datos_aprobacion.fecha_aprobacion
+                this.datos_aprobacion.fecha_aprobacion,
             );
             await axios
                 .post(route("cre.calcular_cronograma.sin_redondeo"), data)
@@ -1315,18 +1315,18 @@ export default {
 
         EditarComision(item) {
             let nombre_comision = this.comisiones.filter(
-                (item_1) => item_1.id == item.comision_id
+                (item_1) => item_1.id == item.comision_id,
             )[0].comision;
 
             this.comision_seleccionada.id = item.comision_id;
             this.comision_seleccionada.nombre_comision = nombre_comision;
             this.comision_seleccionada.monto_cobrar = this.roundTo(
                 item.monto_cobrar,
-                2
+                2,
             );
             this.comision_seleccionada.monto_minimo = this.roundTo(
                 item.monto_cobrar,
-                2
+                2,
             );
 
             $("#mdlEditarComision").css("display", "block");
@@ -1351,12 +1351,12 @@ export default {
                             const item = this.lista_comisiones.find(
                                 (item) =>
                                     item.comision_id ===
-                                    this.comision_seleccionada.id
+                                    this.comision_seleccionada.id,
                             );
 
                             if (item) {
                                 item.monto_cobrar = parseFloat(
-                                    this.comision_seleccionada.monto_cobrar
+                                    this.comision_seleccionada.monto_cobrar,
                                 );
                             }
 
@@ -1416,27 +1416,27 @@ export default {
 
                             data.append(
                                 "datos_aprobacion",
-                                JSON.stringify(this.datos_aprobacion)
+                                JSON.stringify(this.datos_aprobacion),
                             );
                             data.append("caja_id", this.mi_caja.id);
                             data.append("agencia_id", this.agencia_id);
                             data.append(
                                 "modo_desembolso",
-                                this.modo_desembolso
+                                this.modo_desembolso,
                             );
                             data.append(
                                 "lista_comisiones",
-                                JSON.stringify(this.lista_comisiones)
+                                JSON.stringify(this.lista_comisiones),
                             );
 
                             if (this.modo_desembolso == "DOMICILIO") {
                                 data.append(
                                     "comision_domicilio",
-                                    this.comision_domicilio
+                                    this.comision_domicilio,
                                 );
                                 data.append(
                                     "monto_comision",
-                                    this.monto_comision
+                                    this.monto_comision,
                                 );
                             }
 
@@ -1454,7 +1454,7 @@ export default {
                                         route("caj.desembolso", {
                                             aprobacion_id: this.aprobacion_id,
                                             agencia_id: this.agencia_id,
-                                        })
+                                        }),
                                     );
 
                                     return Swal.fire({
@@ -1470,7 +1470,7 @@ export default {
                                 .catch((error) => {
                                     console.log(error);
                                     Swal.showValidationMessage(
-                                        `Ha ocurrido un error, comunicar a TI: ${error}`
+                                        `Ha ocurrido un error, comunicar a TI: ${error}`,
                                     );
                                 });
                         },
@@ -1557,33 +1557,33 @@ export default {
             data.append("agencia_id", this.agencia_id);
             data.append(
                 "agencia",
-                this.$page.props.user_session.nombre_agencia
+                this.$page.props.user_session.nombre_agencia,
             );
             data.append("usuario", this.$page.props.user_session.usuario);
             data.append(
                 "dispositivo",
-                this.$page.props.user_session.dispositivo.nombre
+                this.$page.props.user_session.dispositivo.nombre,
             );
 
             if (concepto == "DESEMBOLSO") {
                 data.append("titulo", "CONSTANCIA DE DESEMBOLSO");
                 data.append(
                     "datos_desembolso",
-                    JSON.stringify(this.datos_desembolso)
+                    JSON.stringify(this.datos_desembolso),
                 );
                 data.append(
                     "datos_titular",
-                    JSON.stringify(this.datos_titular)
+                    JSON.stringify(this.datos_titular),
                 );
             } else if (concepto == "COMISION") {
                 data.append("titulo", "CONSTANCIA DE COMISIÓN");
                 data.append(
                     "datos_creacion",
-                    this.datos_desembolso.datos_creacion
+                    this.datos_desembolso.datos_creacion,
                 );
 
                 let comison_pago = this.datos_desembolso_comisiones.filter(
-                    (item) => item.comision_id == comision_id
+                    (item) => item.comision_id == comision_id,
                 )[0];
                 let datos_comision = {
                     comision_pago_id:
