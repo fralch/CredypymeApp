@@ -506,15 +506,13 @@
                                 </li>
                                 <li>
                                     <inertia-link
-                                        :href="
-                                            $route('cre.documentos_financieros')
-                                        "
+                                        :href="$route('gru.documentos')"
                                         v-if="
                                             $page.props.user_permissions.permisos.includes(
-                                                'CREDITOS_GRUPAL/DOCUMENTOS_FINANCIEROS',
+                                                'CREDITOS_GRUPAL/DOCUMENTOS',
                                             )
                                         "
-                                        >Documentos financieros</inertia-link
+                                        >Documentos</inertia-link
                                     >
                                 </li>
                                 <li>
@@ -3190,6 +3188,26 @@ export default {
                 modulo.agencias_permiso = this.filtrar_agencias(permiso);
                 modulo.nombre_grupo = null;
             } else if (nombre_modal == "mdlBuscarGrupoCreditos") {
+                if (
+                    nombre_modulo == "desembolso" ||
+                    nombre_modulo == "cobranza"
+                ) {
+                    if (
+                        this.$inertia.page.props.creditos_datos.datos_caja ==
+                        null
+                    ) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "¡Ups!",
+                            text: "Primero debe aperturar CAJA",
+                            confirmButtonText:
+                                '<i class="fas fa-check" style="color:white;"></i>   Ok',
+                            confirmButtonColor: "var(--colorAlto)",
+                            allowOutsideClick: true,
+                        });
+                        return false;
+                    }
+                }
                 modulo = this.$refs.mdlBuscarGrupoCreditos;
                 modulo.nombre_modulo = nombre_modulo;
                 modulo.agencias_permiso = this.filtrar_agencias(permiso);

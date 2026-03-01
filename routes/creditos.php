@@ -28,6 +28,7 @@ use App\Http\Controllers\Creditos\Credito\CarritoSeguimientoController;
 use App\Http\Controllers\Creditos\Grupal\SolicitudController;
 use App\Http\Controllers\Creditos\Grupal\AprobacionController as GrupoAprobacionController;
 use App\Http\Controllers\Creditos\Grupal\DesembolsoController as GrupoDesembolsoController;
+use App\Http\Controllers\Creditos\Grupal\DocumentoController as GrupoDocumentoController;
 
 //-----------------------------INVERSIONES-------------------------------
 use App\Http\Controllers\Creditos\Inversion\InversionController;
@@ -359,6 +360,15 @@ Route::GET('/gru/aprobacion/buscar', [GrupoAprobacionController::class, 'buscar'
     ->name('gru.aprobacion.buscar');
 Route::POST('/gru/aprobacion/generar_ficha', [GrupoAprobacionController::class, 'generar_ficha'])
     ->name('gru.aprobacion.generar_ficha');
+
+//-------------------DOCUMENTOS---------------------------------------------------------
+Route::GET('/gru/documentos', [GrupoDocumentoController::class, 'index'])
+    ->name('gru.documentos');
+Route::GET('/gru.documentos/listar_creditos', [GrupoDocumentoController::class, 'listar_creditos'])
+    ->name('gru.documentos.listar_creditos');
+Route::POST('/gru.documentos/generar', [GrupoDocumentoController::class, 'generar'])
+    ->name('gru.documentos.generar');
+
 
 //-------------------DESEMBOLSO---------------------------------------------------------
 Route::GET('/gru/desembolso', [GrupoDesembolsoController::class, 'index'])
