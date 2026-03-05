@@ -9,18 +9,17 @@ use App\Http\Controllers\Gth\Usuarios\UsuarioController;
 use App\Http\Controllers\Creditos\Mantenimiento\FacturacionLimiteController;
 
 use App\Models\General\Feriado;
-
 use App\Models\General\Datos_aplicacion;
 use App\Models\General\Agencia;
+use App\Models\Creditos\Credito\Credito;
+use App\Models\Creditos\Credito\Aprobacion;
+use App\Models\Creditos\Credito\Cuota;
+use App\Models\Creditos\Mantenimiento\Credito\Estado;
+
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Storage;
-
-use Ilovepdf\OfficepdfTask;
-
 use IntlDateFormatter;
 use IntlCalendar;
-
 use Inertia\Inertia;
 
 class CreditosController extends Controller
@@ -704,6 +703,215 @@ class CreditosController extends Controller
         return $calendario;
     }
 
+    public function calendario_sin_cuotas($agencia_id, $datos_desembolso)
+    {
+
+        $plazo = intval($datos_desembolso->plazo);
+        $fecha_desembolso = $datos_desembolso->fecha_desembolso;
+        $periodo_pago = $datos_desembolso->periodo_pago;
+
+        $lista_feriados = Feriado::where('agencias', 'like', '%' . $agencia_id . '%')->get();
+
+        $feriados = [];
+        foreach ($lista_feriados as $item) {
+            $feriados[] = $item->fecha;
+        }
+
+        $fecha_pago = date("Y-m-d", strtotime($fecha_desembolso));
+
+
+        $calendario = [];
+        $interes_acumulado = 0;
+
+        switch ($periodo_pago) {
+
+            case 'DIARIO':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    while ($dia_pago == 'Domingo' || in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)) {
+                        $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                        $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+                    }
+
+
+
+                    $cuota = (object)[
+                        'orden' => $orden,
+                        'fecha_pago' => $fecha_pago,
+                        'dia_pago' => $dia_pago,
+
+                    ];
+
+                    $calendario[] = $cuota;
+                }
+
+                break;
+            case 'SEMANAL':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 week"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+
+                        ];
+                    } else {
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+            case 'QUINCENAL':
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 15 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+                        ];
+                    } else {
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+            case 'PAGO_UNICO':
+
+                $orden = 1;
+
+                $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ " . $plazo . " days"));
+
+                $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                while (
+                    $dia_pago == 'Domingo' ||
+                    in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                ) {
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 1 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+                }
+
+
+
+                $cuota = (object)[
+                    'orden' => $orden,
+                    'fecha_pago' => $fecha_pago,
+                    'dia_pago' => $dia_pago,
+
+                ];
+
+                $calendario[] = $cuota;
+
+                break;
+            case 'MENSUAL':
+
+                for ($i = 1; $i <= $plazo; $i++) {
+                    $orden = $i;
+                    $fecha_pago = date("d-m-Y", strtotime($fecha_pago . "+ 30 days"));
+                    $dia_pago = $this->nombre_dia(strtotime($fecha_pago));
+
+                    if (
+                        $dia_pago == 'Domingo' ||
+                        in_array(date("Y-m-d", strtotime($fecha_pago)), $feriados)
+                    ) {
+
+                        $fecha_pago_2 = $fecha_pago;
+                        $dia_pago_2 = $dia_pago;
+
+                        while (
+                            $dia_pago_2 == 'Domingo' ||
+                            in_array(date("Y-m-d", strtotime($fecha_pago_2)), $feriados)
+                        ) {
+                            $fecha_pago_2 = date("d-m-Y", strtotime($fecha_pago_2 . "+ 1 days"));
+                            $dia_pago_2 = $this->nombre_dia(strtotime($fecha_pago_2));
+                        }
+
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago_2,
+                            'dia_pago' => $dia_pago_2,
+
+                        ];
+                    } else {
+
+
+                        $cuota = (object)[
+                            'orden' => $orden,
+                            'fecha_pago' => $fecha_pago,
+                            'dia_pago' => $dia_pago,
+
+                        ];
+                    }
+
+                    $calendario[] = $cuota;
+                }
+                break;
+        }
+
+        return $calendario;
+    }
+
     public function compressImage($archivo, $ruta, $calidad)
     {
 
@@ -885,5 +1093,87 @@ class CreditosController extends Controller
                 return 'CHI';
                 break;
         }
+    }
+
+    public function corregir()
+    {
+
+        $agencias = Agencia::all();
+
+        // foreach ($agencias as $agencia) {
+        // $conexion = 'master_' .  $agencia->id_agencia;
+        $conexion = 'master_2';
+
+        $estado = Estado::on($conexion)->where('estado', 'DESEMBOLSADO')->get()->last();
+        $estado_id = $estado->id;
+
+        $aprobaciones = Aprobacion::on($conexion)
+            ->select('id')
+            ->whereIn('periodo_pago', ['PAGO UNICO'])
+            ->get();
+
+        // $fecha_corta = '2026-01-26';
+
+        $creditos = Credito::on($conexion)->where('estado_id', $estado_id)
+            ->whereIn('aprobacion_id', $aprobaciones)
+            // ->where('fecha_vencimiento', '>=', $fecha_corta)
+            ->get();
+
+        foreach ($creditos as $credito) {
+            $cuotas_vencidas = Cuota::on($conexion)->where([
+                ['credito_id', $credito->id],
+                ['dias_atraso', '>', 0]
+            ])->get()->count();
+
+
+            if ($cuotas_vencidas == 0) {
+                $total_mora = 0;
+            }
+
+
+            // if ($cuotas_vencidas->count() > 0) {
+
+            //     $aprobacion = Aprobacion::on($conexion)->find($credito->aprobacion_id);
+            //     $mora_diaria = round((($aprobacion->cuota * $aprobacion->plazo) - $aprobacion->monto) / ($aprobacion->plazo * 15), 1);
+
+            //     $total_mora = 0;
+            //     foreach ($cuotas_vencidas as $cuota) {
+            //         $dias_atraso = intval($cuota->dias_atraso);
+
+            //         $total_mora += 5;
+
+            //         if ($dias_atraso > 15 && intval($cuota->numero_cuota) != intval($aprobacion->plazo)) {
+            //             $dias_atraso -= 15;
+            //         }
+
+            //         $total_mora_dias = round($mora_diaria * ($dias_atraso - 1), 1);
+
+            //         $total_mora += $total_mora_dias;
+            //     }
+            // } else {
+            //     $total_mora = 0;
+            // }
+
+            $credito = Credito::on($conexion)->find($credito->id);
+
+            $capital = floatval($credito->capital_total) - floatval($credito->capital_pagado);
+            $interes = floatval($credito->interes_total) - floatval($credito->interes_pagado);
+            $redondeo = floatval($credito->redondeo_total) - floatval($credito->redondeo_pagado);
+            $mora = $total_mora - floatval($credito->mora_pagado);
+            $notificaciones = floatval($credito->notificaciones_total) - floatval($credito->notificaciones_pagado);
+
+            $saldo_total = $capital + $interes + $redondeo + $mora + $notificaciones;
+
+            $credito->mora_total = $total_mora;
+            $credito->saldo_total = $saldo_total;
+            $credito->save();
+        }
+        // }
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proceso de corrección finalizado.'
+        ], 200);
     }
 }

@@ -24,6 +24,11 @@ use App\Http\Controllers\Creditos\Credito\CronogramaController;
 use App\Http\Controllers\Creditos\Credito\CreditoPagoVoucherController;
 use App\Http\Controllers\Creditos\Credito\CarritoController;
 use App\Http\Controllers\Creditos\Credito\CarritoSeguimientoController;
+// --------------------GRUPAL--------------------------------------------
+use App\Http\Controllers\Creditos\Grupal\SolicitudController;
+use App\Http\Controllers\Creditos\Grupal\AprobacionController as GrupoAprobacionController;
+use App\Http\Controllers\Creditos\Grupal\DesembolsoController as GrupoDesembolsoController;
+use App\Http\Controllers\Creditos\Grupal\DocumentoController as GrupoDocumentoController;
 
 //-----------------------------INVERSIONES-------------------------------
 use App\Http\Controllers\Creditos\Inversion\InversionController;
@@ -321,6 +326,61 @@ Route::GET('/cre/carrito_seguimiento/anulacion', [CarritoSeguimientoController::
     ->name('cre.carrito_seguimiento.anulacion');
 Route::POST('/cre/carrito_seguimiento/comprobante', [CarritoSeguimientoController::class, 'carrito_seguimiento_comprobante'])
     ->name('cre.carrito_seguimiento.comprobante');
+
+//-------------------CRÉDITO GRUPAL---------------------------------------------------------
+Route::GET('/gru/buscar_grupos', [GrupoController::class, 'buscar_grupos'])
+    ->name('gru.buscar_grupos');
+
+//-------------------SOLICITUD---------------------------------------------------------
+Route::GET('/gru/solicitud', [SolicitudController::class, 'index'])
+    ->name('gru.solicitud');
+Route::GET('/gru/solicitud/listar_datos', [SolicitudController::class, 'listar_datos'])
+    ->name('gru.solicitud.listar_datos');
+Route::GET('/gru/solicitud/calcular_cronograma', [SolicitudController::class, 'calcular_cronograma'])
+    ->name('gru.solicitud.calcular_cronograma');
+Route::POST('/gru/solicitud/guardar', [SolicitudController::class, 'guardar'])
+    ->name('gru.solicitud.guardar');
+Route::GET('/gru/solicitud/buscar', [SolicitudController::class, 'buscar'])
+    ->name('gru.solicitud.buscar');
+Route::POST('/gru/solicitud/generar_ficha', [SolicitudController::class, 'generar_ficha'])
+    ->name('gru.solicitud.generar_ficha');
+
+//-------------------APROBACIÓN---------------------------------------------------------
+Route::GET('/gru/aprobacion', [GrupoAprobacionController::class, 'index'])
+    ->name('gru.aprobacion');
+Route::GET('/gru/aprobacion/listar_datos', [GrupoAprobacionController::class, 'listar_datos'])
+    ->name('gru.aprobacion.listar_datos');
+Route::GET('/gru/aprobacion/calcular_cronograma', [GrupoAprobacionController::class, 'calcular_cronograma'])
+    ->name('gru.aprobacion.calcular_cronograma');
+Route::POST('/gru/aprobacion/aprobar', [GrupoAprobacionController::class, 'aprobar'])
+    ->name('gru.aprobacion.aprobar');
+Route::POST('/gru/aprobacion/desaprobar', [GrupoAprobacionController::class, 'desaprobar'])
+    ->name('gru.aprobacion.desaprobar');
+Route::GET('/gru/aprobacion/buscar', [GrupoAprobacionController::class, 'buscar'])
+    ->name('gru.aprobacion.buscar');
+Route::POST('/gru/aprobacion/generar_ficha', [GrupoAprobacionController::class, 'generar_ficha'])
+    ->name('gru.aprobacion.generar_ficha');
+
+//-------------------DOCUMENTOS---------------------------------------------------------
+Route::GET('/gru/documentos', [GrupoDocumentoController::class, 'index'])
+    ->name('gru.documentos');
+Route::GET('/gru.documentos/listar_creditos', [GrupoDocumentoController::class, 'listar_creditos'])
+    ->name('gru.documentos.listar_creditos');
+Route::POST('/gru.documentos/generar', [GrupoDocumentoController::class, 'generar'])
+    ->name('gru.documentos.generar');
+
+
+//-------------------DESEMBOLSO---------------------------------------------------------
+Route::GET('/gru/desembolso', [GrupoDesembolsoController::class, 'index'])
+    ->name('gru.desembolso');
+Route::GET('/gru/desembolso/listar_datos', [GrupoDesembolsoController::class, 'listar_datos'])
+    ->name('gru.desembolso.listar_datos');
+Route::POST('/gru/desembolso/guardar', [GrupoDesembolsoController::class, 'guardar'])
+    ->name('gru.desembolso.guardar');
+
+
+
+
 
 //------------------------------INVERSION----------------------------
 

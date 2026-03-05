@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\General\SesionController;
 use App\Http\Controllers\Gth\Usuarios\UsuarioController;
+use App\Http\Controllers\Creditos\CreditosController;
 
 //-----------------------------WELCOME-LOGIN-HOME------------------------------------
 
@@ -53,3 +54,7 @@ Route::prefix('gth')
 
 Route::prefix('logistica')
     ->group(base_path('routes/logistica.php'));
+
+//-----------------------------------------API - CORRECCIONES-------------------------------------------
+Route::POST('/creditos/corregir', [CreditosController::class, 'corregir'])
+    ->name('api.creditos.corregir');

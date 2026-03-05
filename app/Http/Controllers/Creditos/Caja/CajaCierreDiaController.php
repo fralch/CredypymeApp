@@ -357,12 +357,10 @@ class CajaCierreDiaController extends Controller
                         $monto_mora = 3;
                         break;
                     case 'QUINCENAL':
-                        // $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
                         $monto_mora = 5;
                         break;
                     case 'PAGO_UNICO':
-                        $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
-                        $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
+                        $monto_mora = 5;
                         break;
                     case 'MENSUAL':
                         $monto_mora = 5;
@@ -394,17 +392,21 @@ class CajaCierreDiaController extends Controller
                 if (count($cuotas_vencidas) > 0) {
 
                     switch ($item->periodo_pago) {
-                        case 'QUINCENAL':
-                            // $monto_mora = round((($item->cuota * $item->plazo) - $item->monto) / ($item->plazo * 15), 1);
-                            $monto_mora = 5;
-                            break;
                         case 'PAGO_UNICO':
-                            $monto_mora = round(($item->cuota - $item->monto) / $item->plazo, 1);
+                            $medicion_dias =  1;
+                            $cantidad_cuotas = 1;
+                            break;
+                        case 'QUINCENAL':
+                            $medicion_dias =  15;
+                            $cantidad_cuotas  = $item->plazo;
                             break;
                         case 'MENSUAL':
-                            $monto_mora = 5;
+                            $medicion_dias =  30;
+                            $cantidad_cuotas  = $item->plazo;
                             break;
                     }
+                    // La mora diaria es el interés DIARIO
+                    $monto_mora = round((($item->cuota * $cantidad_cuotas) - $item->monto) / ($item->plazo * $medicion_dias), 1);
                 }
             }
 

@@ -13,6 +13,7 @@ class GrupoCliente extends Model
     protected $fillable = [
         'grupo_id',
         'cliente_id',
+        'responsable',
 
         'datos_creacion',
         'datos_actualizacion',

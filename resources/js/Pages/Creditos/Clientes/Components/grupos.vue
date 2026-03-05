@@ -304,30 +304,29 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <div class="card-title mt-2 mb-2">
-                                        LISTA CLIENTES
+                                        CANTIDAD DE CLIENTES EN EL GRUPO:
+                                        {{
+                                            frmDatosGrupo.lista_grupo_clientes
+                                                .length
+                                        }}
                                     </div>
                                     <DataTable
                                         :value="
                                             frmDatosGrupo.lista_grupo_clientes
                                         "
+                                        :row-class="clase_responsable"
                                         :scrollable="true"
                                         scrollDirection="both"
-                                        :scrollHeight="'230px'"
+                                        :scrollHeight="'200px'"
                                         showGridlines
-                                        :rows="100"
+                                        :selectionMode="
+                                            modo == 'VER' ? null : 'single'
+                                        "
+                                        :selection="cliente_seleccionado"
+                                        @update:selection="
+                                            cliente_seleccionado = $event
+                                        "
                                     >
-                                        <Column
-                                            field="numero"
-                                            header="N°"
-                                            :styles="{
-                                                width: '2rem',
-                                                justifyContent: 'center',
-                                            }"
-                                        >
-                                            <template #body="{ index }">
-                                                {{ index + 1 }}
-                                            </template>
-                                        </Column>
                                         <Column
                                             header="QUITAR"
                                             :styles="{
@@ -369,36 +368,73 @@
                                 </div>
                             </div>
                             <hr />
-                            <div class="text-right">
-                                <button
-                                    class="btn btn-action btn-icon-split"
-                                    title="Guardar GRUPO"
-                                    @click="Guardar()"
-                                    v-show="
-                                        (this.modo == 'NUEVO' ||
-                                            this.modo == 'EDITAR') &&
-                                        this.frmDatosGrupo.habilitado == 1
-                                    "
-                                >
-                                    <span class="icon text-white">
-                                        <i class="fas fa-save"></i>
-                                    </span>
-                                    <span class="text">GUARDAR</span>
-                                </button>
-                                <button
-                                    class="btn btn-cancel btn-icon-split"
-                                    title="Editar GRUPO"
-                                    @click="Editar()"
-                                    v-show="
-                                        this.modo == 'VER' &&
-                                        this.frmDatosGrupo.habilitado == 1
-                                    "
-                                >
-                                    <span class="icon text-white">
-                                        <i class="fas fa-edit"></i>
-                                    </span>
-                                    <span class="text">EDITAR</span>
-                                </button>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-left">
+                                        <div class="btn-group">
+                                            <button
+                                                class="btn btn-cancel responsable-1"
+                                                title="Responsable 1"
+                                                @click="
+                                                    SeleccionarResponsable(1)
+                                                "
+                                                :disabled="modo == 'VER'"
+                                            >
+                                                <span class="text"
+                                                    >RESPONSABLE 1</span
+                                                >
+                                            </button>
+
+                                            <button
+                                                class="btn btn-cancel responsable-2"
+                                                title="Responsable 2"
+                                                @click="
+                                                    SeleccionarResponsable(2)
+                                                "
+                                                :disabled="modo == 'VER'"
+                                            >
+                                                <span class="text"
+                                                    >RESPONSABLE 2</span
+                                                >
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-right">
+                                        <button
+                                            class="btn btn-action btn-icon-split"
+                                            title="Guardar GRUPO"
+                                            @click="Guardar()"
+                                            v-show="
+                                                (this.modo == 'NUEVO' ||
+                                                    this.modo == 'EDITAR') &&
+                                                this.frmDatosGrupo.habilitado ==
+                                                    1
+                                            "
+                                        >
+                                            <span class="icon text-white">
+                                                <i class="fas fa-save"></i>
+                                            </span>
+                                            <span class="text">GUARDAR</span>
+                                        </button>
+                                        <button
+                                            class="btn btn-cancel btn-icon-split"
+                                            title="Editar GRUPO"
+                                            @click="Editar()"
+                                            v-show="
+                                                this.modo == 'VER' &&
+                                                this.frmDatosGrupo.habilitado ==
+                                                    1
+                                            "
+                                        >
+                                            <span class="icon text-white">
+                                                <i class="fas fa-edit"></i>
+                                            </span>
+                                            <span class="text">EDITAR</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -442,6 +478,8 @@ export default {
                 asesor_id: 0,
                 lista_grupo_clientes: [],
                 habilitado: 0,
+                responsable_1: null,
+                responsable_2: null,
             },
 
             texto_busqueda: null,
@@ -454,7 +492,7 @@ export default {
             },
 
             lista_eliminados: [],
-
+            cliente_seleccionado: null,
             modo: null,
         };
     },
@@ -543,8 +581,6 @@ export default {
             const response = await axios.get(route("cli.gru.listar_grupos"), {
                 params,
             });
-
-            console.log(response.data.lista_grupos);
 
             this.lista_grupos = response.data.lista_grupos;
         },
@@ -653,6 +689,61 @@ export default {
         Editar() {
             this.modo = "EDITAR";
         },
+        clase_responsable(data) {
+            return data.responsable == "R1"
+                ? "responsable-1"
+                : data.responsable == "R2"
+                  ? "responsable-2"
+                  : "";
+        },
+        SeleccionarResponsable(numero) {
+            if (this.cliente_seleccionado == null) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "¡Ups!",
+                    text: "Seleccione un CLIENTE para asignar como RESPONSABLE.",
+                    allowOutsideClick: true,
+                });
+                return false;
+            }
+
+            Swal.fire({
+                icon: "question",
+                text: "¿ASIGNAR al cliente como RESPONSABLE " + numero + "?",
+                confirmButtonText: "Si",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                allowOutsideClick: false,
+            }).then(async (result) => {
+                if (!result.isConfirmed) {
+                    return false;
+                }
+
+                let existe_responsable =
+                    this.frmDatosGrupo.lista_grupo_clientes.find(
+                        (cliente) => cliente.responsable === "R" + numero,
+                    );
+
+                if (existe_responsable) {
+                    existe_responsable.responsable = null;
+                }
+
+                this.frmDatosGrupo.lista_grupo_clientes.find(
+                    (cliente) =>
+                        cliente.cliente_id ===
+                        this.cliente_seleccionado.cliente_id,
+                ).responsable = "R" + numero;
+
+                this.cliente_seleccionado = null;
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "RESPONSABLE " + numero + " ASIGNADO CORRECTAMENTE",
+                    allowOutsideClick: false,
+                    showConfirmButton: true,
+                });
+            });
+        },
         async Guardar() {
             this.submited = true;
             if (
@@ -680,6 +771,31 @@ export default {
                     icon: "error",
                     title: "¡Ups!",
                     text: "Tiene que ingresar al menos 4 integrantes al grupo",
+                });
+                return false;
+            }
+
+            let responsable_1 = this.frmDatosGrupo.lista_grupo_clientes.find(
+                (item) => item.responsable == "R1",
+            );
+            let responsable_2 = this.frmDatosGrupo.lista_grupo_clientes.find(
+                (item) => item.responsable == "R2",
+            );
+
+            if (!responsable_1) {
+                Swal.fire({
+                    icon: "error",
+                    title: "¡Ups!",
+                    text: "Tiene que ASIGNAR el RESPONSABLE 1",
+                });
+                return false;
+            }
+
+            if (!responsable_2) {
+                Swal.fire({
+                    icon: "error",
+                    title: "¡Ups!",
+                    text: "Tiene que ASIGNAR el RESPONSABLE 2",
                 });
                 return false;
             }
@@ -729,8 +845,9 @@ export default {
                     JSON.stringify(this.frmDatosGrupo),
                 );
 
-                //  this.$inertia.post(route('cli.gru.guardar'), data);
-                //  return false;
+                // this.$inertia.post(route("cli.gru.guardar"), data);
+                // return false;
+
                 Swal.fire({
                     title: "REGISTRANDO",
                     text: "Espere porfavor...",
@@ -744,6 +861,7 @@ export default {
                                 data,
                             );
 
+                            Swal.close();
                             await Swal.fire({
                                 icon: "success",
                                 title: response.data.message,
@@ -779,6 +897,27 @@ export default {
 .slot-grupo {
     width: 99%;
     margin: 0 auto;
+}
+
+.responsable-1 {
+    background-color: green !important;
+    color: white !important;
+    border-color: green;
+
+    &:disabled {
+        background-color: green !important;
+        border-color: green !important;
+    }
+}
+
+.responsable-2 {
+    background-color: orange !important;
+    border-color: orange;
+    color: black !important;
+    &:disabled {
+        background-color: orange;
+        border-color: orange;
+    }
 }
 
 @media (min-width: 900px) {
