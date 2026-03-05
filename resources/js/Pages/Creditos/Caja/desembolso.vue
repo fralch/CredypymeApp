@@ -429,14 +429,6 @@
                                                         <button
                                                             class="btn btn-cancel btn-icon-split"
                                                             title="Editar COMISIÓN"
-                                                            v-if="
-                                                                comisiones.filter(
-                                                                    (item_1) =>
-                                                                        item_1.id ==
-                                                                        data.comision_id,
-                                                                )[0].comision ==
-                                                                'DESEMBOLSO'
-                                                            "
                                                             @click="
                                                                 EditarComision(
                                                                     data,
@@ -1324,10 +1316,7 @@ export default {
                 item.monto_cobrar,
                 2,
             );
-            this.comision_seleccionada.monto_minimo = this.roundTo(
-                item.monto_cobrar,
-                2,
-            );
+            this.comision_seleccionada.monto_minimo = this.roundTo(0.5, 2);
 
             $("#mdlEditarComision").css("display", "block");
         },
