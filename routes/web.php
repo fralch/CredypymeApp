@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 //--------GENERAL-------------------------------------------------------------------
 //-------------------SESIONES-------------------------------------------------------
 
-use App\Http\Controllers\General\SesionController;
-use App\Http\Controllers\Gth\Usuarios\UsuarioController;
-use App\Http\Controllers\Creditos\CreditosController;
+use Modules\General\Presentation\Controllers\SesionController;
+use Modules\Gth\Presentation\Controllers\Usuarios\UsuarioController;
+use Modules\Creditos\Presentation\Controllers\CreditosController;
 
 //-----------------------------WELCOME-LOGIN-HOME------------------------------------
 
@@ -44,16 +44,16 @@ Route::post(
 //--------------------------------------------------------------------------------------
 
 Route::prefix('general')
-    ->group(base_path('routes/general.php'));
+    ->group(base_path('modules/General/Presentation/Routes/web.php'));
 
 Route::prefix('creditos')
-    ->group(base_path('routes/creditos.php'));
+    ->group(base_path('modules/Creditos/Presentation/Routes/web.php'));
 
 Route::prefix('gth')
-    ->group(base_path('routes/gth.php'));
+    ->group(base_path('modules/Gth/Presentation/Routes/web.php'));
 
 Route::prefix('logistica')
-    ->group(base_path('routes/logistica.php'));
+    ->group(base_path('modules/Logistica/Presentation/Routes/web.php'));
 
 //-----------------------------------------API - CORRECCIONES-------------------------------------------
 Route::POST('/creditos/corregir', [CreditosController::class, 'corregir'])

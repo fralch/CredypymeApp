@@ -5,9 +5,9 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use App\Models\General\Sesion;
+use Modules\General\Infrastructure\Persistence\Eloquent\Sesion;
 
-use App\Http\Controllers\Gth\GthController;
+use Modules\Gth\Presentation\Controllers\GthController;
 
 class Online
 {

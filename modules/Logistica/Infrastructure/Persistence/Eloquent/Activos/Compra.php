@@ -1,0 +1,20 @@
+<?php
+
+namespace Modules\Logistica\Infrastructure\Persistence\Eloquent\Activos;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Compra extends Model
+{
+    protected $table = 'activo_compras';
+    protected $primaryKey = 'id';
+    protected $fillable = [
+        'agencia_id',
+        'usuario_compra',
+        'documento',
+        'datos_creacion',
+        'datos_actualizacion',
+        'created_at',
+        'updated_at'
+    ];
+}

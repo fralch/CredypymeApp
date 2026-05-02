@@ -8,6 +8,18 @@
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
         </testsuite>
+        <testsuite name="Modules-Gth">
+            <directory suffix="Test.php">./tests/Unit/Modules/Gth</directory>
+        </testsuite>
+        <testsuite name="Modules-Creditos">
+            <directory suffix="Test.php">./tests/Unit/Modules/Creditos</directory>
+        </testsuite>
+        <testsuite name="Modules-General">
+            <directory suffix="Test.php">./tests/Unit/Modules/General</directory>
+        </testsuite>
+        <testsuite name="Modules-Logistica">
+            <directory suffix="Test.php">./tests/Unit/Modules/Logistica</directory>
+        </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
@@ -15,6 +27,7 @@
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">./app</directory>
+            <directory suffix=".php">./modules</directory>
         </include>
     </coverage>
     <php>

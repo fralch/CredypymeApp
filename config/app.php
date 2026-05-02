@@ -196,6 +196,10 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Modules\Gth\Infrastructure\Providers\GthServiceProvider::class,
+        Modules\Creditos\Infrastructure\Providers\CreditosServiceProvider::class,
+        Modules\General\Infrastructure\Providers\GeneralServiceProvider::class,
+        Modules\Logistica\Infrastructure\Providers\LogisticaServiceProvider::class,
 
 
 

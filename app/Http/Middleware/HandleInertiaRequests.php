@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\General\Dispositivo;
-use App\Models\Gth\Usuarios\Usuario;
+use Modules\General\Infrastructure\Persistence\Eloquent\Dispositivo;
+use Modules\Gth\Infrastructure\Persistence\Eloquent\Usuarios\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Middleware;
