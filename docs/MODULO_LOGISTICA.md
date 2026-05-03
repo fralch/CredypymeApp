@@ -24,7 +24,7 @@ El módulo **Logística** gestiona la administración de activos fijos e inventa
 modules/Logistica/
 ├── Application/
 │   └── UseCases/
-│       └── GetLogisticaContextUseCase.php
+│       └── ObtenerContextoLogisticaCasoDeUso.php
 ├── Domain/
 │   ├── Contracts/
 │   └── Entities/

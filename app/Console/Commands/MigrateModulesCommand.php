@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\MultiAgencia\ResolvedorConexionAgencia;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 
 class MigrateModulesCommand extends Command
 {
@@ -16,9 +16,14 @@ class MigrateModulesCommand extends Command
 
     protected $description = 'Ejecuta migraciones modulares por lote o por modulo.';
 
+    public function __construct(private readonly ResolvedorConexionAgencia $resolvedorConexionAgencia)
+    {
+        parent::__construct();
+    }
+
     public function handle(): int
     {
-        $this->prepareDynamicAgencyConnections();
+        $this->resolvedorConexionAgencia->prepararConexionesDinamicasDesdeTablaAgencias(true);
 
         $action = strtolower((string) $this->argument('action'));
         if (!in_array($action, ['migrate', 'rollback', 'refresh', 'status'], true)) {
@@ -57,47 +62,6 @@ class MigrateModulesCommand extends Command
         }
 
         return $exitCode;
-    }
-
-    private function prepareDynamicAgencyConnections(): void
-    {
-        $connections = (array) config('database.connections', []);
-        if (!isset($connections['master'], $connections['records'])) {
-            return;
-        }
-
-        try {
-            $agencyIds = DB::connection('master')->table('agencias')->pluck('id_agencia')->map(
-                static fn ($id): int => (int) $id
-            )->all();
-        } catch (\Throwable $e) {
-            // Si no existe tabla agencias, simplemente no prepara conexiones dinamicas.
-            return;
-        }
-
-        foreach ($agencyIds as $id) {
-            $masterName = "master_{$id}";
-            $recordsName = "records_{$id}";
-
-            if (!isset($connections[$masterName])) {
-                $masterConfig = $connections['master'];
-                $masterConfig['database'] = (string) env("S_MASTER_DATABASE_{$id}", "solucion_master_{$id}");
-                config(["database.connections.{$masterName}" => $masterConfig]);
-            }
-
-            if (!isset($connections[$recordsName])) {
-                $recordsConfig = $connections['records'];
-                $recordsConfig['database'] = (string) env("S_RECORDS_DATABASE_{$id}", "solucion_records_{$id}");
-                config(["database.connections.{$recordsName}" => $recordsConfig]);
-            }
-
-            try {
-                DB::connection('master')->statement('CREATE DATABASE IF NOT EXISTS `' . env("S_MASTER_DATABASE_{$id}", "solucion_master_{$id}") . '`');
-                DB::connection('master')->statement('CREATE DATABASE IF NOT EXISTS `' . env("S_RECORDS_DATABASE_{$id}", "solucion_records_{$id}") . '`');
-            } catch (\Throwable $e) {
-                // Si el usuario no tiene permisos de CREATE DATABASE, continuamos.
-            }
-        }
     }
 
     /**

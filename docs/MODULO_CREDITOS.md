@@ -23,7 +23,7 @@ El módulo **Créditos** es el núcleo del sistema ERP, encargado de gestionar t
 modules/Creditos/
 ├── Application/
 │   └── UseCases/
-│       └── GetCreditosContextUseCase.php
+│       └── ObtenerContextoCreditosCasoDeUso.php
 ├── Domain/
 │   ├── Contracts/
 │   └── Entities/

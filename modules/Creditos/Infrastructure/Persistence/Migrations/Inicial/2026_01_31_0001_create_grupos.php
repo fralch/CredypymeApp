@@ -14,7 +14,6 @@ return new class extends Migration
      */
     public function up()
     {
-
         $main_db = env('S_TEST_DATABASE', env('S_MASTER_DATABASE', 'solucion_master'));
 
         $agencias = Agencia::all();
@@ -22,7 +21,7 @@ return new class extends Migration
 
             $agencia_id = $item->id_agencia;
 
-            $this->down($agencia_id);
+            Schema::connection('master_' . $agencia_id)->dropIfExists('grupos');
 
             Schema::connection('master_' . $agencia_id)->create('grupos', function (Blueprint $table) use ($main_db) {
 
@@ -47,8 +46,12 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down($agencia_id)
+    public function down(): void
     {
-        Schema::connection('master_' . $agencia_id)->dropIfExists('grupos');
+        $agencias = Agencia::all();
+        foreach ($agencias as $item) {
+            $agencia_id = $item->id_agencia;
+            Schema::connection('master_' . $agencia_id)->dropIfExists('grupos');
+        }
     }
 };

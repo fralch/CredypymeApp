@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\MultiAgencia\ResolvedorConexionAgencia;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
@@ -13,8 +14,15 @@ class SeedModulesCommand extends Command
 
     protected $description = 'Ejecuta seeders modulares por lote o por modulo.';
 
+    public function __construct(private readonly ResolvedorConexionAgencia $resolvedorConexionAgencia)
+    {
+        parent::__construct();
+    }
+
     public function handle(): int
     {
+        $this->resolvedorConexionAgencia->prepararConexionesDinamicasDesdeTablaAgencias();
+
         $map = $this->moduleSeeders();
         $selected = $this->selectedModules(array_keys($map));
 
@@ -59,11 +67,18 @@ class SeedModulesCommand extends Command
         return [
             'aplicacion' => [],
             'creditos' => [
+                \Modules\Creditos\Infrastructure\Persistence\Seeders\CreditosCatalogosSeeder::class,
                 \Modules\Creditos\Infrastructure\Persistence\Seeders\CreditosPermisosSeeder::class,
             ],
-            'general' => [],
-            'gth' => [],
-            'logistica' => [],
+            'general' => [
+                \Modules\General\Infrastructure\Persistence\Seeders\GeneralBootstrapSeeder::class,
+            ],
+            'gth' => [
+                \Modules\Gth\Infrastructure\Persistence\Seeders\GthPermisosSeeder::class,
+            ],
+            'logistica' => [
+                \Modules\Logistica\Infrastructure\Persistence\Seeders\LogisticaPermisosSeeder::class,
+            ],
         ];
     }
 
@@ -83,4 +98,3 @@ class SeedModulesCommand extends Command
         return array_values(array_filter($available, static fn (string $module): bool => in_array($module, $requested, true)));
     }
 }
-

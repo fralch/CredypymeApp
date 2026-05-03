@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\MultiAgencia\ResolvedorConexionAgencia;
 use Modules\General\Infrastructure\Persistence\Eloquent\Dispositivo;
 use Modules\Gth\Infrastructure\Persistence\Eloquent\Usuarios\Usuario;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    public function __construct(private readonly ResolvedorConexionAgencia $resolvedorConexionAgencia)
+    {
+    }
 
     /**
      * Determines the current asset version.
@@ -84,8 +89,19 @@ class HandleInertiaRequests extends Middleware
                     ->where('usuarios_permisos.usuario_id', session('usuario_dni'))
                     ->get();
 
+                $permisos_array = [];
+                $permisos_object = [];
+
                 $datos_aplicacion = DB::table('datos_aplicacion')->get();
-                $version = DB::select("SELECT * FROM versiones ORDER by id_version DESC LIMIT 1");
+                $version = DB::table('versiones')
+                    ->select([
+                        DB::raw('id_version as idVersion'),
+                        DB::raw('numero_version as numeroVersion'),
+                        'observaciones',
+                    ])
+                    ->orderByDesc('id_version')
+                    ->limit(1)
+                    ->get();
                 $agencias = DB::table('agencias')->select('id_agencia as id', 'nombre as agencia', 'direccion', 'dis.distrito', 'nueva_empresa')
                     ->join('distritos as dis', 'agencias.distrito_id', 'dis.id')
                     ->orderBy('agencia', 'asc')
@@ -100,7 +116,7 @@ class HandleInertiaRequests extends Middleware
                     ];
                 }
 
-                $conexion = 'master_' .  session('id_agencia');
+                $conexion = $this->resolvedorConexionAgencia->conexionMaster((int) session('id_agencia'));
 
                 // Datos de la aplicación segun agencia del usuario
 

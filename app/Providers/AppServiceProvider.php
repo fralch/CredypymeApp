@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Auditoria\RegistradorAuditoria;
+use App\Finanzas\CoordinadorTransacciones;
+use App\MultiAgencia\ResolvedorConexionAgencia;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(ResolvedorConexionAgencia::class);
+        $this->app->singleton(RegistradorAuditoria::class);
+        $this->app->singleton(CoordinadorTransacciones::class);
     }
 
     /**

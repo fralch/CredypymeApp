@@ -95,7 +95,7 @@
         <?php
         foreach ($version as $item) {
         ?>
-            Versión: {{ $item->numeroVersion }}
+            Versión: {{ $item->numeroVersion ?? ($item->numero_version ?? '') }}
         <?php
         }
         ?>

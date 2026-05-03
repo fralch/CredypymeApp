@@ -23,7 +23,7 @@ El módulo **General** contiene la configuración base del sistema y funcionalid
 modules/General/
 ├── Application/
 │   └── UseCases/
-│       └── GetGeneralContextUseCase.php
+│       └── ObtenerContextoGeneralCasoDeUso.php
 ├── Domain/
 │   ├── Contracts/
 │   └── Entities/

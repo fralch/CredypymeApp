@@ -23,7 +23,7 @@ El módulo **GTH** gestiona todos los procesos relacionados con los recursos hum
 modules/Gth/
 ├── Application/
 │   └── UseCases/
-│       └── GetGthContextUseCase.php
+│       └── ObtenerContextoGthCasoDeUso.php
 ├── Domain/
 │   ├── Contracts/
 │   └── Entities/

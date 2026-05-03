@@ -72,7 +72,15 @@ class UsuarioController extends Controller
             return view('welcome');
         } else {
 
-            $version = DB::select("SELECT * FROM versiones ORDER by id_version DESC LIMIT 1");
+            $version = DB::table('versiones')
+                ->select([
+                    DB::raw('id_version as idVersion'),
+                    DB::raw('numero_version as numeroVersion'),
+                    'observaciones',
+                ])
+                ->orderByDesc('id_version')
+                ->limit(1)
+                ->get();
 
             return view('home')->with('version', $version)->with('mensaje', $mensaje);
         }
