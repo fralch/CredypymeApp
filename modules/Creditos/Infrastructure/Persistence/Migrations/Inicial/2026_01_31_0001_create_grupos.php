@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
 
-        $main_db = env('S_TEST_DATABASE');
+        $main_db = env('S_TEST_DATABASE', env('S_MASTER_DATABASE', 'solucion_master'));
 
         $agencias = Agencia::all();
         foreach ($agencias as $item) {
@@ -29,7 +29,7 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('agencia_id')->nullable();
                 $table->string('nombre', 200);
-                $table->unsignedBigInteger('asesor_id')->nullable();
+                $table->string('asesor_id', 20)->nullable();
                 $table->boolean('habilitado')->default(1);
 
                 $table->longText('datos_creacion')->nullable();

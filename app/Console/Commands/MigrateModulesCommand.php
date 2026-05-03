@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class MigrateModulesCommand extends Command
 {
@@ -17,6 +18,8 @@ class MigrateModulesCommand extends Command
 
     public function handle(): int
     {
+        $this->prepareDynamicAgencyConnections();
+
         $action = strtolower((string) $this->argument('action'));
         if (!in_array($action, ['migrate', 'rollback', 'refresh', 'status'], true)) {
             $this->error("Accion no valida: {$action}");
@@ -56,6 +59,47 @@ class MigrateModulesCommand extends Command
         return $exitCode;
     }
 
+    private function prepareDynamicAgencyConnections(): void
+    {
+        $connections = (array) config('database.connections', []);
+        if (!isset($connections['master'], $connections['records'])) {
+            return;
+        }
+
+        try {
+            $agencyIds = DB::connection('master')->table('agencias')->pluck('id_agencia')->map(
+                static fn ($id): int => (int) $id
+            )->all();
+        } catch (\Throwable $e) {
+            // Si no existe tabla agencias, simplemente no prepara conexiones dinamicas.
+            return;
+        }
+
+        foreach ($agencyIds as $id) {
+            $masterName = "master_{$id}";
+            $recordsName = "records_{$id}";
+
+            if (!isset($connections[$masterName])) {
+                $masterConfig = $connections['master'];
+                $masterConfig['database'] = (string) env("S_MASTER_DATABASE_{$id}", "solucion_master_{$id}");
+                config(["database.connections.{$masterName}" => $masterConfig]);
+            }
+
+            if (!isset($connections[$recordsName])) {
+                $recordsConfig = $connections['records'];
+                $recordsConfig['database'] = (string) env("S_RECORDS_DATABASE_{$id}", "solucion_records_{$id}");
+                config(["database.connections.{$recordsName}" => $recordsConfig]);
+            }
+
+            try {
+                DB::connection('master')->statement('CREATE DATABASE IF NOT EXISTS `' . env("S_MASTER_DATABASE_{$id}", "solucion_master_{$id}") . '`');
+                DB::connection('master')->statement('CREATE DATABASE IF NOT EXISTS `' . env("S_RECORDS_DATABASE_{$id}", "solucion_records_{$id}") . '`');
+            } catch (\Throwable $e) {
+                // Si el usuario no tiene permisos de CREATE DATABASE, continuamos.
+            }
+        }
+    }
+
     /**
      * @return array<string, array<int, string>>
      */
@@ -66,6 +110,7 @@ class MigrateModulesCommand extends Command
                 base_path('modules/Aplicacion/Infrastructure/Persistence/Migrations'),
             ],
             'creditos' => [
+                base_path('modules/Creditos/Infrastructure/Persistence/Migrations/Base'),
                 base_path('modules/Creditos/Infrastructure/Persistence/Migrations/Inicial'),
                 base_path('modules/Creditos/Infrastructure/Persistence/Migrations/Principal'),
             ],
@@ -99,21 +144,29 @@ class MigrateModulesCommand extends Command
 
     private function runMigrationAction(string $action, string $relativePath): int
     {
-        $options = ['--path' => $relativePath, '--force' => (bool) $this->option('force')];
+        try {
+            $options = ['--path' => $relativePath];
 
-        if ($action === 'rollback') {
-            $options['--step'] = (int) $this->option('step');
+            if ($action === 'rollback') {
+                $options['--step'] = (int) $this->option('step');
+            }
+
+            if (in_array($action, ['migrate', 'rollback', 'refresh'], true)) {
+                $options['--force'] = (bool) $this->option('force');
+            }
+
+            $command = match ($action) {
+                'migrate' => 'migrate',
+                'rollback' => 'migrate:rollback',
+                'refresh' => 'migrate:refresh',
+                'status' => 'migrate:status',
+                default => 'migrate',
+            };
+
+            return (int) Artisan::call($command, $options, $this->output);
+        } catch (\Throwable $e) {
+            $this->error('   Error: ' . $e->getMessage());
+            return self::FAILURE;
         }
-
-        $command = match ($action) {
-            'migrate' => 'migrate',
-            'rollback' => 'migrate:rollback',
-            'refresh' => 'migrate:refresh',
-            'status' => 'migrate:status',
-            default => 'migrate',
-        };
-
-        return (int) Artisan::call($command, $options, $this->output);
     }
 }
-

@@ -108,6 +108,44 @@ Se agregaron pruebas unitarias por modulo en:
 
 Adicionalmente, `phpunit.xml` incorpora testsuites dedicados para ejecutar cada modulo de forma aislada.
 
+## Ejecucion de migraciones modulares
+Se agrego el comando artisan `migrate:modules` para ejecutar migraciones por lote o por modulo.
+
+Comandos mas usados:
+
+- Ejecutar estado de todas las migraciones modulares:
+  - `php artisan migrate:modules status`
+- Ejecutar todas las migraciones modulares:
+  - `php artisan migrate:modules migrate --force`
+- Ejecutar solo un modulo:
+  - `php artisan migrate:modules migrate --module=general --force`
+  - `php artisan migrate:modules migrate --module=creditos --force`
+- Rollback modular (por defecto 1 paso):
+  - `php artisan migrate:modules rollback --module=creditos --step=1 --force`
+- Refresh modular:
+  - `php artisan migrate:modules refresh --module=general --force`
+
+Notas:
+
+- Si un modulo falla por dependencias faltantes de tablas/llaves foraneas, el comando continua con los siguientes modulos y muestra el error puntual.
+- El exit code es `1` cuando existe al menos un fallo, y `0` cuando todo termina correctamente.
+
+## Ejecucion de seeders modulares
+Se agrego el comando artisan `seed:modules` para ejecutar seeders por lote o por modulo.
+
+Comandos mas usados:
+
+- Ejecutar todos los seeders modulares:
+  - `php artisan seed:modules --force`
+- Ejecutar solo un modulo:
+  - `php artisan seed:modules --module=creditos --force`
+
+Notas:
+
+- Los SQL legacy de permisos fueron reemplazados por seeders modulares en:
+  - `Modules\Creditos\Infrastructure\Persistence\Seeders\CreditosPermisosSeeder`
+- El seeder crea/actualiza datos de forma idempotente usando `updateOrInsert`.
+
 ## Guia de implementacion para nuevos desarrollos
 1. Crear entidad y contratos en `Domain`.
 2. Crear caso de uso en `Application`.

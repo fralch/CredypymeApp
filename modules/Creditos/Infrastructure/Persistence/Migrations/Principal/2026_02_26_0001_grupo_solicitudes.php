@@ -30,7 +30,7 @@ return new class extends Migration
 
                 $table->id();
                 $table->unsignedBigInteger('grupo_id');
-                $table->unsignedBigInteger('asesor_id')->nullable();
+                $table->string('asesor_id', 20)->nullable();
                 $table->integer('plazo');
                 $table->enum('periodo_pago', [
                     'SEMANAL',
@@ -41,13 +41,13 @@ return new class extends Migration
                 $table->decimal('tasa_retencion', 5, 2)->default(0);
                 $table->unsignedBigInteger('estado_id');
                 $table->dateTime('fecha_solicitud')->nullable();
-                $table->unsignedBigInteger('usuario_solicitud')->nullable();
+                $table->string('usuario_solicitud', 20)->nullable();
                 $table->dateTime('fecha_aprobacion')->nullable();
-                $table->unsignedBigInteger('usuario_aprobacion')->nullable();
+                $table->string('usuario_aprobacion', 20)->nullable();
                 $table->dateTime('fecha_desembolso')->nullable();
                 $table->datetime('fecha_desaprobacion')->nullable();
                 $table->string('comentario_desaprobacion', 300)->nullable();
-                $table->unsignedBigInteger('usuario_desaprobacion')->nullable();
+                $table->string('usuario_desaprobacion', 20)->nullable();
 
                 $table->unsignedBigInteger('agencia_caja')->nullable();
                 $table->unsignedBigInteger('caja_desembolso')->nullable();
